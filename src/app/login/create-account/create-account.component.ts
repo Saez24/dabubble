@@ -14,7 +14,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatButtonModule } from '@angular/material/button';
 import { SelectAvatarComponent } from './select-avatar/select-avatar.component';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
+import { Location } from '@angular/common';
 
 export class MyErrorStateMatcher implements ErrorStateMatcher {
   isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
@@ -33,6 +34,8 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
 })
 export class CreateAccountComponent {
 
+  constructor(private _location: Location, private router: Router) { }
+
   emailFormControl = new FormControl('', [Validators.required, Validators.email]);
   passwordFormControl = new FormControl('', [Validators.required]);
   nameFormControl = new FormControl('', [Validators.required]);
@@ -41,12 +44,34 @@ export class CreateAccountComponent {
 
   matcher: MyErrorStateMatcher = new MyErrorStateMatcher();
 
-  nextstep() {
+  nextStep() {
     this.formSubmitted = true;
-    if (this.emailFormControl.valid && this.passwordFormControl.valid && this.nameFormControl.valid && this.checkboxFormControl.valid) {
-      console.log('Form is valid')
+    this.emailFormControl.markAsTouched();
+    this.passwordFormControl.markAsTouched();
+    this.nameFormControl.markAsTouched();
+    this.checkboxFormControl.markAsTouched();
+
+    this.emailFormControl.updateValueAndValidity();
+    this.passwordFormControl.updateValueAndValidity();
+    this.nameFormControl.updateValueAndValidity();
+    this.checkboxFormControl.updateValueAndValidity();
+
+    if (this.isFormValid()) {
+      this.router.navigate(['selectavatar']);
+      console.log('Form is valid');
     } else {
       console.log('Form is invalid');
     }
+  }
+
+  isFormValid(): boolean {
+    return this.emailFormControl.valid &&
+      this.passwordFormControl.valid &&
+      this.nameFormControl.valid &&
+      this.checkboxFormControl.valid;
+  }
+
+  backClicked() {
+    this._location.back();
   }
 }
