@@ -10,7 +10,7 @@ export const routes: Routes = [
         children: [
             { path: '', component: SignInComponent },
             { path: 'create-account', component: CreateAccountComponent },
-            { path: 'selectavatar', component: SelectAvatarComponent },
+            { path: 'select-avatar', component: SelectAvatarComponent },
             { path: 'reset-password', component: ResetPasswordComponent },
         ] },
 ];

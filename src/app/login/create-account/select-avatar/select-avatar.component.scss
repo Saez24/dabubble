@@ -19,6 +19,7 @@ h1 {
     font-size: 46px;
     color: $dark-purple;
     font-weight: 700;
+    margin-top: 12px;
 }
 
 h2 {
@@ -37,10 +38,21 @@ p {
     width: 100%
 }
 
+.select-avatar-content {
+    position: relative;
+    height: 100%;
+    width: 100%;
+}
+
+mat-icon {
+    position: absolute;
+    z-index: 1;
+    left: -32px;
+    top: calc(45px - 32px)
+}
+
 mat-card {
-    // border: solid 1px black;
-    // height: 448px;
-    // width: 472px;
+    height: auto;
     box-shadow: none;
     @include dFlex($g: 32px, $fd: column);
     > div:nth-of-type(2) {
@@ -102,10 +114,10 @@ mat-card {
             @include dFlex();
         }
         button {
-            width: 187px;
+            // width: 187px;
             height: 49px;
             border-radius: 25px;
-            padding: 12px, 25px, 12px, 25px;
+            padding: 12px 25px 12px 25px;
             border: 1px solid $light-purple;
             font-weight: 700;
             color: $dark-purple;
@@ -118,35 +130,22 @@ mat-card {
             }
         }
     }
+    > div:nth-of-type(5) {
+        @include dFlex($jc: flex-end);
+        width: 100%;
+        button {
+            width: 107px;
+            height: 49px;
+            background-color: $dark-purple;
+            border-radius: 25px;
+            padding: 12px 25px 12px 25px;
+            color: white;
+            font-size: 18px;
+            transition: background-color 0.25s ease-in-out;
+            &:hover {
+                cursor: pointer;
+                background-color: $light-purple;
+            }
+        }
+    }
 }
-
-// section {
-//     position: relative;
-//     width: 100%;
-//     .back-button {
-//         position: absolute;
-//         top: 45px;
-//         left: 32px;
-//     }
-// }
-
-// .next-button {
-//     @include dFlex();
-//     position: absolute;
-//     top: 580px;
-//     left: 446px;
-//     button {
-//         width: 107px;
-//         height: 49px;
-//         background-color: $dark-purple;
-//         border-radius: 25px;
-//         padding: 12px, 25px, 12px, 25px;
-//         color: white;
-//         font-size: 18px;
-//         transition: background-color 0.25s ease-in-out;
-//         &:hover {
-//             cursor: pointer;
-//             background-color: $light-purple;
-//         }
-//     }
-// }

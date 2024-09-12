@@ -14,7 +14,7 @@ import {MatIconModule} from '@angular/material/icon';
     CreateAccountComponent,
     SignInComponent,
     MatCardModule,
-    MatIconModule
+    MatIconModule,
 ],
   templateUrl: './login.component.html',
   styleUrls: [

@@ -14,12 +14,12 @@ import { MatIconModule } from '@angular/material/icon';
 export class SelectAvatarComponent implements OnInit {
 
   avatars = [
-    '../../../../assets/avatars/avatar1.svg',
-    '../../../../assets/avatars/avatar2.svg',
-    '../../../../assets/avatars/avatar3.svg',
-    '../../../../assets/avatars/avatar4.svg',
-    '../../../../assets/avatars/avatar5.svg',
-    '../../../../assets/avatars/avatar6.svg',
+    '../../../../assets/images/avatars/avatar1.svg',
+    '../../../../assets/images/avatars/avatar2.svg',
+    '../../../../assets/images/avatars/avatar3.svg',
+    '../../../../assets/images/avatars/avatar4.svg',
+    '../../../../assets/images/avatars/avatar5.svg',
+    '../../../../assets/images/avatars/avatar6.svg',
   ];
 
   selectedAvatar: string | null = null;
@@ -29,7 +29,7 @@ export class SelectAvatarComponent implements OnInit {
     this.shuffleAvatars();
   }
 
-onAvatarClick(avatar: string) {
+chooseAvatar(avatar: string) {
   this.selectedAvatar = avatar;
   this.avatarSelected = true;
 }
