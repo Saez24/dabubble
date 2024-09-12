@@ -1,7 +1,23 @@
-.create-account-form {
+.create-account-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 16px;
     padding: 0 32px 0 32px;
+    max-width: 500px;
+
+    >span {
+        text-align: center;
+    }
+}
+
+.create-account-inputs {
     width: 100%;
-    min-width: 500px;
+}
+
+.create-account-form {
+
     display: flex;
     flex-direction: column;
     gap: 18px;
@@ -42,11 +58,13 @@
 
 .mdc-button {
     border-radius: 100px !important;
-    position: absolute !important;
+    position: relative !important;
     bottom: 10px;
-    right: 20px;
+    right: 0;
+    float: right;
     background-color: rgba(68, 77, 242, 1) !important;
     width: 107px;
     height: 49px !important;
     color: white !important;
+    margin-top: 20px;
 }

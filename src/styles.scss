@@ -1,18 +1,36 @@
 @import "./assets/fonts/fonts.scss";
 
-html, body {
+html,
+body {
     height: 100%;
 }
 
 body {
     margin: 0;
-    background-color: rgb(236,238,254);
+    background-color: rgb(236, 238, 254);
 }
 
-.mat-body, .mat-body-2, .mat-typography .mat-body, .mat-typography .mat-body-2, .mat-typography {
+.mat-body,
+.mat-body-2,
+.mat-typography .mat-body,
+.mat-typography .mat-body-2,
+.mat-typography {
     font-family: 'Nunito' !important;
 }
 
-h1, h2, h3, h4, h5, h6 {
-    font-family: 'Nunito';
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: 'Nunito' !important;
+}
+
+span {
+    font-family: 'Nunito' !important;
+}
+
+input {
+    font-family: 'Nunito' !important;
 }
