@@ -1,0 +1,152 @@
+@mixin dFlex($g: 0px, $fd: row, $jc: center, $ai: center) {
+    display: flex;
+    justify-content: $jc;
+    align-items: $ai;
+    flex-direction: $fd;
+    gap: $g;
+}
+
+$dark-purple: #444DF2;
+$light-purple: #797EF3;
+$light-grey: lightgrey;
+
+section {
+    width: 100%;
+    @include dFlex();
+}
+
+h1 {
+    font-size: 46px;
+    color: $dark-purple;
+    font-weight: 700;
+}
+
+h2 {
+    font-weight: 700;
+    font-size: 32px;
+}
+
+p {
+    margin-block-end: 0;
+    font-weight: 400;
+    font-size: 20px;
+}
+
+.selected {
+    height: 100%;
+    width: 100%
+}
+
+mat-card {
+    // border: solid 1px black;
+    // height: 448px;
+    // width: 472px;
+    box-shadow: none;
+    @include dFlex($g: 32px, $fd: column);
+    > div:nth-of-type(2) {
+        @include dFlex();
+        height: 180px;
+        width: 180px;
+        border-radius: 100%;
+        transition: background-color 0.25s ease-in-out;
+        &:hover {
+            background-color: $light-grey;
+            cursor: pointer;
+        }
+        div {
+        height: 168px;
+        width: 168px;
+        background-color: $light-purple;
+        border-radius: 100%;
+        @include dFlex();
+        }
+        img {
+            height: 90.67px;
+            width: 90.67px;
+        }
+    }
+    > div:nth-of-type(3) {
+        @include dFlex($fd: column, $g: 8px);
+        width: 100%;
+        > div:nth-of-type(1) {
+            width: 100%;
+            > div:nth-of-type(1) {
+                @include dFlex();
+            }
+            > div:nth-of-type(2) {
+                @include dFlex($jc: flex-start);
+            }
+        }
+        > div:nth-of-type(2) {
+            @include dFlex($g: 8px);
+            div {
+                @include dFlex();
+                padding: 4px;
+                border-radius: 100%;
+                transition: background-color 0.25s ease-in-out;
+                img {
+                    height: 64px;
+                    width: 64px;
+                }
+                &:hover {
+                    cursor: pointer;
+                    background-color: $light-grey;
+                }
+            }
+        }
+    }
+    > div:nth-of-type(4) {
+        @include dFlex($g: 24px, $jc: flex-start);
+        width: 100%;
+        > div:nth-of-type(1) {
+            @include dFlex();
+        }
+        button {
+            width: 187px;
+            height: 49px;
+            border-radius: 25px;
+            padding: 12px, 25px, 12px, 25px;
+            border: 1px solid $light-purple;
+            font-weight: 700;
+            color: $dark-purple;
+            font-size: 18px;
+            transition: background-color 0.5s ease-in-out;
+            &:hover {
+                cursor: pointer;
+                background-color: $dark-purple;
+                color: white;
+            }
+        }
+    }
+}
+
+// section {
+//     position: relative;
+//     width: 100%;
+//     .back-button {
+//         position: absolute;
+//         top: 45px;
+//         left: 32px;
+//     }
+// }
+
+// .next-button {
+//     @include dFlex();
+//     position: absolute;
+//     top: 580px;
+//     left: 446px;
+//     button {
+//         width: 107px;
+//         height: 49px;
+//         background-color: $dark-purple;
+//         border-radius: 25px;
+//         padding: 12px, 25px, 12px, 25px;
+//         color: white;
+//         font-size: 18px;
+//         transition: background-color 0.25s ease-in-out;
+//         &:hover {
+//             cursor: pointer;
+//             background-color: $light-purple;
+//         }
+//     }
+// }

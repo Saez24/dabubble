@@ -1,1 +1,33 @@
-<p>select-avatar works!</p>
+<mat-card id="selectAvatar">
+    <div>
+        <h1>Wähle deinen Avatar</h1>
+    </div>
+    <div>
+        <div>
+            <img 
+            [src]="selectedAvatar ? selectedAvatar : '../../../../assets/avatars/person.svg'"  alt="Selected Avatar"
+            [ngStyle]="{'height': selectedAvatar ? '95%' : '90.67px', 'width': selectedAvatar ? '95%' : '90.67px'}"
+            >
+        </div>
+    </div>
+    <div>
+        <div>
+            <div><h2>Frederik Beck</h2></div>
+            <div><p>Aus der Liste wählen</p></div>
+        </div>
+        <div>
+            <div *ngFor="let avatar of avatars" (click)="onAvatarClick(avatar)">
+                <img [src]="avatar" alt="Avatar">
+            </div>
+        </div>
+    </div>
+    <div>
+        <div><p>eigenes Bild verwenden</p></div>
+        <button mat-stroked-button>Datei hochladen</button>
+    </div>  
+</mat-card>
+<!-- <a class="next-button">
+    <button mat-stroked-button>Weiter</button>
+</a> -->
+
+
