@@ -1,4 +1,18 @@
-/* You can add global styles to this file, and also import other style files */
+@import "./assets/fonts/fonts.scss";
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+html, body {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    background-color: rgb(236,238,254);
+}
+
+.mat-body, .mat-body-2, .mat-typography .mat-body, .mat-typography .mat-body-2, .mat-typography {
+    font-family: 'Nunito' !important;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Nunito';
+}

@@ -1,0 +1,22 @@
+.card-header {
+    display: flex;
+    width: 100%;
+    position: relative;
+
+    >.btn-back {
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 40px;
+        width: 40px;
+        cursor: pointer;
+    }
+
+    >h1 {
+        font-weight: 700;
+        font-size: 46px;
+        line-height: 55.2px;
+        color: #444DF2;
+        margin: 0;
+    }
+}
