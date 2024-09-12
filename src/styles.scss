@@ -3,11 +3,22 @@
 html,
 body {
     height: 100%;
+    width: 100%;
+    margin: 0;
 }
 
 body {
-    margin: 0;
+
     background-color: rgb(236, 238, 254);
+}
+
+.full-width {
+    width: 100%;
+    max-width: 1280px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .mat-body,
