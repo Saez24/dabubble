@@ -7,6 +7,7 @@ import { getAuth, provideAuth } from '@angular/fire/auth';
 import { getFirestore, provideFirestore } from '@angular/fire/firestore';
 import { getMessaging, provideMessaging } from '@angular/fire/messaging';
 import { getStorage, provideStorage } from '@angular/fire/storage';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 
 export const appConfig: ApplicationConfig = {
   providers: [provideRouter(routes), provideFirebaseApp(() => initializeApp(
@@ -17,5 +18,5 @@ export const appConfig: ApplicationConfig = {
       "apiKey": "AIzaSyAhhcc0m188sSIG68UZkzVj0o4PsCSDY0g",
       "authDomain": "dabubble-effe4.firebaseapp.com",
       "messagingSenderId": "196287678984"
-    })), provideAuth(() => getAuth()), provideFirestore(() => getFirestore()), provideMessaging(() => getMessaging()), provideStorage(() => getStorage())]
+    })), provideAuth(() => getAuth()), provideFirestore(() => getFirestore()), provideMessaging(() => getMessaging()), provideStorage(() => getStorage()), provideAnimationsAsync()]
 };
