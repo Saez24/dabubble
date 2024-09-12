@@ -1,0 +1,52 @@
+.create-account-form {
+    padding: 0 32px 0 32px;
+    width: 100%;
+    min-width: 500px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.mdc-text-field--filled:not(.mdc-text-field--disabled) {
+    width: 100%;
+    background-color: rgba(236, 238, 254, 1) !important;
+    border-radius: 100px;
+
+    &:hover {
+        border: 1px bold black !important;
+    }
+}
+
+.mat-mdc-form-field-infix {
+    display: flex;
+    gap: 30px;
+    color: rgba(104, 104, 104, 1);
+
+    &:hover {
+        color: black;
+    }
+}
+
+.mat-icon {
+    width: 32px !important;
+}
+
+.mdc-line-ripple {
+    display: none;
+}
+
+.mdc-checkbox .mdc-checkbox__native-control:enabled:focus:checked~.mdc-checkbox__background {
+    background-color: blue !important;
+    border-color: rgba(121, 126, 243, 1);
+}
+
+.mdc-button {
+    border-radius: 100px !important;
+    position: absolute !important;
+    bottom: 10px;
+    right: 20px;
+    background-color: rgba(68, 77, 242, 1) !important;
+    width: 107px;
+    height: 49px !important;
+    color: white !important;
+}

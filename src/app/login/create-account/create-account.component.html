@@ -1,1 +1,43 @@
-<p>create-account works!</p>
+<h1>Konto erstellen</h1>
+<span>Mit deinem Namen und deiner E-Mail-Adresse hast du dein neues DABubble-Konto.</span>
+
+<form class="create-account-form">
+
+    <mat-form-field class="full-width">
+        <mat-icon fontIcon="person"></mat-icon>
+        <input type="text" matInput [formControl]="nameFormControl" [errorStateMatcher]="matcher"
+            placeholder="Name und Nachname">
+        @if (nameFormControl.hasError('required')) {
+        <mat-error>Bitte schreiben Sie einen Namen.</mat-error>
+        }
+    </mat-form-field>
+
+    <mat-form-field class="login-input-fields full-width">
+        <mat-icon fontIcon="mail"></mat-icon>
+        <input class="login-input-fields" type="email" matInput [formControl]="emailFormControl"
+            [errorStateMatcher]="matcher" placeholder="example@example.com">
+        @if (emailFormControl.hasError('email') && !emailFormControl.hasError('required')) {
+        <mat-error>Diese E-Mail-Adresse ist leider ungültig</mat-error>
+        }
+        @if (emailFormControl.hasError('required')) {
+        <mat-error>Bitte geben Sie eine E-Mail ein.</mat-error>
+        }
+    </mat-form-field>
+
+    <mat-form-field class="full-width">
+        <mat-icon fontIcon="lock"></mat-icon>
+        <input type="text" matInput [formControl]="passwordFormControl" [errorStateMatcher]="matcher"
+            placeholder="Passwort">
+        @if (passwordFormControl.hasError('required')) {
+        <mat-error>Bitte geben Sie ein Passwort ein.</mat-error>
+        }
+    </mat-form-field>
+
+    <mat-checkbox class="privacy-checkbox">Ich stimme der <a href="">Datenschutzerklärung</a> zu
+        @if (checkboxFormControl.hasError('required') && formSubmitted) {
+        <mat-error>Bitte akzeptieren sie die Datenschutzerklärung.</mat-error>
+        }
+    </mat-checkbox>
+
+    <button mat-flat-button color=" primary" (click)="nextstep()">Weiter</button>
+</form>
