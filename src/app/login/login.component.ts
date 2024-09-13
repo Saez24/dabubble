@@ -24,7 +24,6 @@ import {MatIconModule} from '@angular/material/icon';
 })
 export class LoginComponent {
 
-  ngOnInit() {
-  }
+  constructor() {}
 
 }
