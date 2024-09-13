@@ -1,5 +1,7 @@
 <div class="select-avatar-content">
-    <mat-icon>arrow_back</mat-icon>
+    <button (click)="goBack()" class="back-button" mat-icon-button>
+        <mat-icon>arrow_back</mat-icon>
+    </button>
     <mat-card>
         <div>
             <h1>Wähle deinen Avatar</h1>
@@ -15,7 +17,7 @@
         <div>
             <div>
                 <div><h2>Frederik Beck</h2></div>
-                <div><p>Aus der Liste wählen</p></div>
+                <div><span>Aus der Liste wählen</span></div>
             </div>
             <div>
                 <div *ngFor="let avatar of avatars" (click)="chooseAvatar(avatar)">
@@ -24,10 +26,10 @@
             </div>
         </div>
         <div>
-            <div><p>eigenes Bild verwenden</p></div>
+            <div><span>eigenes Bild verwenden</span></div>
             <button mat-stroked-button>Datei hochladen</button>
         </div>  
-        <div><button class="next-button" mat-stroked-button>Weiter</button></div>
+        <div><button mat-stroked-button>Weiter</button></div>
     </mat-card>
 </div>
 

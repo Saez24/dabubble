@@ -10,11 +10,6 @@ $dark-purple: #444DF2;
 $light-purple: #797EF3;
 $light-grey: lightgrey;
 
-section {
-    width: 100%;
-    @include dFlex();
-}
-
 h1 {
     font-size: 46px;
     color: $dark-purple;
@@ -27,15 +22,10 @@ h2 {
     font-size: 32px;
 }
 
-p {
+span {
     margin-block-end: 0;
     font-weight: 400;
     font-size: 20px;
-}
-
-.selected {
-    height: 100%;
-    width: 100%
 }
 
 .select-avatar-content {
@@ -44,16 +34,17 @@ p {
     width: 100%;
 }
 
-mat-icon {
+.back-button {
     position: absolute;
     z-index: 1;
-    left: -32px;
-    top: calc(45px - 32px)
+    left: calc(32px - 64px);
+    top: 4px;
 }
 
 mat-card {
     height: auto;
     box-shadow: none;
+    padding: 0 16px 0 16px;
     @include dFlex($g: 32px, $fd: column);
     > div:nth-of-type(2) {
         @include dFlex();
@@ -148,4 +139,8 @@ mat-card {
             }
         }
     }
+}
+
+.create-account-container {
+    display: none !important;
 }
