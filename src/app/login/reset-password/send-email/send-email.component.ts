@@ -6,7 +6,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
 
 export class MyErrorStateMatcher implements ErrorStateMatcher {
   isErrorState(control: FormControl | null): boolean {
@@ -38,7 +38,6 @@ export class SendEmailComponent {
   matcher: MyErrorStateMatcher = new MyErrorStateMatcher();
 
   isButtonDisabled(): boolean {
-    // Typ-Assertion, um sicherzustellen, dass `emailFormControl` immer ein FormControl ist
     const control = this.emailFormControl as FormControl;
     return control.invalid || control.value?.trim() === '';
   }

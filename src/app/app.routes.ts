@@ -14,6 +14,6 @@ export const routes: Routes = [
             { path: 'create-account', component: CreateAccountComponent },
             { path: 'select-avatar', component: SelectAvatarComponent },
             { path: 'reset-password', component: ResetPasswordComponent },
-            { path: 'reset-password', component: SendEmailComponent },
+            { path: 'send-mail', component: SendEmailComponent },
         ] },
 ];

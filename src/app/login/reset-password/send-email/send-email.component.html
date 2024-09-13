@@ -1,5 +1,10 @@
 <div class="send-mail-content">
-  <button (click)="backClicked()" class="back-button" mat-icon-button>
+  <button
+    routerLink=""
+    (click)="backClicked()"
+    class="back-button"
+    mat-icon-button
+  >
     <mat-icon>arrow_back</mat-icon>
   </button>
   <h1>Passwort zurücksetzen</h1>
@@ -35,6 +40,8 @@
         [disabled]="isButtonDisabled()"
         [ngClass]="{ 'disabled-button': isButtonDisabled() }"
         (click)="nextstep()"
+        routerLink="/reset-password"
+        type="button"
       >
         E-Mail senden
       </button>

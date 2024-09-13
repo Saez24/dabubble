@@ -57,10 +57,6 @@ h1 {
 
 }
 
-.mat-mdc-form-field {
-  width: 100%;
-}
-
 .btn-div{
   display: flex;
   justify-content: flex-end;
@@ -70,6 +66,11 @@ form{
   display: flex;
     flex-direction: column;
     gap: 40px;
+    width: 100%;
+}
+
+.mdc-text-field--filled:not(.mdc-text-field--disabled){
+  background-color: #ECEEFE !important;
 }
 
 
