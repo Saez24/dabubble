@@ -21,6 +21,7 @@ import { SelectAvatarComponent } from './create-account/select-avatar/select-ava
   templateUrl: './login.component.html',
   styleUrls: [
     './login.component.scss',
+    './login-animation.scss',
     './../../styles.scss'
   ]
 })
