@@ -44,6 +44,13 @@ export class CreateAccountComponent {
   matcher: MyErrorStateMatcher = new MyErrorStateMatcher();
   passwordVisible: boolean = false;
 
+
+  /**
+   * This function is called when the "Weiter" button is clicked in the create account component.
+   * It marks all form controls as touched and updates their validity.
+   * If the form is valid, it navigates to the 'select-avatar' component.
+   * If the form is invalid, it logs a message to the console.
+   */
   nextStep() {
     this.formSubmitted = true;
     this.emailFormControl.markAsTouched();
@@ -58,12 +65,14 @@ export class CreateAccountComponent {
 
     if (this.isFormValid()) {
       this.router.navigate(['select-avatar']);
-      console.log('Form is valid');
     } else {
-      console.log('Form is invalid');
     }
   }
 
+  /**
+   * Checks if all the form controls are valid.
+   * @returns {boolean} Whether all the form controls are valid.
+   */
   isFormValid(): boolean {
     return this.emailFormControl.valid &&
       this.passwordFormControl.valid &&
@@ -71,10 +80,16 @@ export class CreateAccountComponent {
       this.checkboxFormControl.valid;
   }
 
-  backClicked() {
+  /**
+   * Navigates back to the previous URL.
+   */
+  goBack() {
     this._location.back();
   }
 
+  /**
+   * Toggles the visibility of the password input field.
+   */
   showPassword(): void {
     this.passwordVisible = !this.passwordVisible;
 
