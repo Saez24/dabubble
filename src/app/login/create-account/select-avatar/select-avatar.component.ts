@@ -1,5 +1,5 @@
 import { NgClass, NgFor, NgStyle } from '@angular/common';
-import { Component, OnInit, } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -10,7 +10,8 @@ import { AccountService } from '../../../account.service';
   standalone: true,
   imports: [MatCardModule, NgFor, MatButtonModule, NgClass, NgStyle, MatIconModule],
   templateUrl: './select-avatar.component.html',
-  styleUrl: './select-avatar.component.scss'
+  styleUrl: './select-avatar.component.scss',
+  encapsulation: ViewEncapsulation.None
 })
 export class SelectAvatarComponent implements OnInit {
 
@@ -37,14 +38,14 @@ export class SelectAvatarComponent implements OnInit {
     this.avatarSelected = true;
   }
 
-    shuffleAvatars() {
-      for (let i = this.avatars.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [this.avatars[i], this.avatars[j]] = [this.avatars[j], this.avatars[i]];
-      }
-    }
-
-    goBack() {
-      this.accountService.goBack();
+  shuffleAvatars() {
+    for (let i = this.avatars.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [this.avatars[i], this.avatars[j]] = [this.avatars[j], this.avatars[i]];
     }
   }
+
+  goBack() {
+    this.accountService.goBack();
+  }
+}
