@@ -87,7 +87,7 @@
     }
 
     to {
-        left: 75px;
+        left: 75px; /* calculate new, cause of the auto ,argin in the header */
         top: -20px; /* at width 557px --> calculate logo position new */
         transform: translate(0, 0);
     }

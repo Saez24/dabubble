@@ -1,14 +1,42 @@
 header {
+    max-width: 1920px;
+    height: 110px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     width: 100%;
     padding: 32px 75px 0;
     box-sizing: border-box;
+    margin: 0 auto;
+}
+
+footer {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 16px;
+    margin-bottom: 24px;
+
+    >a {
+        text-decoration: none;
+        color: #797ef3;
+        font-size: 18px;
+        font-family: "Figtree", sans-serif;
+        transition: border-color 0.125s ease-in-out;
+        padding: 10px 15px;
+        border: 1px solid transparent;
+        border-radius: 25px;
+        cursor: pointer;
+
+        &:hover {
+            border-color: #ADB0D9;
+            transition: border-color 0.125s ease-in-out;
+        }
+    }
 }
 
 .logo-container {
-    height: 84px;
     display: flex;
     align-items: center;
 
@@ -68,7 +96,7 @@ header {
     border-radius: 30px;
     margin-top: 16px;
     padding: 32px 64px;
-    min-width: 500px;
+    max-width: 628px;
 }
 
 
@@ -79,9 +107,11 @@ header {
         padding: 32px 16px 32px 16px;
         margin-top: 32px;
     }
+
     .create-account-container {
         display: none;
     }
+
     header {
         justify-content: center;
     }
