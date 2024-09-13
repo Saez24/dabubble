@@ -42,4 +42,8 @@ export class ResetPasswordComponent {
       console.log('Form is invalid');
     }
   }
+
+  backClicked() {
+  
+  }
 }

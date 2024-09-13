@@ -1,37 +1,42 @@
-<h1>Passwort zurücksetzen</h1>
-<span>Bitte geben Sie Ihre E-Mail-Adresse ein.</span>
-
-<form class="send-mail-form">
-  <mat-form-field class="full-width">
-    <mat-icon>mail</mat-icon>
-    <input
-      type="email"
-      matInput
-      [formControl]="emailFormControl"
-      [errorStateMatcher]="matcher"
-      placeholder="example@example.com"
-      pattern="[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$"
-    />
-    @if (emailFormControl.hasError('email') &&
-    !emailFormControl.hasError('required')) {
-    <mat-error>Diese E-Mail-Adresse ist leider ungültig</mat-error>
-    } @if (emailFormControl.hasError('required')) {
-    <mat-error>Bitte geben Sie eine E-Mail ein.</mat-error>
-    }
-  </mat-form-field>
-
-  <span
-    >Wir senden Ihnen eine E-Mail, über die Sie Ihr Passwort ändern
-    können.</span
-  >
-
-  <button
-    mat-flat-button
-    color="primary"
-    [disabled]="isButtonDisabled()"
-    [ngClass]="{ 'disabled-button': isButtonDisabled() }"
-    (click)="nextstep()"
-  >
-    Email senden
+<div class="send-mail-content">
+  <button (click)="backClicked()" class="back-button" mat-icon-button>
+    <mat-icon>arrow_back</mat-icon>
   </button>
-</form>
+  <h1>Passwort zurücksetzen</h1>
+  <span>Bitte geben Sie Ihre E-Mail-Adresse ein.</span>
+
+  <form>
+    <mat-form-field class="full-width">
+      <mat-icon>mail</mat-icon>
+      <input
+        type="email"
+        matInput
+        [formControl]="emailFormControl"
+        [errorStateMatcher]="matcher"
+        placeholder="example@example.com"
+        pattern="[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$"
+      />
+      @if (emailFormControl.hasError('email') &&
+      !emailFormControl.hasError('required')) {
+      <mat-error>Diese E-Mail-Adresse ist leider ungültig</mat-error>
+      } @if (emailFormControl.hasError('required')) {
+      <mat-error>Bitte geben Sie eine E-Mail ein.</mat-error>
+      }
+    </mat-form-field>
+
+    <span
+      >Wir senden Ihnen eine E-Mail, über die Sie Ihr Passwort ändern
+      können.</span
+    >
+
+    <button
+      mat-flat-button
+      color="primary"
+      [disabled]="isButtonDisabled()"
+      [ngClass]="{ 'disabled-button': isButtonDisabled() }"
+      (click)="nextstep()"
+    >
+      Email senden
+    </button>
+  </form>
+</div>
