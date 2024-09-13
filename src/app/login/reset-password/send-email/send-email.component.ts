@@ -17,15 +17,7 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
 @Component({
   selector: 'app-send-email',
   standalone: true,
-  imports: [
-    CommonModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
-    MatIconModule,
-    ReactiveFormsModule,
-    RouterModule
-  ],
+  imports: [CommonModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatIconModule, ReactiveFormsModule, RouterModule],
   templateUrl: './send-email.component.html',
   styleUrls: ['./send-email.component.scss'],
   encapsulation: ViewEncapsulation.None
@@ -34,25 +26,10 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
 export class SendEmailComponent {
 
   emailFormControl = new FormControl('', [Validators.required, Validators.email]);
-  formSubmitted = false;
   matcher: MyErrorStateMatcher = new MyErrorStateMatcher();
 
   isButtonDisabled(): boolean {
     const control = this.emailFormControl as FormControl;
     return control.invalid || control.value?.trim() === '';
-  }
-  
-
-  nextstep() {
-    this.formSubmitted = true;
-    if (this.emailFormControl.valid) {
-      console.log('Form is valid');
-    } else {
-      console.log('Form is invalid');
-    }
-  }
-
-  backClicked() {
-   
   }
 }

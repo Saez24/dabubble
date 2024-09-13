@@ -1,4 +1,4 @@
-.send-mail-content{
+.send-mail-content {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -9,33 +9,32 @@
 }
   
 h1 {
-      font-weight: 700 !important;
-      font-size: 46px !important;
-      width: max-content;
-      color: #444DF2;
-      margin: 0;
-      padding: 10px;
-      text-align: center;
-  }
+  font-weight: 700 !important;
+  font-size: 46px !important;
+  width: max-content;
+  color: #444DF2;
+  margin: 0;
+  padding: 10px;
+  text-align: center;
+}
   
-  .first-info-text {
-    color: black;
-    font-weight: 400;
-    font-size: 20px;
-  }
+.first-info-text {
+  color: black;
+  font-weight: 400;
+  font-size: 20px;
+}
 
-  .second-info-text{
-    display: flex;
-    justify-content: center;
-    text-align: center;
-    color: #686868;
-    font-weight: 400;
-    font-size: 20px;
-
-  }
+.second-info-text {
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  color: #686868;
+  font-weight: 400;
+  font-size: 20px;
+}
 
 .create-account-container {
-    display: none !important;
+  display: none !important;
 }
 
 .back-button {
@@ -45,16 +44,17 @@ h1 {
   float: left;
 }
 
-.mat-mdc-unelevated-button[disabled] {
-  border-radius: 25px;
-  padding: 12px, 25px, 12px, 25px;
-  background-color: #686868 !important;
+.mat-mdc-unelevated-button {
+  border-radius: 25px !important;
   color: white !important;
-  font-size: 18px;
-  font-weight: 700;
-  width: 173px;
-  height: 49px;
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  width: 173px !important;
+  height: 49px !important;
+}
 
+.mat-mdc-unelevated-button[disabled] {
+  background-color: #686868 !important;
 }
 
 .btn-div{
@@ -64,13 +64,40 @@ h1 {
 
 form{
   display: flex;
-    flex-direction: column;
-    gap: 40px;
-    width: 100%;
+  flex-direction: column;
+  gap: 40px;
+  width: 100%;
+  padding-top: 22px;
 }
 
-.mdc-text-field--filled:not(.mdc-text-field--disabled){
-  background-color: #ECEEFE !important;
+.mat-mdc-form-field-infix{
+  display: flex;
+  gap: 30px;
+}
+
+.mdc-text-field--filled:not(.mdc-text-field--disabled) {
+  width: 100%;
+  background-color: rgba(236, 238, 254, 1) !important;
+  border-radius: 100px;
+  box-sizing: border-box;
+  border: 1px solid transparent;
+  transition: border 0.3s ease;
+
+  &:hover {
+      background-color: rgba(236, 238, 254, 1) !important;
+      border: 1px solid rgba(104, 104, 104, 1) !important;
+  }
+
+  &:focus-within,
+  &:focus,
+  &:active {
+      background-color: rgba(236, 238, 254, 1) !important;
+      border: 1px solid rgba(83, 90, 241, 1) !important;
+  }
+}
+
+.mdc-line-ripple {
+  display: none;
 }
 
 

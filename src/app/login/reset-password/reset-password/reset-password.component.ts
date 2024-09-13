@@ -17,36 +17,26 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
 @Component({
   selector: 'app-reset-password',
   standalone: true,
-  imports: [
-    CommonModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
-    MatIconModule,
-    ReactiveFormsModule,
-    RouterModule
-  ],
+  imports: [CommonModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatIconModule, ReactiveFormsModule, RouterModule],
   templateUrl: './reset-password.component.html',
   styleUrls: ['./reset-password.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
+
 export class ResetPasswordComponent {
+
   passwordFormControl = new FormControl('', [Validators.required]);
   confirmPasswordFormControl = new FormControl('', [Validators.required]);
-  formSubmitted = false;
   matcher = new MyErrorStateMatcher();
+  passwordVisible: boolean = false;
 
-
-  nextstep() {
-    this.formSubmitted = true;
-    if (this.passwordFormControl.valid && this.confirmPasswordFormControl.valid) {
-      console.log('Form is valid');
-    } else {
-      console.log('Form is invalid');
-    }
+  isButtonDisabled(): boolean {
+    const control = this.passwordFormControl as FormControl;
+    return control.invalid || control.value?.trim() === '';
   }
 
-  backClicked() {
-  
+  showPassword(): void {
+    this.passwordVisible = !this.passwordVisible;
+
   }
 }
