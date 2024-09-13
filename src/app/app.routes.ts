@@ -15,5 +15,6 @@ export const routes: Routes = [
             { path: 'select-avatar', component: SelectAvatarComponent },
             { path: 'reset-password', component: ResetPasswordComponent },
             { path: 'reset-password', component: SendEmailComponent },
+            { path: 'sign-in', component: SignInComponent}
         ] },
 ];
