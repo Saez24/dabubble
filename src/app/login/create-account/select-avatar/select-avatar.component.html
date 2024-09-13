@@ -1,8 +1,8 @@
 <div class="select-avatar-content">
-    <button (click)="goBack()" class="back-button" mat-icon-button>
-        <mat-icon>arrow_back</mat-icon>
-    </button>
     <mat-card>
+        <button (click)="goBack()" class="back-button" mat-icon-button>
+            <mat-icon>arrow_back</mat-icon>
+        </button>
         <div>
             <h1>Wähle deinen Avatar</h1>
         </div>
@@ -10,7 +10,7 @@
             <div>
                 <img 
                 [src]="selectedAvatar ? selectedAvatar : '../../../../assets/images/avatars/person.svg'"  alt="Selected Avatar"
-                [ngStyle]="{'height': selectedAvatar ? '95%' : '90.67px', 'width': selectedAvatar ? '95%' : '90.67px'}"
+                [ngStyle]="{'height': selectedAvatar ? '100%' : '90.67px', 'width': selectedAvatar ? '100%' : '90.67px'}"
                 >
             </div>
         </div>
@@ -29,7 +29,7 @@
             <div><span>eigenes Bild verwenden</span></div>
             <button mat-stroked-button>Datei hochladen</button>
         </div>  
-        <div><button mat-stroked-button>Weiter</button></div>
+        <div><a href="sign-in" mat-stroked-button>Weiter</a></div>
     </mat-card>
 </div>
 

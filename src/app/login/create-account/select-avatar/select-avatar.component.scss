@@ -10,28 +10,36 @@ $dark-purple: #444DF2;
 $light-purple: #797EF3;
 $light-grey: lightgrey;
 
-h1 {
+.mat-typography h1 {
     font-size: 46px;
     color: $dark-purple;
     font-weight: 700;
     margin-top: 12px;
+    @media (max-width: 768px) {
+        font-size: 28px;
+        text-align: center;
+    }
 }
 
-h2 {
+.mat-typography h2 {
     font-weight: 700;
     font-size: 32px;
 }
 
-span {
+.mat-typography span {
     margin-block-end: 0;
     font-weight: 400;
     font-size: 20px;
+    @media (max-width: 768px) {
+        font-size: 16px;
+    }
 }
 
 .select-avatar-content {
-    position: relative;
-    height: 100%;
-    width: 100%;
+    margin-top: -32px;
+    @media (max-width: 768px) {
+        max-width: 280px;
+    }
 }
 
 .back-button {
@@ -39,12 +47,19 @@ span {
     z-index: 1;
     left: calc(32px - 64px);
     top: 4px;
+    @media (max-width: 768px) {
+        left: 0px;
+    }
 }
 
-mat-card {
+.mdc-icon-button {
+    position: absolute !important;
+}
+
+.mat-mdc-card {
     height: auto;
     box-shadow: none;
-    padding: 0 16px 0 16px;
+    padding: 0 32px 0 32px;
     @include dFlex($g: 32px, $fd: column);
     > div:nth-of-type(2) {
         @include dFlex();
@@ -96,6 +111,10 @@ mat-card {
                     background-color: $light-grey;
                 }
             }
+            @media (max-width: 768px) {
+                flex-wrap: wrap;
+                justify-content: flex-start;
+            }
         }
     }
     > div:nth-of-type(4) {
@@ -110,7 +129,6 @@ mat-card {
             border-radius: 25px;
             padding: 12px 25px 12px 25px;
             border: 1px solid $light-purple;
-            font-weight: 700;
             color: $dark-purple;
             font-size: 18px;
             transition: background-color 0.5s ease-in-out;
@@ -119,12 +137,15 @@ mat-card {
                 background-color: $dark-purple;
                 color: white;
             }
+            .mdc-button__label {
+                font-weight: 700;
+            }
         }
     }
     > div:nth-of-type(5) {
         @include dFlex($jc: flex-end);
         width: 100%;
-        button {
+        a {
             width: 107px;
             height: 49px;
             background-color: $dark-purple;
@@ -136,6 +157,9 @@ mat-card {
             &:hover {
                 cursor: pointer;
                 background-color: $light-purple;
+            }
+            .mdc-button__label {
+                font-weight: 700;
             }
         }
     }
