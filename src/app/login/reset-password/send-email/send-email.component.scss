@@ -1,72 +1,28 @@
 .send-mail-form {
-  padding: 0 32px;
-  width: 100%;
-  min-width: 500px;
   display: flex;
   flex-direction: column;
-  gap: 18px;
-}
-
-.mat-form-field {
-  width: 100%;
-  background-color: rgba(236, 238, 254, 1) !important;
-  border-radius: 100px;
-  padding: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-
-  &:hover {
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-  }
-}
-
-.mat-form-field .mat-form-field-infix {
-  display: flex;
   align-items: center;
-  gap: 12px;
-  color: rgba(104, 104, 104, 1);
+  justify-content: flex-start;
+  gap: 16px;
+  padding: 0 32px 0 32px;
+  max-width: 500px;
 }
+  
+h1 {
+      font-weight: 700;
+      font-size: 36px;
+      color: rgba(68, 77, 242, 1);
+      margin: 0;
+      padding: 10px;
+      text-align: center;
+  }
+  
+span {
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    font-weight: 400;
+    font-size: 16px;
+  }
 
-.mat-form-field .mat-form-field-label {
-  color: rgba(104, 104, 104, 1);
-}
-
-.mat-form-field:hover .mat-form-field-label {
-  color: black;
-}
-
-.mat-icon {
-  width: 32px;
-  height: 32px;
-  color: rgba(104, 104, 104, 1);
-}
-
-.mat-error {
-  color: red;
-  font-size: 12px;
-  margin-top: 4px;
-}
-
-.send-mail-form button.mat-flat-button {
-  border-radius: 100px !important;
-  background-color: rgba(68, 77, 242, 1) !important;
-  color: white !important;
-  width: 107px;
-  height: 49px;
-  position: relative;
-  align-self: flex-end;
-  margin-top: 16px;
-}
-
-.send-mail-form span {
-  color: rgba(104, 104, 104, 1);
-  font-size: 14px;
-  text-align: center;
-}
-
-.mdc-button {
-  border-radius: 100px !important;
-  background-color: rgba(68, 77, 242, 1) !important;
-  color: white !important;
-  width: 150px;
-}
 

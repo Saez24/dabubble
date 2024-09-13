@@ -33,6 +33,13 @@ export class SendEmailComponent {
   formSubmitted = false;
   matcher: MyErrorStateMatcher = new MyErrorStateMatcher();
 
+  isButtonDisabled(): boolean {
+    // Typ-Assertion, um sicherzustellen, dass `emailFormControl` immer ein FormControl ist
+    const control = this.emailFormControl as FormControl;
+    return control.invalid || control.value?.trim() === '';
+  }
+  
+
   nextstep() {
     this.formSubmitted = true;
     if (this.emailFormControl.valid) {

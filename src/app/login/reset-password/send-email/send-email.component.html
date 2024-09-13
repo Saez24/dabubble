@@ -25,7 +25,13 @@
     können.</span
   >
 
-  <button mat-flat-button color="primary" (click)="nextstep()">
+  <button
+    mat-flat-button
+    color="primary"
+    [disabled]="isButtonDisabled()"
+    [ngClass]="{ 'disabled-button': isButtonDisabled() }"
+    (click)="nextstep()"
+  >
     Email senden
   </button>
 </form>
