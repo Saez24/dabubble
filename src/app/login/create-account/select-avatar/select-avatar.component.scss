@@ -15,15 +15,20 @@ $light-grey: lightgrey;
     color: $dark-purple;
     font-weight: 700;
     margin-top: 12px;
+    line-height: 55.2px;
     @media (max-width: 768px) {
-        font-size: 28px;
         text-align: center;
+    }
+    @media (max-width: 480px) {
+        font-size: 28px;
+        line-height: 32px;
     }
 }
 
 .mat-typography h2 {
     font-weight: 700;
     font-size: 32px;
+    text-align: center;
 }
 
 .mat-typography span {
@@ -31,13 +36,18 @@ $light-grey: lightgrey;
     font-weight: 400;
     font-size: 20px;
     @media (max-width: 768px) {
-        font-size: 16px;
+        font-size: 14px !important;
     }
 }
 
 .select-avatar-content {
     margin-top: -32px;
+    min-width: 472px;
     @media (max-width: 768px) {
+        min-width: 280px;
+        width: 100%;
+    }
+    @media (max-width: 480px) {
         max-width: 280px;
     }
 }
@@ -59,7 +69,10 @@ $light-grey: lightgrey;
 .mat-mdc-card {
     height: auto;
     box-shadow: none;
-    padding: 0 32px 0 32px;
+    padding: 0px 32px 0px 32px;
+    @media (max-width: 480px) {
+        padding: 0 16px 0 16px;
+    }
     @include dFlex($g: 32px, $fd: column);
     > div:nth-of-type(2) {
         @include dFlex();
@@ -88,15 +101,20 @@ $light-grey: lightgrey;
         width: 100%;
         > div:nth-of-type(1) {
             width: 100%;
+            @include dFlex($g: 8px, $fd: column);
             > div:nth-of-type(1) {
                 @include dFlex();
             }
             > div:nth-of-type(2) {
                 @include dFlex($jc: flex-start);
+                width: 100%;
+                @media (max-width: 480px) {
+                    justify-content: center;
+                }
             }
         }
         > div:nth-of-type(2) {
-            @include dFlex($g: 8px);
+            @include dFlex($g: 8px, $jc: flex-start);
             div {
                 @include dFlex();
                 padding: 4px;
@@ -113,15 +131,21 @@ $light-grey: lightgrey;
             }
             @media (max-width: 768px) {
                 flex-wrap: wrap;
-                justify-content: flex-start;
+            }
+            @media (max-width: 480px) {
+                justify-content: center;
             }
         }
     }
     > div:nth-of-type(4) {
         @include dFlex($g: 24px, $jc: flex-start);
         width: 100%;
+        @media (max-width: 480px) {
+            flex-direction: column;
+        }
         > div:nth-of-type(1) {
             @include dFlex();
+            flex: 1;
         }
         button {
             // width: 187px;
@@ -132,6 +156,9 @@ $light-grey: lightgrey;
             color: $dark-purple;
             font-size: 18px;
             transition: background-color 0.5s ease-in-out;
+            @media (max-width: 768px) {
+                padding: 6px 12px 6px 12px;
+            }
             &:hover {
                 cursor: pointer;
                 background-color: $dark-purple;
@@ -139,6 +166,7 @@ $light-grey: lightgrey;
             }
             .mdc-button__label {
                 font-weight: 700;
+                font-size: 18px;
             }
         }
     }
@@ -160,6 +188,7 @@ $light-grey: lightgrey;
             }
             .mdc-button__label {
                 font-weight: 700;
+                font-size: 18px;
             }
         }
     }
