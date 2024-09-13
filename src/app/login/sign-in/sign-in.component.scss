@@ -3,7 +3,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    gap: 16px;
+    gap: 18px;
     padding: 0 32px 0 32px;
     max-width: 500px;
 
@@ -13,6 +13,7 @@
         line-height: 55.2px;
         color: #444DF2;
         text-align: center;
+        margin: 0;
     }
 
     >span {
@@ -20,11 +21,8 @@
         font-weight: 400;
         line-height: 24px;
         text-align: center;
+        padding: 20px 0 20px 0;
     }
-}
-
-.create-account-inputs {
-    width: 100%;
 }
 
 .sign-in-form {
@@ -32,6 +30,11 @@
     flex-direction: column;
     align-items: center;
     gap: 18px;
+    width: 100%;
+
+    >mat-form-field {
+        width: 100%;
+    }
 }
 
 .or-container {
@@ -39,7 +42,6 @@
     align-items: center;
     justify-content: center;
     width: 100%;
-    padding: 16px 0;
 
     >span {
         font-size: 18px;
@@ -55,38 +57,24 @@
     }
 }
 
-.google-btn {
-    cursor: pointer;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 100px;
-    background-color: #ECEEFE;
-    border: unset;
-    transition: all 0.125s ease-in-out;
-    padding: 11px 0;
-    gap: 20px;
-    font-size: 18px;
-    font-weight: 400;
-    line-height: 21.6px;
-    color: #444DF2;
-    border: 1px solid transparent;
-
-    &:hover {
-        border: 1px solid #444DF2;
-        font-weight: 700;
-        transition: all 0.125s ease-in-out;
-    }
-}
-
 .mdc-text-field--filled:not(.mdc-text-field--disabled) {
     width: 100%;
     background-color: rgba(236, 238, 254, 1) !important;
     border-radius: 100px;
+    box-sizing: border-box;
+    border: 1px solid transparent;
+    transition: border 0.3s ease;
 
     &:hover {
-        border: 1px bold black !important;
+        background-color: rgba(236, 238, 254, 1) !important;
+        border: 1px solid rgba(104, 104, 104, 1) !important;
+    }
+
+    &:focus-within,
+    &:focus,
+    &:active {
+        background-color: rgba(236, 238, 254, 1) !important;
+        border: 1px solid rgba(83, 90, 241, 1) !important;
     }
 }
 
@@ -95,11 +83,9 @@
     gap: 30px;
     color: rgba(104, 104, 104, 1);
 
-    >.mat-icon {
-        color: Text gray;
-    }
-
-    &:hover {
+    &:focus-within,
+    &:focus,
+    &:active {
         color: black;
     }
 }
@@ -121,52 +107,72 @@
 }
 
 .sign-in-btn-container {
-    width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 30px;
+    padding: 20px 0;
 
-    >button {
-        width: 100%;
-        height: 49px;
-        border-radius: 25px;
-        background-color: #444DF2;
+    >.sign-in-btn {
         color: white;
-        font-size: 18px;
-        font-weight: 700;
-        line-height: 21.6px;
-        padding: 12px 25px;
-        border: unset;
-        cursor: pointer;
+        background-color: #444DF2;
+        border: 1px solid #444DF2;
         transition: all 0.125s ease-in-out;
 
         &:hover {
-            background-color: #3A3FDB;
+            background-color: #797EF3;
+            border: 1px solid #797EF3;
+            transition: all 0.125s ease-in-out;
+        }
+    }
+
+    >.guest-sign-in-btn {
+        color: #444DF2;
+        background-color: transparent;
+        border: 1px solid #797EF3;
+        transition: all 0.125s ease-in-out;
+
+        &:hover {
+            background-color: #444DF2;
+            color: white;
             transition: all 0.125s ease-in-out;
         }
     }
 }
 
-.sign-in-btn {
+.btn {
     cursor: pointer;
-    padding: 12px 25px;
-    border: 1px solid #797ef3;
-    border-radius: 25px;
-    font-family: "Nunito", sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50px;
     font-size: 18px;
     font-weight: 700;
-    height: 49px;
-    color: #FFFFFF;
+    line-height: 24.55px;
+    padding: 12px 25px;
 }
 
-.guest-sign-in-btn {
+.google-btn {
     cursor: pointer;
-    width: fit-content;
-    background-color: transparent;
-    transition: background-color 0.125s ease-in-out;
-    padding: 12px 25px;
-    border: 1px solid #444DF2;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 100px;
+    background-color: #ECEEFE;
+    border: unset;
+    transition: all 0.125s ease-in-out;
+    padding: 11px 0;
+    gap: 30px;
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 21.6px;
     color: #444DF2;
+    border: 1px solid transparent;
 
+    &:hover {
+        border: 1px solid #444DF2;
+        font-weight: 700;
+        transition: all 0.125s ease-in-out;
+    }
 }
