@@ -26,7 +26,6 @@ import { SelectAvatarComponent } from './create-account/select-avatar/select-ava
 })
 export class LoginComponent {
 
-  ngOnInit() {
-  }
+  constructor() {}
 
 }

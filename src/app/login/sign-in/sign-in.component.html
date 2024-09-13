@@ -1,1 +1,45 @@
-<p>sign-in works!</p>
+<div class="sign-in-content">
+    <h1>Anmeldung</h1>
+    <span>Wir empfehlen dir, die E-Mail-Adresse zu nutzen, die du bei der Arbeit verwendest.</span>
+    <form class="sign-in-form">
+        <mat-form-field>
+            <mat-icon>mail_outline</mat-icon>
+            <input type="email" matInput [formControl]="emailFormControl"
+                [errorStateMatcher]="matcher" placeholder="example@example.com">
+            @if (emailFormControl.hasError('email') && !emailFormControl.hasError('required')) {
+            <mat-error>Diese E-Mail-Adresse ist leider ungültig</mat-error>
+            }
+            @if (emailFormControl.hasError('required')) {
+            <mat-error>Bitte geben Sie eine E-Mail ein.</mat-error>
+            }
+        </mat-form-field>
+
+        <mat-form-field>
+            <mat-icon>lock_outline</mat-icon>
+            <input type="text" matInput [formControl]="passwordFormControl" [errorStateMatcher]="matcher"
+                placeholder="Passwort">
+            @if (passwordFormControl.hasError('required')) {
+            <mat-error>Bitte geben Sie ein Passwort ein.</mat-error>
+            }
+        </mat-form-field>
+
+        <a class="reset-password-link" routerLink="reset-password">
+            Passwort vergessen?
+        </a>
+
+        <div class="or-container">
+            <mat-divider></mat-divider>
+            <span>ODER</span>
+            <mat-divider></mat-divider>
+        </div>
+
+        <a class="google-btn">
+            <img src="../../../assets/images/google_logo.png">
+            <span>Anmelden mit Google</span>
+        </a>
+        <div class="sign-in-btn-container">
+            <div class="btn sign-in-btn" (click)="signIn()">Anmelden</div>
+            <div class="btn guest-sign-in-btn" (click)="signIn()">Gäste-Login</div>
+        </div>
+    </form>
+</div>
