@@ -10,7 +10,7 @@ import { AccountService } from '../../../account.service';
   standalone: true,
   imports: [MatCardModule, NgFor, MatButtonModule, NgClass, NgStyle, MatIconModule],
   templateUrl: './select-avatar.component.html',
-  styleUrl: './select-avatar.component.scss'
+  styleUrl: './select-avatar.component.scss',
 })
 export class SelectAvatarComponent implements OnInit {
 

@@ -6,6 +6,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
+import { Router, RouterModule } from '@angular/router';
 
 export class MyErrorStateMatcher implements ErrorStateMatcher {
   isErrorState(control: FormControl | null): boolean {
@@ -22,13 +23,15 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
     MatInputModule,
     MatButtonModule,
     MatIconModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    RouterModule
   ],
   templateUrl: './send-email.component.html',
   styleUrls: ['./send-email.component.scss']
 })
 
 export class SendEmailComponent {
+
   emailFormControl = new FormControl('', [Validators.required, Validators.email]);
   formSubmitted = false;
   matcher: MyErrorStateMatcher = new MyErrorStateMatcher();
@@ -47,5 +50,9 @@ export class SendEmailComponent {
     } else {
       console.log('Form is invalid');
     }
+  }
+
+  backClicked() {
+   
   }
 }
