@@ -57,7 +57,7 @@ export class CreateAccountComponent {
     this.checkboxFormControl.updateValueAndValidity();
 
     if (this.isFormValid()) {
-      this.router.navigate(['selectavatar']);
+      this.router.navigate(['select-avatar']);
       console.log('Form is valid');
     } else {
       console.log('Form is invalid');

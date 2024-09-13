@@ -7,7 +7,7 @@
     <div class="create-account-inputs">
         <form class="create-account-form">
 
-            <mat-form-field class="full-width">
+            <mat-form-field>
                 <mat-icon fontIcon="person"></mat-icon>
                 <input type="text" matInput [formControl]="nameFormControl" [errorStateMatcher]="matcher"
                     placeholder="Name und Nachname">
@@ -16,7 +16,7 @@
                 }
             </mat-form-field>
 
-            <mat-form-field class="login-input-fields full-width">
+            <mat-form-field>
                 <mat-icon fontIcon="mail"></mat-icon>
                 <input class="login-input-fields" type="email" matInput [formControl]="emailFormControl"
                     [errorStateMatcher]="matcher" placeholder="example@example.com" required
@@ -29,7 +29,7 @@
                 }
             </mat-form-field>
 
-            <mat-form-field class="full-width">
+            <mat-form-field>
                 <mat-icon fontIcon="lock"></mat-icon>
                 <input minlength="6" [type]="passwordVisible ? 'text' : 'password'" matInput
                     [formControl]="passwordFormControl" [errorStateMatcher]="matcher" placeholder="Passwort"> <mat-icon
