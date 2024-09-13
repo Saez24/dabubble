@@ -41,8 +41,8 @@ export class CreateAccountComponent {
   nameFormControl = new FormControl('', [Validators.required]);
   checkboxFormControl = new FormControl(false, [Validators.requiredTrue]);
   formSubmitted = false;
-
   matcher: MyErrorStateMatcher = new MyErrorStateMatcher();
+  passwordVisible: boolean = false;
 
   nextStep() {
     this.formSubmitted = true;
@@ -73,5 +73,10 @@ export class CreateAccountComponent {
 
   backClicked() {
     this._location.back();
+  }
+
+  showPassword(): void {
+    this.passwordVisible = !this.passwordVisible;
+
   }
 }
