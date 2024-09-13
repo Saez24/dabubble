@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewEncapsulation } from '@angular/core';
 import { FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ErrorStateMatcher } from '@angular/material/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -27,7 +27,8 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
     RouterModule
   ],
   templateUrl: './send-email.component.html',
-  styleUrls: ['./send-email.component.scss']
+  styleUrls: ['./send-email.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 
 export class SendEmailComponent {

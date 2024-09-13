@@ -8,6 +8,9 @@ header {
 }
 
 .logo-container {
+    height: 84px;
+    display: flex;
+    align-items: center;
 
     >img {
         display: flex;
