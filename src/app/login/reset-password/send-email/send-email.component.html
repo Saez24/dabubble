@@ -3,7 +3,7 @@
     <mat-icon>arrow_back</mat-icon>
   </button>
   <h1>Passwort zurücksetzen</h1>
-  <span>Bitte geben Sie Ihre E-Mail-Adresse ein.</span>
+  <span class="first-info-text">Bitte geben Sie Ihre E-Mail-Adresse ein.</span>
 
   <form>
     <mat-form-field class="full-width">
@@ -24,19 +24,20 @@
       }
     </mat-form-field>
 
-    <span
+    <span class="second-info-text"
       >Wir senden Ihnen eine E-Mail, über die Sie Ihr Passwort ändern
       können.</span
     >
-
-    <button
-      mat-flat-button
-      color="primary"
-      [disabled]="isButtonDisabled()"
-      [ngClass]="{ 'disabled-button': isButtonDisabled() }"
-      (click)="nextstep()"
-    >
-      Email senden
-    </button>
+    <div class="btn-div">
+      <button
+        mat-flat-button
+        color="primary"
+        [disabled]="isButtonDisabled()"
+        [ngClass]="{ 'disabled-button': isButtonDisabled() }"
+        (click)="nextstep()"
+      >
+        E-Mail senden
+      </button>
+    </div>
   </form>
 </div>

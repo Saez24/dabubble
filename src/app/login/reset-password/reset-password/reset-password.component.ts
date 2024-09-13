@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewEncapsulation  } from '@angular/core';
 import { FormControl, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ErrorStateMatcher } from '@angular/material/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -25,7 +25,8 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
     ReactiveFormsModule
   ],
   templateUrl: './reset-password.component.html',
-  styleUrls: ['./reset-password.component.scss']
+  styleUrls: ['./reset-password.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 export class ResetPasswordComponent {
   passwordFormControl = new FormControl('', [Validators.required]);

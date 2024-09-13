@@ -9,20 +9,29 @@
 }
   
 h1 {
-      font-weight: 700;
-      font-size: 36px;
-      color: rgba(68, 77, 242, 1);
+      font-weight: 700 !important;
+      font-size: 46px !important;
+      width: max-content;
+      color: #444DF2;
       margin: 0;
       padding: 10px;
       text-align: center;
   }
   
-span {
+  .first-info-text {
+    color: black;
+    font-weight: 400;
+    font-size: 20px;
+  }
+
+  .second-info-text{
     display: flex;
     justify-content: center;
     text-align: center;
+    color: #686868;
     font-weight: 400;
-    font-size: 16px;
+    font-size: 20px;
+
   }
 
 .create-account-container {
@@ -32,8 +41,35 @@ span {
 .back-button {
   position: absolute !important;
   top: 34px;
-  left: 88px;
+  left: 34px;
   float: left;
+}
+
+.mat-mdc-unelevated-button[disabled] {
+  border-radius: 25px;
+  padding: 12px, 25px, 12px, 25px;
+  background-color: #686868 !important;
+  color: white !important;
+  font-size: 18px;
+  font-weight: 700;
+  width: 173px;
+  height: 49px;
+
+}
+
+.mat-mdc-form-field {
+  width: 100%;
+}
+
+.btn-div{
+  display: flex;
+  justify-content: flex-end;
+}
+
+form{
+  display: flex;
+    flex-direction: column;
+    gap: 40px;
 }
 
 
