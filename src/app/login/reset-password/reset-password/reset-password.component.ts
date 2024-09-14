@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation  } from '@angular/core';
+import { Component, ViewEncapsulation } from '@angular/core';
 import { FormControl, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ErrorStateMatcher } from '@angular/material/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -24,19 +24,37 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
 })
 
 export class ResetPasswordComponent {
-
-  passwordFormControl = new FormControl('', [Validators.required]);
+  passwordFormControl = new FormControl('', [
+    Validators.required,
+    Validators.pattern('(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,}')
+  ]);
   confirmPasswordFormControl = new FormControl('', [Validators.required]);
   matcher = new MyErrorStateMatcher();
-  passwordVisible: boolean = false;
+  passwordVisible = false;
+  confirmPasswordVisible = false;
 
   isButtonDisabled(): boolean {
-    const control = this.passwordFormControl as FormControl;
-    return control.invalid || control.value?.trim() === '';
+    const passwordValue = this.passwordFormControl.value;
+    const confirmPasswordValue = this.confirmPasswordFormControl.value;
+
+    return this.passwordFormControl.invalid ||
+      this.confirmPasswordFormControl.invalid ||
+      passwordValue !== confirmPasswordValue;
   }
 
-  showPassword(): void {
-    this.passwordVisible = !this.passwordVisible;
+  togglePasswordVisibility(field: 'password' | 'confirmPassword'): void {
+    if (field === 'password') {
+      this.passwordVisible = !this.passwordVisible;
+    } else if (field === 'confirmPassword') {
+      this.confirmPasswordVisible = !this.confirmPasswordVisible;
+    }
+  }
 
+  getConfirmPasswordError(): string | null {
+    if (this.confirmPasswordFormControl.hasError('required')) {
+      return 'Bitte bestätigen Sie Ihr Passwort.';
+    }
+    else (this.passwordFormControl.value !== this.confirmPasswordFormControl.value)
+    return 'Die Passwörter stimmen nicht überein.';
   }
 }
