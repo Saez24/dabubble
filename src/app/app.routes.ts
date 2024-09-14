@@ -5,16 +5,20 @@ import { SelectAvatarComponent } from './login/create-account/select-avatar/sele
 import { ResetPasswordComponent } from './login/reset-password/reset-password/reset-password.component';
 import { SendEmailComponent } from './login/reset-password/send-email/send-email.component';
 import { SignInComponent } from './login/sign-in/sign-in.component';
+import { BoardComponent } from './board/board.component';
 
 
 export const routes: Routes = [
-    { path: '', component: LoginComponent,
+    {
+        path: '', component: LoginComponent,
         children: [
             { path: '', component: SignInComponent },
             { path: 'create-account', component: CreateAccountComponent },
             { path: 'select-avatar', component: SelectAvatarComponent },
             { path: 'reset-password', component: ResetPasswordComponent },
             { path: 'send-mail', component: SendEmailComponent },
-            { path: 'sign-in', component: SignInComponent}
-        ] },
+            { path: 'sign-in', component: SignInComponent }
+        ]
+    },
+    { path: 'board', component: BoardComponent },
 ];

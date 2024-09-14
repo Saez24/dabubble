@@ -46,13 +46,13 @@
       <mat-divider></mat-divider>
     </div>
 
-    <a class="google-btn">
+    <a class="google-btn" (click)="googleLogin()">
       <img src="../../../assets/images/google_logo.png" />
       <span>Anmelden mit Google</span>
     </a>
     <div class="sign-in-btn-container">
       <div class="btn sign-in-btn" (click)="signIn()">Anmelden</div>
-      <div class="btn guest-sign-in-btn" (click)="signIn()">Gäste-Login</div>
+      <div class="btn guest-sign-in-btn" (click)="guestSignIn()">Gäste-Login</div>
     </div>
   </form>
 </div>
