@@ -15,6 +15,7 @@ $light-grey: lightgrey;
   color: $dark-purple;
   font-weight: 700;
   margin-top: 12px;
+  margin-left: -32px;
   line-height: 55.2px;
   @media (max-width: 768px) {
     text-align: center;
@@ -55,7 +56,7 @@ $light-grey: lightgrey;
 .mat-mdc-icon-button {
     position: absolute;
     left: -32px;
-    top: 32px;
+    top: 0px;;
     @media (max-width: 768px) {
         left: 0px;
     }
@@ -70,6 +71,7 @@ $light-grey: lightgrey;
   }
   @include dFlex($g: 32px, $fd: column);
   > mat-card-header {
+    padding: 0;
     @include dFlex($jc: space-between);
     .mat-typography h1 {
       margin: 0;
