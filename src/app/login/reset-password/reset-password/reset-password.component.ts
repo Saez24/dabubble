@@ -7,6 +7,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { AccountService } from '../../../account.service';
 
 export class MyErrorStateMatcher implements ErrorStateMatcher {
   isErrorState(control: FormControl | null): boolean {
@@ -24,6 +25,8 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
 })
 
 export class ResetPasswordComponent {
+  constructor(private accountService: AccountService) { }
+
   passwordFormControl = new FormControl('', [
     Validators.required,
     Validators.pattern('(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,}')
@@ -56,5 +59,9 @@ export class ResetPasswordComponent {
     }
     else (this.passwordFormControl.value !== this.confirmPasswordFormControl.value)
     return 'Die Passwörter stimmen nicht überein.';
+  }
+
+  goBack() {
+    this.accountService.goBack();
   }
 }

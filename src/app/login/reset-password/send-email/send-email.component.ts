@@ -7,6 +7,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { AccountService } from '../../../account.service';
 
 export class MyErrorStateMatcher implements ErrorStateMatcher {
   isErrorState(control: FormControl | null): boolean {
@@ -24,6 +25,7 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
 })
 
 export class SendEmailComponent {
+  constructor(private accountService: AccountService) { }
 
   emailFormControl = new FormControl('', [Validators.required, Validators.email]);
   matcher: MyErrorStateMatcher = new MyErrorStateMatcher();
@@ -31,5 +33,9 @@ export class SendEmailComponent {
   isButtonDisabled(): boolean {
     const control = this.emailFormControl as FormControl;
     return control.invalid || control.value?.trim() === '';
+  }
+
+  goBack() {
+    this.accountService.goBack();
   }
 }

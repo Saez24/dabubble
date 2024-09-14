@@ -1,12 +1,12 @@
 <div class="send-mail-content">
-  <button routerLink="" class="back-button" mat-icon-button>
+  <button (click)="goBack()" class="back-button" mat-icon-button>
     <mat-icon>arrow_back</mat-icon>
   </button>
   <h1>Passwort zurücksetzen</h1>
   <span class="first-info-text">Bitte geben Sie Ihre E-Mail-Adresse ein.</span>
 
   <form>
-    <mat-form-field class="full-width">
+    <mat-form-field>
       <mat-icon>mail_outline</mat-icon>
       <input
         type="email"
