@@ -5,7 +5,7 @@
   <h1>Passwort zurücksetzen</h1>
   <span class="first-info-text">Bitte geben Sie Ihre E-Mail-Adresse ein.</span>
 
-  <form>
+  <form (ngSubmit)="sendPasswordResetEmail()">
     <mat-form-field>
       <mat-icon>mail_outline</mat-icon>
       <input
@@ -34,8 +34,7 @@
         color="primary"
         [disabled]="isButtonDisabled()"
         [ngClass]="{ 'disabled-button': isButtonDisabled() }"
-        routerLink="/reset-password"
-        type="button"
+        type="submit"
       >
         E-Mail senden
       </button>
