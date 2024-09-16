@@ -1,6 +1,6 @@
 import { Component, ViewEncapsulation } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
-import { AccountService } from '../../../account.service';
+import { Location } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 
 @Component({
@@ -12,8 +12,8 @@ import { MatButtonModule } from '@angular/material/button';
   encapsulation: ViewEncapsulation.None
 })
 export class LegalNoticeComponent {
-  constructor(private accountService: AccountService) { }
+  constructor(private _location: Location) { }
   goBack() {
-    this.accountService.goBack();
+    this._location.back();
   }
 }

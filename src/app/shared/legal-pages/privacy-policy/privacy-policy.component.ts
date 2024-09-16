@@ -1,7 +1,7 @@
 import { Component, ViewEncapsulation } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { AccountService } from '../../../account.service';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-privacy-policy',
@@ -12,8 +12,8 @@ import { AccountService } from '../../../account.service';
   encapsulation: ViewEncapsulation.None
 })
 export class PrivacyPolicyComponent {
-  constructor(private accountService: AccountService) { }
+  constructor(private _location: Location) { }
   goBack() {
-    this.accountService.goBack();
+    this._location.back();
   }
 }
