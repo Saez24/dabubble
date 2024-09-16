@@ -1,31 +1,33 @@
 <header>
-    <div class="logo-container">
-        <img src="./../../assets/images/main_logo.png" alt="DABubble Logo">
+  <div class="logo-container">
+    <img src="./../../assets/images/main_logo.png" alt="DABubble Logo" />
+  </div>
+  <div class="create-account-container">
+    <span>Neu bei DABubble?</span>
+    <a routerLink="create-account">Konto erstellen</a>
+  </div>
+
+  <!-- Animation Container -->
+  <div class="intro-animation-container">
+    <div class="max-width-container">
+      <div class="intro-logo-container">
+        <img src="../../assets/images/logo_big.png" alt="" />
+        <div class="headline">
+          <h1>DABubble</h1>
+        </div>
+      </div>
     </div>
-    <div class="create-account-container">
-        <span>Neu bei DABubble?</span>
-        <a routerLink="create-account">Konto erstellen</a>
-    </div>
+  </div>
+
 </header>
 <div class="max-width">
-    <div class="content">
-        <mat-card appearance="outlined" class="login-container">
-            <router-outlet></router-outlet>
-        </mat-card>
-    </div>
-    <!-- Animation Container -->
-    <div class="intro-animation-container">
-        <div class="max-width-container">
-            <div class="intro-logo-container">
-                <img src="../../assets/images/logo_big.png" alt="">
-                <div class="headline">
-                    <h1>DABubble</h1>
-                </div>
-            </div>
-        </div>
-    </div>
-    <footer>
-        <a>Impressum</a>
-        <a>Datenschutz</a>
-    </footer>
+  <div class="content">
+    <mat-card appearance="outlined" class="login-container">
+      <router-outlet></router-outlet>
+    </mat-card>
+  </div>
+  <footer>
+    <a routerLink="legal-notice">Impressum</a>
+    <a routerLink="privacy-policy">Datenschutz</a>
+  </footer>
 </div>

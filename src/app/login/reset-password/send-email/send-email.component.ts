@@ -8,6 +8,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AccountService } from '../../../account.service';
+import { inject } from '@angular/core';
+import { Auth, sendPasswordResetEmail } from '@angular/fire/auth';
+import { from } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 
 export class MyErrorStateMatcher implements ErrorStateMatcher {
   isErrorState(control: FormControl | null): boolean {
@@ -25,6 +29,8 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
 })
 
 export class SendEmailComponent {
+
+  private auth = inject(Auth);
   constructor(private accountService: AccountService) { }
 
   emailFormControl = new FormControl('', [Validators.required, Validators.email]);
@@ -37,5 +43,22 @@ export class SendEmailComponent {
 
   goBack() {
     this.accountService.goBack();
+  }
+
+
+  sendPasswordResetEmail() {
+    // console.log('sendPasswordResetEmail Methode aufgerufen');
+    // const email = this.emailFormControl.value;
+
+    // if (email) {
+    //   from(sendPasswordResetEmail(this.auth, email)).pipe(
+    //     map(() => alert('Eine E-Mail zum Zurücksetzen des Passworts wurde gesendet.')),
+    //     catchError((error) => {
+    //       console.error('Fehler beim Senden der E-Mail:', error);
+    //       alert('Fehler beim Senden der E-Mail.');
+    //       return [];
+    //     })
+    //   ).subscribe();
+    // }
   }
 }

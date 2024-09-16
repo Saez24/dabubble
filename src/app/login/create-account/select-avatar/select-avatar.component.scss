@@ -15,12 +15,10 @@ $light-grey: lightgrey;
   color: $dark-purple;
   font-weight: 700;
   margin-top: 12px;
-  margin-left: -32px;
   line-height: 55.2px;
+  text-align: center;
   @media (max-width: 768px) {
-    text-align: center;
-  }
-  @media (max-width: 480px) {
+    width: 240px;
     font-size: 28px;
     line-height: 32px;
   }
@@ -42,8 +40,9 @@ $light-grey: lightgrey;
 }
 
 .select-avatar-content {
+  @include dFlex($jc: flex-start, $fd: column);
+  max-width: 500px;
   margin-top: -32px;
-  min-width: 472px;
   @media (max-width: 768px) {
     min-width: 280px;
     width: 100%;
@@ -51,15 +50,6 @@ $light-grey: lightgrey;
   @media (max-width: 480px) {
     max-width: 280px;
   }
-}
-
-.mat-mdc-icon-button {
-    position: absolute;
-    left: -32px;
-    top: 0px;;
-    @media (max-width: 768px) {
-        left: 0px;
-    }
 }
 
 .mat-mdc-card {
@@ -70,11 +60,17 @@ $light-grey: lightgrey;
     padding: 0 16px 0 16px;
   }
   @include dFlex($g: 32px, $fd: column);
-  > mat-card-header {
-    padding: 0;
-    @include dFlex($jc: space-between);
-    .mat-typography h1 {
-      margin: 0;
+}
+
+.back-button {
+  position: absolute !important;
+  top: 45px !important;
+  left: 32px !important;
+  @media (max-width: 375px) {
+    .mat-icon {
+      left: -12px;
+      top: 0px;
+      position: absolute;
     }
   }
 }

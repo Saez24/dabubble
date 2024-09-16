@@ -10,6 +10,11 @@ import { Router, RouterModule } from '@angular/router';
 import { MatDividerModule } from '@angular/material/divider';
 import { GoogleAuthService } from '../../shared/services/authentication/google-auth-service/google-auth.service';
 
+/* Put into ServiceWorker.ts */
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { UserCredential } from "firebase/auth";
+/* ------------------------- */
+
 export class MyErrorStateMatcher implements ErrorStateMatcher {
   isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
     const isSubmitted = form && form.submitted;
@@ -28,7 +33,7 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
     MatCheckboxModule,
     MatButtonModule,
     RouterModule,
-    MatDividerModule
+    MatDividerModule,
   ],
   templateUrl: './sign-in.component.html',
   styleUrls: ['./sign-in.component.scss', './../../../styles.scss'],
@@ -38,6 +43,10 @@ export class SignInComponent {
 
   googleAuthService = inject(GoogleAuthService);
   router = inject(Router);
+
+  /* Put into ServiceWorker.ts */
+  auth = getAuth();
+  /* ------------------------- */
 
   emailFormControl = new FormControl('', [Validators.required, Validators.email]);
   passwordFormControl = new FormControl('', [Validators.required]);
@@ -62,8 +71,15 @@ export class SignInComponent {
     this.router.navigateByUrl('board');
   }
 
-
-  signIn(): void {
-
+/* -------create user------- */
+  async createUser(email: string, password: string) {
+    try {
+      let response: UserCredential = await createUserWithEmailAndPassword(this.auth, email, password);
+      this.router.navigateByUrl('board');
+    } catch (err: any) {
+      console.error(err);
+      throw err;
     }
+  }
+  /* ------------------------- */
 }
