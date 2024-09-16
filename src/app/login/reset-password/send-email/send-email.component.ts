@@ -12,6 +12,7 @@ import { inject } from '@angular/core';
 import { Auth, sendPasswordResetEmail } from '@angular/fire/auth';
 import { from } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
+import { Location } from '@angular/common';
 
 export class MyErrorStateMatcher implements ErrorStateMatcher {
   isErrorState(control: FormControl | null): boolean {
@@ -29,9 +30,8 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
 })
 
 export class SendEmailComponent {
-
+  constructor(private _location: Location) { }
   private auth = inject(Auth);
-  constructor(private accountService: AccountService) { }
 
   emailFormControl = new FormControl('', [Validators.required, Validators.email]);
   matcher: MyErrorStateMatcher = new MyErrorStateMatcher();
@@ -40,11 +40,6 @@ export class SendEmailComponent {
     const control = this.emailFormControl as FormControl;
     return control.invalid || control.value?.trim() === '';
   }
-
-  goBack() {
-    this.accountService.goBack();
-  }
-
 
   sendPasswordResetEmail() {
     // console.log('sendPasswordResetEmail Methode aufgerufen');
@@ -60,5 +55,9 @@ export class SendEmailComponent {
     //     })
     //   ).subscribe();
     // }
+  }
+
+  goBack() {
+    this._location.back();
   }
 }

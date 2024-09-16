@@ -3,7 +3,7 @@ import { Component, OnInit, ViewEncapsulation, } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { AccountService } from '../../../account.service';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-select-avatar',
@@ -15,7 +15,7 @@ import { AccountService } from '../../../account.service';
 })
 export class SelectAvatarComponent implements OnInit {
 
-  constructor(private accountService: AccountService) { }
+  constructor(private location: Location) { }
 
   avatars = [
     '../../../../assets/images/avatars/avatar1.svg',
@@ -46,6 +46,6 @@ export class SelectAvatarComponent implements OnInit {
   }
 
   goBack() {
-    this.accountService.goBack();
+    this.location.back();
   }
 }
