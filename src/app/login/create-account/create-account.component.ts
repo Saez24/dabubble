@@ -34,7 +34,7 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
 })
 export class CreateAccountComponent {
 
-  constructor(private _location: Location, private router: Router) { }
+  constructor(private location: Location, private router: Router) { }
 
   emailFormControl = new FormControl('', [Validators.required, Validators.email]);
   passwordFormControl = new FormControl('', [Validators.required]);
@@ -84,7 +84,7 @@ export class CreateAccountComponent {
    * Navigates back to the previous URL.
    */
   goBack() {
-    this._location.back();
+    this.location.back();
   }
 
   /**
