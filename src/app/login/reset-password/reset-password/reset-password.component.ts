@@ -7,7 +7,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { AccountService } from '../../../account.service';
+import { Location } from '@angular/common';
 
 export class MyErrorStateMatcher implements ErrorStateMatcher {
   isErrorState(control: FormControl | null): boolean {
@@ -25,7 +25,7 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
 })
 
 export class ResetPasswordComponent {
-  constructor(private accountService: AccountService) { }
+  constructor(private _location: Location) { }
 
   passwordFormControl = new FormControl('', [
     Validators.required,
@@ -62,6 +62,6 @@ export class ResetPasswordComponent {
   }
 
   goBack() {
-    this.accountService.goBack();
+    this._location.back();
   }
 }
