@@ -59,18 +59,21 @@
                 </div>
             </div>
             <div class="message-input-container">
-                <textarea type="text" placeholder="Schreiben Sie Ihre Nachricht"></textarea>
+                <textarea [(ngModel)]="message" type="text" placeholder="Schreiben Sie Ihre Nachricht"></textarea>
                 <div class="message-icon-container">
                     <div class="left-icon-container">
                         <div class="message-icon"><mat-icon fontIcon="add"></mat-icon></div>
                         <div class="separator"></div>
-                        <div class="message-icon"><mat-icon fontIcon="sentiment_satisfied"></mat-icon></div>
+                        <div (click)="showEmoji()" class="message-icon"><mat-icon
+                                fontIcon="sentiment_satisfied"></mat-icon></div>
                         <div class="message-icon"><mat-icon fontIcon="alternate_email"></mat-icon></div>
                     </div>
                     <div class="right-icon-container">
                         <div class="message-icon send"><mat-icon fontIcon="send"></mat-icon></div>
                     </div>
                 </div>
+                <emoji-mart *ngIf="showEmojiPicker" (emojiSelect)="addEmoji($event)" [darkMode]="false"
+                    title="Pick your emoji…" emoji="point_up"></emoji-mart>
             </div>
         </div>
     </mat-card>
