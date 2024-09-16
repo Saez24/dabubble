@@ -1,0 +1,146 @@
+@import '../../../mixin.scss';
+
+.mat-mdc-card {
+    @include dFlex($fd: column, $g: 25px);
+    box-shadow: none;
+    width: 366px;
+    padding: 32px 30px 32px 30px;
+    border-radius: 30px;
+}
+
+.mat-mdc-card-content {
+    padding: 0;
+    width: 100%;
+    @include dFlex($fd: column, $ai: flex-start, $g: 24px);
+}
+
+header {
+    width: 100%;
+    @include dFlex($jc: space-between);
+
+    div:nth-of-type(1) {
+        @include dFlex();
+        gap: 15px;
+
+        span {
+            font-size: 24px;
+            font-weight: 700;
+        }
+        div:nth-of-type(1) {
+            @include dFlex();
+            width: 60px;
+            height: 60px;
+            border-radius: 100%;
+            background: #010147;
+        }  
+    }
+} 
+
+section {
+    width: 100%;
+    @include dFlex($jc: space-between, $ai: flex-start);
+    .panel-content {
+        .panel-container {
+            @include dFlex($g: 10px, $jc: flex-start);
+            span {
+                font-size: 20px;
+                font-weight: 700;
+            }
+        }
+        .panel-container-open {
+            @include dFlex($g: 10px, $jc: flex-start);
+            padding: 4px 20px 4px 20px;
+            border-radius: 20px;
+            background-color: $light-purple;
+            color: $purple;
+        }
+        .add-channel-container {
+            @include dFlex($g: 10px, $jc: flex-start);
+            padding: 4px 20px 4px 20px;
+        }
+        .chat-container-open {
+            @include dFlex($fd: column, $g: 13px, $ai: flex-start);
+            > div {
+                @include dFlex($g: 15px);
+                > div {
+                    @include dFlex($ai: flex-end);
+                    
+                }
+                > div .online {
+                    width: 14px;
+                    height: 14px;
+                    border: 2px solid white;
+                    background: #92C83E;
+                    border-radius: 100%;
+                    margin-left: -14px;
+                }
+                span {
+                    font-size: 18px;
+                    font-weight: 400;
+                } 
+            }
+            
+        }
+    }
+}
+
+.icon {
+    width: 17.11px;
+    height: 16.65px;
+    &:hover {
+    color: $purple;
+    cursor: pointer;
+    }
+} 
+
+.add-button {
+    height: 32px;
+    width: 32px;
+    border-radius: 100%;
+    margin-top: 6px;
+    @include dFlex();
+    &:hover {
+    color: $dark-purple;
+    cursor: pointer;
+    font-weight: 700;
+    background-color: $light-purple;
+    }
+}
+
+.new-channel-button {
+    height: 40px;
+    width: 40px;
+    border-radius: 100%;
+    @include dFlex();
+    &:hover {
+    color: $dark-purple;
+    font-weight: 700;
+    cursor: pointer;
+    background-color: $light-purple;
+    }
+}
+
+.mat-expansion-panel-header {
+    flex-direction: row-reverse;
+    gap: 14px;
+    .mat-content {
+        display: flex;
+        flex-direction: row-reverse !important;
+    }
+}
+
+.mat-expansion-panel {
+    box-shadow: none !important;
+}
+
+.mat-expansion-panel-header-description, .mat-expansion-panel-header-title {
+    flex-grow: unset;
+    gap: 10px;
+}
+
+.mat-expansion-panel-header:focus, .mat-expansion-panel-header:hover {
+    color: $purple;
+    background: none !important;
+}
+
+

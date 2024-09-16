@@ -15,7 +15,7 @@ import { Location } from '@angular/common';
 })
 export class SelectAvatarComponent implements OnInit {
 
-  constructor(private location: Location) { }
+  constructor(private _location: Location) { }
 
   avatars = [
     '../../../../assets/images/avatars/avatar1.svg',
@@ -46,6 +46,6 @@ export class SelectAvatarComponent implements OnInit {
   }
 
   goBack() {
-    this.location.back();
+    this._location.back();
   }
 }
