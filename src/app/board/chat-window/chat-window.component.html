@@ -1,1 +1,77 @@
-<p>chat-window works!</p>
+<div class="chat-container max-width">
+    <mat-card class="chat-container" appearance="outlined">
+        <div class="chat-header">
+            <div class="chat-header-button"><span># Entwicklerteam</span> <mat-icon
+                    fontIcon="keyboard_arrow_down"></mat-icon></div>
+            <div class="members-container">
+                <img src="./assets/images/avatars/avatar1.svg" alt="">
+                <img src="./assets/images/avatars/avatar2.svg" alt="">
+                <img src="./assets/images/avatars/avatar3.svg" alt="">
+                <span>3</span>
+                <mat-icon class="add-member-button" fontIcon="person_add"></mat-icon>
+            </div>
+        </div>
+        <div class="chat-content">
+            <div class="posted-date-container"><span class="posted-date">14. September</span></div>
+
+            <div class="message-received-container">
+                <img src="assets/images/avatars/avatar1.svg" alt="">
+                <div class="message-container">
+                    <div class="reaction-container-received">
+                        <div class="reaction-icon"><img src="./assets/images/reaction/check_mark.png" alt=""></div>
+                        <div class="reaction-icon"><img src="./assets/images/reaction/hands_up.png" alt=""></div>
+                        <div class="reaction-icon"><mat-icon fontIcon="add_reaction"></mat-icon></div>
+                        <div class="reaction-icon"><mat-icon fontIcon="comment"></mat-icon></div>
+                    </div>
+                    <span class="sender-name">Noa Braun <span class="message-time">14:25 Uhr</span></span>
+                    <span class="message-recieved">Welche Version ist aktuell von Angular</span>
+                    <span class="answers">2 Antworten <span class="message-time">Letzte Antwort <span
+                                class="message-time">14:25</span></span></span>
+
+                </div>
+            </div>
+
+            <div class="posted-date-container"><span class="posted-date">Heute</span></div>
+
+            <div class="message-sender-container">
+                <img src="assets/images/avatars/avatar1.svg" alt="">
+                <div class="message-container">
+                    <div class="reaction-container-sender">
+                        <div class="reaction-icon"><img src="./assets/images/reaction/check_mark.png" alt=""></div>
+                        <div class="reaction-icon"><img src="./assets/images/reaction/hands_up.png" alt=""></div>
+                        <div class="reaction-icon"><mat-icon fontIcon="add_reaction"></mat-icon></div>
+                        <div class="reaction-icon"><mat-icon fontIcon="comment"></mat-icon></div>
+                        <div class="reaction-icon"><mat-icon fontIcon="more_vert"></mat-icon></div>
+                    </div>
+                    <span class="my-name">Frederik Beck <span class="message-time">15:06 Uhr</span></span>
+                    <span class="message-sender">Lorem ipsum dolor sit amet consectetur adipisicing elit. Omnis iusto
+                        quasi eum fugit! Mollitia quisquam, blanditiis voluptatum incidunt debitis quae deleniti quas
+                        corrupti expedita, autem consequuntur vel laborum illum ab!</span>
+                    <div class="show-reactions">
+                        <div class="reaction-icon-button">
+                            <div class="reaction-name-popup">
+                                <img src="./assets/images/reaction/rocket.png" alt="">
+                                <h3>Sofia Müller</h3><span>Hat reagiert</span>
+                            </div><img src="./assets/images/reaction/check_mark.png" alt=""> 1
+                        </div>
+                        <div class="reaction-icon"><mat-icon fontIcon="add_reaction"></mat-icon></div>
+                    </div>
+                </div>
+            </div>
+            <div class="message-input-container">
+                <textarea type="text" placeholder="Schreiben Sie Ihre Nachricht"></textarea>
+                <div class="message-icon-container">
+                    <div class="left-icon-container">
+                        <div class="message-icon"><mat-icon fontIcon="add"></mat-icon></div>
+                        <div class="separator"></div>
+                        <div class="message-icon"><mat-icon fontIcon="sentiment_satisfied"></mat-icon></div>
+                        <div class="message-icon"><mat-icon fontIcon="alternate_email"></mat-icon></div>
+                    </div>
+                    <div class="right-icon-container">
+                        <div class="message-icon send"><mat-icon fontIcon="send"></mat-icon></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </mat-card>
+</div>
