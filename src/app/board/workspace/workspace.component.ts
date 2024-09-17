@@ -1,16 +1,25 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIconModule } from '@angular/material/icon'; 
 import { MatCardModule } from '@angular/material/card';
 import { IconsService } from '../../shared/services/icons/icons.service';
 import { NgClass, NgFor, NgStyle } from '@angular/common';
 import { ChannelsService } from '../../shared/services/channels/channels.service';
+import { MatDialog } from '@angular/material/dialog';
+import { CreateNewChannelDialog } from './create-new-channel-dialog/create-new-channel-dialog.component';
 
 @Component({
   selector: 'app-workspace',
   standalone: true,
-  imports: [MatExpansionModule, MatIconModule, MatButtonModule, MatCardModule, NgFor, NgClass, NgStyle], 
+  imports: [
+    MatExpansionModule, 
+    MatIconModule, 
+    MatCardModule, 
+    NgFor, 
+    NgClass, 
+    NgStyle,
+    CreateNewChannelDialog
+  ], 
   templateUrl: './workspace.component.html',
   styleUrl: './workspace.component.scss', 
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -35,6 +44,7 @@ export class WorkspaceComponent {
   ];
 
   constructor(
+    public dialog: MatDialog,
     private iconsService: IconsService, 
     private channelsService: ChannelsService,
   ) {
@@ -42,6 +52,7 @@ export class WorkspaceComponent {
     this.icons = this.iconsService.getIcons();
     this.setClickedArrays();
    }
+
    
   rotateArrow(i: number){
     this.arrowRotated[i] = !this.arrowRotated[i];  
@@ -63,5 +74,12 @@ export class WorkspaceComponent {
     this.clickedChannels = Array(this.channels.length).fill(false);
     this.clickedUsers = Array(this.users.length).fill(false);
   }
+
+  
+  openDialog() {
+    this.dialog.open(CreateNewChannelDialog);
+  }
 }
+
+
 

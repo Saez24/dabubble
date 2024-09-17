@@ -37,13 +37,13 @@
                         <mat-icon class="icon" svgIcon="hashtag" aria-hidden="false" aria-label="Hashtag icon"></mat-icon>
                         <span>{{ channel }}</span>
                     </div>
-                    <div class="add-channel-container">
+                    <a (click)="openDialog()" class="add-channel-container">
                         <mat-icon class="icon" svgIcon="add-circle" aria-hidden="false" aria-label="Add circle icon"></mat-icon>
                         <span>Channel hinzufügen</span>
-                    </div>
+                    </a>
                 </mat-expansion-panel>    
             </div>
-            <div><a class="add-button"><mat-icon>add</mat-icon></a></div>
+            <div><a (click)="openDialog()" class="add-button"><mat-icon>add</mat-icon></a></div>
         </section>
 
         <section id="messages">

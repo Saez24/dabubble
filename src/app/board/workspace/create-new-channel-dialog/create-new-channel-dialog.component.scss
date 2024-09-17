@@ -1,0 +1,58 @@
+@import '../../../../mixin.scss';
+
+.dialog-content {
+    padding: 40px;
+    background-color: white;
+    @include dFlex($g: 24px, $fd: column, $jc: flex-start);
+}
+
+header {
+    width: 100%;
+    @include dFlex($jc: space-between);
+    h1 {
+        // margin-block-end: 0;
+        font-weight: 700;
+        font-size: 24px;
+    }
+}
+
+.mat-mdc-dialog-content {
+    @include dFlex($g: 24px, $fd: column, $ai: flex-start);
+    span {
+        font-size: 18px;
+    }
+}
+
+form {
+    width: 100%;
+}
+
+.channel-name {
+    width: 100%;
+    @include dFlex($g: 20px, $fd: column, $ai: flex-start);
+    h2 {
+        font-size: 18px;
+        font-weight: 700;
+        margin-block-end: 0;
+    }
+}
+
+.channel-description {
+    @include dFlex($g: 20px, $fd: column, $ai: flex-start);
+    div:nth-child(1) {
+        @include dFlex($g: 8px);
+        h2 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-block-end: 0;
+        }
+        span {
+            color: grey;
+        }
+    }
+}
+
+.mat-mdc-form-field {
+    width: 100%;
+}
+
