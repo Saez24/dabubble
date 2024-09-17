@@ -1,19 +1,18 @@
-<div class="container">
-  <mat-card class="card-header">
-    <mat-card-content>
+<div class="thread-container">
+  <mat-card>
+    <div class="card-header">
       <div class="card-header-content">
         <h1 class="card-title">Thread</h1>
         <span class="card-subtitle"># testtesttest</span>
       </div>
-      <div class="card-footer">
-        <button mat-icon-button>
-          <mat-icon>close</mat-icon>
-        </button>
-      </div>
-    </mat-card-content>
-  </mat-card>
-  <mat-card class="card-body" appearance="outlined">
-    <mat-card-content class="padding-0">
+
+      <button mat-icon-button>
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <div class="card-body">
+      <!-- Originalnachricht -->
       <div class="message-container">
         <img
           src="/assets/images/logo_big.png"
@@ -25,48 +24,95 @@
             <span class="message-sender">Noah Braun</span>
             <span class="message-time">14:25</span>
           </div>
-          <mat-card class="message-bubble">
-            <mat-card-content>
-              <p class="message-text">
-                Lorem ipsum dolor sit amet consectetur, adipisicing elit. Iure
-                voluptatibus porro aspernatur fugiat, nihil beatae labore
-                numquam ipsam aliquam facere sint, officiis a voluptatem
-                molestiae tenetur illo omnis fugit cum.
-              </p>
-            </mat-card-content>
-          </mat-card>
+          <div class="message-bubble">
+            <div class="message-text">
+              Lorem ipsum dolor sit amet consectetur, adipisicing elit. Iure
+              voluptatibus porro aspernatur fugiat, nihil beatae labore numquam
+              ipsam aliquam facere sint, officiis a voluptatem molestiae tenetur
+              illo omnis fugit cum.
+            </div>
+          </div>
+        </div>
+        <div class="emoji-box">
+          <mat-icon class="message-icon">add_reaction</mat-icon>
         </div>
       </div>
+
+      <!-- Anzahl der Antworten -->
       <div class="responses">
         <div class="antwort-zahl"><span>2</span><span>Antworten</span></div>
         <div class="line"></div>
       </div>
-    </mat-card-content>
 
-    <mat-card-content class="padding-0">
-      <div class="mirrored-message-container">
+      <!-- Kommentar -->
+      <div class="message-container">
         <img
           src="/assets/images/logo_big.png"
           alt="Profile Image"
-          class="mirrored-avatar"
+          class="avatar"
         />
-        <div class="mirrored-message-details">
-          <div class="mirrored-message-header">
-            <span class="mirrored-message-sender">Noah Braun</span>
-            <span class="mirrored-message-time">14:25</span>
+        <div class="message-details">
+          <div class="message-header">
+            <span class="message-sender">Somebody</span>
+            <span class="message-time">14:25</span>
           </div>
-          <mat-card class="mirrored-message-bubble">
-            <mat-card-content>
-              <p class="mirrored-message-text">
-                Lorem ipsum dolor sit amet consectetur, adipisicing elit. Iure
-                voluptatibus porro aspernatur fugiat, nihil beatae labore
-                numquam ipsam aliquam facere sint, officiis a voluptatem
-                molestiae tenetur illo omnis fugit cum.
-              </p>
-            </mat-card-content>
-          </mat-card>
+          <div class="message-bubble">
+            <div class="message-text">
+              Lorem ipsum dolor sit amet consectetur, adipisicing elit. Iure
+              voluptatibus porro aspernatur fugiat, nihil beatae labore numquam
+              ipsam aliquam facere sint, officiis a voluptatem molestiae tenetur
+              illo omnis fugit cum.
+            </div>
+          </div>
+        </div>
+        <div class="emoji-box">
+          <mat-icon class="material-symbols-outlined">add_reaction</mat-icon>
         </div>
       </div>
-    </mat-card-content>
+
+      <!-- Eigene Nachricht -->
+      <div class="user-message-container">
+        <img
+          src="/assets/images/logo_big.png"
+          alt="Profile Image"
+          class="user-avatar"
+        />
+        <div class="user-message-details">
+          <div class="user-message-header">
+            <span class="user-message-sender">My name</span>
+            <span class="user-message-time">14:25</span>
+          </div>
+          <div class="user-message-bubble">
+            <div>
+              Lorem ipsum dolor sit amet consectetur, adipisicing elit. Iure
+              voluptatibus porro aspernatur fugiat, nihil beatae labore numquam
+              ipsam aliquam facere sint, officiis a voluptatem molestiae tenetur
+              illo omnis fugit cum.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="message-input-container">
+        <textarea type="text" placeholder="Antworten..."></textarea>
+        <div class="message-icon-container">
+          <div class="left-icon-container">
+            <div class="message-icon"><mat-icon fontIcon="add"></mat-icon></div>
+            <div class="separator"></div>
+            <div class="message-icon">
+              <mat-icon fontIcon="sentiment_satisfied"></mat-icon>
+            </div>
+            <div class="message-icon">
+              <mat-icon fontIcon="alternate_email"></mat-icon>
+            </div>
+          </div>
+          <div class="right-icon-container">
+            <div class="message-icon send">
+              <mat-icon fontIcon="send"></mat-icon>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </mat-card>
 </div>
