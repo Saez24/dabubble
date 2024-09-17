@@ -8,9 +8,9 @@ import { RouterOutlet } from '@angular/router';
   imports: [CommonModule, RouterOutlet],
   templateUrl: './app.component.html',
   styleUrls: [
-      './app.component.scss',
-      '../styles.scss'
-    ]
+    './app.component.scss',
+    '../styles.scss'
+  ]
 })
 export class AppComponent {
   title = 'dabubble';
