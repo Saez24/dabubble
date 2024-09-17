@@ -8,6 +8,10 @@ import {MatButtonModule} from '@angular/material/button';
 import {MatSidenavModule} from '@angular/material/sidenav';
 import {MatCardModule} from '@angular/material/card';
 import {MatIconModule} from '@angular/material/icon';
+import {FormsModule} from '@angular/forms';
+import {MatInputModule} from '@angular/material/input';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatMenuModule} from '@angular/material/menu';
 
 @Component({
   selector: 'app-board',
@@ -24,13 +28,17 @@ import {MatIconModule} from '@angular/material/icon';
     WorkspaceComponent,
     ThreadComponent,
     CommonModule,
-    NgIf
+    NgIf,
+    FormsModule,
+    MatInputModule,
+    MatFormFieldModule,
+    MatMenuModule
   ],
   templateUrl: './board.component.html',
   styleUrl: './board.component.scss'
 })
 export class BoardComponent {
-
+  searchInput: string = '';
   showThreadComponent: boolean = true;
 
   closeThread() {

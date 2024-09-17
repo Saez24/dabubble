@@ -3,6 +3,22 @@
         <div class="logo-container">
             <img src="./../../assets/images/main_logo.png" alt="DABubble Logo">
         </div>
+        <mat-form-field class="searchbar">
+            <mat-label>Clearable input</mat-label>
+            <input matInput type="text" [(ngModel)]="searchInput">
+            <button matSuffix mat-icon-button>
+                <mat-icon>search</mat-icon>
+            </button>
+        </mat-form-field>
+        <div class="profile-menu-container" [matMenuTriggerFor]="menu" mat-button>
+            <span>Guest</span>
+            <img src="../../assets/images/avatars/avatar2.svg" alt="Profil Icon">
+            <mat-icon >keyboard_arrow_down</mat-icon>
+            <mat-menu #menu="matMenu">
+              <button mat-menu-item>Item 1</button>
+              <button mat-menu-item>Item 2</button>
+            </mat-menu>
+        </div>
     </header>
     <mat-drawer-container class="mat-drawer-container" autosize>
         <mat-drawer #drawer class="sidenav" [opened]="true" mode="side">
@@ -16,7 +32,7 @@
             </mat-card>
             <mat-card class="thread-container" appearance="outlined" *ngIf="showThreadComponent">
                 <mat-card-content>
-                    <app-thread  (closeThreadEvent)="closeThread()" @fadeInOut></app-thread>
+                    <app-thread (closeThreadEvent)="closeThread()" @fadeInOut></app-thread>
                 </mat-card-content>
             </mat-card>
         </div>

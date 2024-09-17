@@ -8,6 +8,35 @@ header {
     box-sizing: border-box;
 }
 
+mat-form-field {
+    border-radius: 42px;
+    background-color: #ffffff;
+    width: 989px;
+}
+
+.profile-menu-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+
+    >span {
+        font-family: "Nunito";
+        font-weight: 700;
+        font-size: 32px;
+        line-height: 43.65px;
+    }
+
+    >img {
+        width: 70px;
+        height: 70px;
+    }
+
+    &:hover {
+        cursor: pointer;
+    }
+}
+
 .logo-container {
     display: flex;
     align-items: center;
@@ -85,7 +114,8 @@ mat-toolbar-row {
     font-weight: 400;
 }
 
-.sidenav, .mat-drawer {
+.sidenav,
+.mat-drawer {
     border-radius: 30px;
 }
 
