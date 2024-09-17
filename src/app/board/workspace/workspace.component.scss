@@ -1,11 +1,15 @@
 @import '../../../mixin.scss';
 
+.workspace-content {
+    padding: 20px;
+}
+
 .mat-mdc-card {
     @include dFlex($fd: column, $g: 25px);
     box-shadow: none;
     width: 366px;
     padding: 32px 30px 32px 30px;
-    border-radius: 30px;
+    border-radius: 30px;    
 }
 
 .mat-mdc-card-content {
@@ -85,6 +89,7 @@ section {
 
         .chat-container-open {
             @include dFlex($fd: column, $g: 13px, $ai: flex-start);
+            overflow-y: auto;
             > div {
                 @include dFlex($g: 15px);
                 padding: 4px 20px 4px 20px;
@@ -130,8 +135,8 @@ section {
 }
 
 .icon {
-    width: 17.11px;
-    height: 16.65px;
+    width: 17.11px !important;
+    height: 16.65px !important;
 
     &:hover {
         color: $purple;
@@ -141,12 +146,12 @@ section {
 
 .arrow {
     transform: rotate(0deg) !important;
-    width: 9.01px;
+    width: 9.01px !important;
 }
 
 .rotated {
     transform: rotate(-90deg) !important;
-    width: 9.01px;
+    width: 9.01px !important;
 }
 
 .clicked {
@@ -172,8 +177,8 @@ section {
 }
 
 .new-channel-button {
-    height: 40px;
-    width: 40px;
+    height: 24px !important;
+    width: 24px !important;
     border-radius: 100%;
     @include dFlex();
 
