@@ -14,9 +14,9 @@
                     <app-chat-window (showThreadEvent)="showThread()"></app-chat-window>
                 </mat-card-content>
             </mat-card>
-            <mat-card class="thread-container" appearance="outlined">
+            <mat-card class="thread-container" appearance="outlined" *ngIf="showThreadComponent">
                 <mat-card-content>
-                    <app-thread *ngIf="showThreadComponent" (closeThreadEvent)="closeThread()" @fadeInOut></app-thread>
+                    <app-thread  (closeThreadEvent)="closeThread()" @fadeInOut></app-thread>
                 </mat-card-content>
             </mat-card>
         </div>
