@@ -29,12 +29,15 @@
                             <span>Channels</span>
                         </a>
                     </mat-expansion-panel-header>
-                    <div *ngFor="let channel of channels; let i = index" class="panel-container-open" 
-                        (click)="clickChannel(i)" [ngClass]="channelClicked[i] ? 'channel-clicked' : ''">
+                    <div 
+                    *ngFor="let channel of channels; let i = index" class="panel-container-open" 
+                    (click)="clickChannel(i)" 
+                    [ngClass]="clickedChannels[i] ? 'clicked' : ''"
+                    >
                         <mat-icon class="icon" svgIcon="hashtag" aria-hidden="false" aria-label="Hashtag icon"></mat-icon>
                         <span>{{ channel }}</span>
                     </div>
-                    <div class="panel-container-open">
+                    <div class="add-channel-container">
                         <mat-icon class="icon" svgIcon="add-circle" aria-hidden="false" aria-label="Add circle icon"></mat-icon>
                         <span>Channel hinzufügen</span>
                     </div>
@@ -46,7 +49,7 @@
         <section id="messages">
             <div class="panel-content">
                 <mat-expansion-panel hideToggle>
-                    <mat-expansion-panel-header  (click)="rotateArrow(1)">
+                    <mat-expansion-panel-header (click)="rotateArrow(1)">
                         <div class="panel-container">
                             <mat-icon 
                             class="icon" svgIcon="arrow" aria-hidden="false" aria-label="Arrow icon"
@@ -57,13 +60,17 @@
                         </div>
                     </mat-expansion-panel-header>
                     <div class="chat-container-open">
-                        <div *ngFor="let avatar of avatars">
+                        <div 
+                        *ngFor="let user of users; let i = index"
+                        (click)="clickUser(i)"
+                        [ngClass]="clickedUsers[i] ? 'clicked' : ''"
+                        >
                             <div>
-                                <img [src]="avatar" alt="Avatar Image">
-                                <div class="online"></div>
+                              <img [src]="user.avatar" alt="Avatar Image">
+                              <div [ngStyle]="{ 'background': users[i].online ? '#92C83E' : '#686868' }" class="status"></div>
                             </div>
-                            <span>Name</span>
-                          </div>
+                            <span>{{ user.firstName }} {{ user.lastName }}</span>
+                        </div>
                     </div>
                 </mat-expansion-panel>    
             </div>

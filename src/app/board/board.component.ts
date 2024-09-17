@@ -1,11 +1,12 @@
 import { Component } from '@angular/core';
-import { ChatWindowComponent } from './chat-window/chat-window.component';
-import { WorkspaceComponent } from "./workspace/workspace.component";
+import { ChatWindowComponent } from "./chat-window/chat-window.component";
 
 @Component({
   selector: 'app-board',
   standalone: true,
-  imports: [ChatWindowComponent, WorkspaceComponent],
+  imports: [
+    ChatWindowComponent
+],
   templateUrl: './board.component.html',
   styleUrl: './board.component.scss'
 })

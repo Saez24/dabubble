@@ -54,33 +54,63 @@ section {
             @include dFlex($g: 10px, $jc: flex-start);
             padding: 4px 20px 4px 20px;
             border-radius: 20px;
+            margin-bottom: 25px;
+            &:nth-child(1) {
+                margin-top: 25px;
+            }
             &:hover {
-                color: $purple;
+                background-color: $light-purple;
                 cursor: pointer;
-                font-weight: 700;
+                .icon {
+                    color: $purple;
+                }
             } 
         }
 
-        // .add-channel-container {
-        //     @include dFlex($g: 10px, $jc: flex-start);
-        //     padding: 4px 20px 4px 20px;
-        // }
+        .add-channel-container {
+            @include dFlex($g: 10px, $jc: flex-start);
+            padding: 4px 20px 4px 20px;
+            border-radius: 20px;
+            &:hover {
+                cursor: pointer;
+                .icon {
+                    color: $purple;
+                }
+                span {
+                    color: $purple;
+                }
+            }
+        }
+                
 
         .chat-container-open {
             @include dFlex($fd: column, $g: 13px, $ai: flex-start);
             > div {
                 @include dFlex($g: 15px);
+                padding: 4px 20px 4px 20px;
+                border-radius: 35px;
+                &:nth-child(1) {
+                    margin-top: 25px;
+                }
+                &:hover {
+                    cursor: pointer;
+                    background-color: $light-purple;
+                }
 
                 > div {
                     @include dFlex($ai: flex-end);
                     
                 }
 
-                > div .online {
+                img {
+                    width: 50px;
+                    height: 50px;
+                }
+
+                > div .status {
                     width: 14px;
                     height: 14px;
                     border: 2px solid white;
-                    background: #92C83E;
                     border-radius: 100%;
                     margin-left: -14px;
                 }
@@ -88,6 +118,10 @@ section {
                 span {
                     font-size: 18px;
                     font-weight: 400;
+                    white-space: nowrap;      
+                    overflow: hidden;          
+                    text-overflow: ellipsis; 
+                    max-width: 168px; 
                 } 
             }
             
@@ -107,22 +141,19 @@ section {
 
 .arrow {
     transform: rotate(0deg) !important;
-    width: 14px;
-    height: 13px;
-
+    width: 9.01px;
 }
 
 .rotated {
     transform: rotate(-90deg) !important;
-    width: 14px;
-    height: 13px;
-
+    width: 9.01px;
 }
 
-.channel-clicked {
+.clicked {
     color: $purple;
     font-weight: 700;
     background-color: $light-purple;
+    cursor: default !important;
 }
 
 .add-button {
@@ -156,6 +187,10 @@ section {
 
 .mat-expansion-panel {
     box-shadow: none !important;
+}
+
+.mat-expansion-panel-header.mat-expanded {
+    height: 48px !important;
 }
 
 .mat-expansion-panel-header-description, .mat-expansion-panel-header-title {

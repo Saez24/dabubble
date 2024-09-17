@@ -1,17 +1,16 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIconModule } from '@angular/material/icon'; 
 import { MatCardModule } from '@angular/material/card';
 import { IconsService } from '../../shared/services/icons/icons.service';
-import { AvatarsService } from '../../shared/services/avatars/avatars.service';
-import { NgClass, NgFor } from '@angular/common';
+import { NgClass, NgFor, NgStyle } from '@angular/common';
 import { ChannelsService } from '../../shared/services/channels/channels.service';
 
 @Component({
   selector: 'app-workspace',
   standalone: true,
-  imports: [MatExpansionModule, MatIconModule, MatButtonModule, MatCardModule, NgFor, NgClass], 
+  imports: [MatExpansionModule, MatIconModule, MatButtonModule, MatCardModule, NgFor, NgClass, NgStyle], 
   templateUrl: './workspace.component.html',
   styleUrl: './workspace.component.scss', 
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -20,32 +19,49 @@ import { ChannelsService } from '../../shared/services/channels/channels.service
 export class WorkspaceComponent {
 
   panelOpenState = false;
-  avatars: string[] = [];
   arrowRotated: boolean[] = [false, false]; 
   channels: string[] = [];
-  channelClicked: boolean[] = [];
+  clickedChannels: boolean[] = [];
+  clickedUsers: boolean[] = [];
   icons: string[] = [];
+
+  users = [
+    { firstName: 'Anna', lastName: 'Müller', avatar: '../../../../assets/images/avatars/avatar1.svg', online: true },
+    { firstName: 'Ben', lastName: 'Schmidt', avatar:  '../../../../assets/images/avatars/avatar2.svg', online: true },
+    { firstName: 'Clara', lastName: 'Meier', avatar: '../../../../assets/images/avatars/avatar3.svg', online: true },
+    { firstName: 'David', lastName: 'Schneider', avatar: '../../../../assets/images/avatars/avatar4.svg', online: false },
+    { firstName: 'Ella', lastName: 'Fischer', avatar: '../../../../assets/images/avatars/avatar5.svg', online: true },
+    { firstName: 'Felix', lastName: 'Weber', avatar: '../../../../assets/images/avatars/avatar6.svg', online: true }
+  ];
 
   constructor(
     private iconsService: IconsService, 
-    private avatarsService: AvatarsService,
     private channelsService: ChannelsService,
   ) {
-    this.avatars = this.avatarsService.getAvatars();
     this.channels = this.channelsService.getChannels();
     this.icons = this.iconsService.getIcons();
-    this.channelClicked = Array(this.channels.length).fill(false); 
+    this.setClickedArrays();
    }
-
    
   rotateArrow(i: number){
     this.arrowRotated[i] = !this.arrowRotated[i];  
   }
 
-  clickChannel(i: number) {
-    this.channelClicked = Array(this.channels.length).fill(false);
-    this.channelClicked[i] = true;
+  clickChannel (i: number) {
+    this.clickedChannels.fill(false);
+    this.clickedUsers.fill(false);
+    this.clickedChannels[i] = true;
   }
 
+  clickUser (i: number) {
+    this.clickedUsers.fill(false);
+    this.clickedChannels.fill(false);
+    this.clickedUsers[i] = true;
+  }
+
+  setClickedArrays() {
+    this.clickedChannels = Array(this.channels.length).fill(false);
+    this.clickedUsers = Array(this.users.length).fill(false);
+  }
 }
 
