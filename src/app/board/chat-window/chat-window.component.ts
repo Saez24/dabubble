@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, HostListener, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, HostListener, Output, ViewEncapsulation } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -41,5 +41,10 @@ export class ChatWindowComponent {
     if (this.showEmojiPicker && !target.closest('emoji-mart') && !target.closest('.message-icon')) {
       this.showEmojiPicker = false;
     }
+  }
+
+  @Output() showThreadEvent = new EventEmitter<void>();
+  showThread() {
+    this.showThreadEvent.emit();
   }
 }
