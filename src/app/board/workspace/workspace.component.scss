@@ -39,7 +39,9 @@ header {
 section {
     width: 100%;
     @include dFlex($jc: space-between, $ai: flex-start);
+
     .panel-content {
+
         .panel-container {
             @include dFlex($g: 10px, $jc: flex-start);
             span {
@@ -47,25 +49,33 @@ section {
                 font-weight: 700;
             }
         }
+
         .panel-container-open {
             @include dFlex($g: 10px, $jc: flex-start);
             padding: 4px 20px 4px 20px;
             border-radius: 20px;
-            background-color: $light-purple;
-            color: $purple;
+            &:hover {
+                color: $purple;
+                cursor: pointer;
+                font-weight: 700;
+            } 
         }
-        .add-channel-container {
-            @include dFlex($g: 10px, $jc: flex-start);
-            padding: 4px 20px 4px 20px;
-        }
+
+        // .add-channel-container {
+        //     @include dFlex($g: 10px, $jc: flex-start);
+        //     padding: 4px 20px 4px 20px;
+        // }
+
         .chat-container-open {
             @include dFlex($fd: column, $g: 13px, $ai: flex-start);
             > div {
                 @include dFlex($g: 15px);
+
                 > div {
                     @include dFlex($ai: flex-end);
                     
                 }
+
                 > div .online {
                     width: 14px;
                     height: 14px;
@@ -74,6 +84,7 @@ section {
                     border-radius: 100%;
                     margin-left: -14px;
                 }
+
                 span {
                     font-size: 18px;
                     font-weight: 400;
@@ -87,11 +98,32 @@ section {
 .icon {
     width: 17.11px;
     height: 16.65px;
+
     &:hover {
-    color: $purple;
-    cursor: pointer;
+        color: $purple;
+        cursor: pointer;
     }
 } 
+
+.arrow {
+    transform: rotate(0deg) !important;
+    width: 14px;
+    height: 13px;
+
+}
+
+.rotated {
+    transform: rotate(-90deg) !important;
+    width: 14px;
+    height: 13px;
+
+}
+
+.channel-clicked {
+    color: $purple;
+    font-weight: 700;
+    background-color: $light-purple;
+}
 
 .add-button {
     height: 32px;
@@ -99,11 +131,12 @@ section {
     border-radius: 100%;
     margin-top: 6px;
     @include dFlex();
+
     &:hover {
-    color: $dark-purple;
-    cursor: pointer;
-    font-weight: 700;
-    background-color: $light-purple;
+        color: $dark-purple;
+        cursor: pointer;
+        font-weight: 700;
+        background-color: $light-purple;
     }
 }
 
@@ -112,20 +145,12 @@ section {
     width: 40px;
     border-radius: 100%;
     @include dFlex();
-    &:hover {
-    color: $dark-purple;
-    font-weight: 700;
-    cursor: pointer;
-    background-color: $light-purple;
-    }
-}
 
-.mat-expansion-panel-header {
-    flex-direction: row-reverse;
-    gap: 14px;
-    .mat-content {
-        display: flex;
-        flex-direction: row-reverse !important;
+    &:hover {
+        color: $dark-purple;
+        font-weight: 700;
+        cursor: pointer;
+        background-color: $light-purple;
     }
 }
 

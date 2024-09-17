@@ -4,6 +4,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { Location } from '@angular/common';
+import { AvatarsService } from '../../../shared/services/avatars/avatars.service';
 
 @Component({
   selector: 'app-select-avatar',
@@ -13,23 +14,15 @@ import { Location } from '@angular/common';
   styleUrl: './select-avatar.component.scss',
   encapsulation: ViewEncapsulation.None
 })
-export class SelectAvatarComponent implements OnInit {
 
-  constructor(private _location: Location) { }
+export class SelectAvatarComponent {
 
-  avatars = [
-    '../../../../assets/images/avatars/avatar1.svg',
-    '../../../../assets/images/avatars/avatar2.svg',
-    '../../../../assets/images/avatars/avatar3.svg',
-    '../../../../assets/images/avatars/avatar4.svg',
-    '../../../../assets/images/avatars/avatar5.svg',
-    '../../../../assets/images/avatars/avatar6.svg',
-  ];
-
+  avatars: string[] = [];
   selectedAvatar: string | null = null;
   avatarSelected = false;
 
-  ngOnInit() {
+  constructor(private _location: Location, private avatarsService: AvatarsService) { 
+    this.avatars = this.avatarsService.getAvatars();
     this.shuffleAvatars();
   }
 
