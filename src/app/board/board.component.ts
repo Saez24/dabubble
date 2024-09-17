@@ -31,7 +31,14 @@ import {MatIconModule} from '@angular/material/icon';
 })
 export class BoardComponent {
 
+  showThreadComponent: boolean = false;
+
   closeThread() {
     this.showThreadComponent = false;
+  }
+
+
+  showThread() {
+    
   }
 }
