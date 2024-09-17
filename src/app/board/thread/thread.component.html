@@ -1,15 +1,13 @@
 <!-- <div class="container"> -->
-  <mat-card class="card-header">
-    <mat-card-content>
-      <div class="card-header-content">
-        <h1 class="card-title">Thread</h1>
-        <span class="card-subtitle"># testtesttest</span>
-      </div>
-      <button class="close-btn" mat-icon-button aria-label="Close Thread" (click)="closeThread()">
-        <mat-icon>close</mat-icon>
-      </button>
-      
+<mat-card class="card-header">
+  <mat-card-content>
+    <div class="card-header-content">
+      <h1 class="card-title">Thread</h1>
+      <span class="card-subtitle"># testtesttest</span>
     </div>
+    <button class="close-btn" mat-icon-button aria-label="Close Thread" (click)="closeThread()">
+      <mat-icon>close</mat-icon>
+    </button>
 
     <div class="card-body">
       <!-- Originalnachricht -->
@@ -117,24 +115,24 @@
         </div>
       </div>
     </div>
-      <!-- Nachrichteneingabebereich -->
-      <div class="message-input-container">
-        <textarea id="message" [(ngModel)]="message" placeholder="Schreiben Sie Ihre Nachricht"></textarea>
-        <div class="message-icon-container">
-          <div class="left-icon-container">
-            <div class="message-icon"><mat-icon fontIcon="add"></mat-icon></div>
-            <div class="separator"></div>
-            <div (click)="showEmoji()" class="message-icon">
-              <mat-icon fontIcon="sentiment_satisfied"></mat-icon>
-            </div>
-            <div class="message-icon"><mat-icon fontIcon="alternate_email"></mat-icon></div>
+    <!-- Nachrichteneingabebereich -->
+    <div class="message-input-container">
+      <textarea id="message" [(ngModel)]="message" placeholder="Schreiben Sie Ihre Nachricht"></textarea>
+      <div class="message-icon-container">
+        <div class="left-icon-container">
+          <div class="message-icon"><mat-icon fontIcon="add"></mat-icon></div>
+          <div class="separator"></div>
+          <div (click)="showEmoji()" class="message-icon">
+            <mat-icon fontIcon="sentiment_satisfied"></mat-icon>
           </div>
-          <div class="right-icon-container">
-            <div class="message-icon send"><mat-icon fontIcon="send"></mat-icon></div>
-          </div>
+          <div class="message-icon"><mat-icon fontIcon="alternate_email"></mat-icon></div>
         </div>
-        <emoji-mart *ngIf="showEmojiPicker" (emojiSelect)="addEmoji($event)" [darkMode]="false" title="Pick your emoji…" emoji="point_up"></emoji-mart>
+        <div class="right-icon-container">
+          <div class="message-icon send"><mat-icon fontIcon="send"></mat-icon></div>
+        </div>
       </div>
-    
-  </mat-card>
+        <emoji-mart *ngIf="showEmojiPicker" (emojiSelect)="addEmoji($event)" [darkMode]="false" title="Pick your emoji…" emoji="point_up"></emoji-mart>
+    </div>
+  </mat-card-content>
+</mat-card>
 <!-- </div> -->
