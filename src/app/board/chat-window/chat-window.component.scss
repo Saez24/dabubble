@@ -1,17 +1,22 @@
 .chat-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
     height: 100vh;
     width: 100%;
     max-width: 980px;
-    margin: 20px auto;
     border-radius: 30px !important;
     overflow-x: hidden;
+    padding: 20px 20px;
 }
 
 .chat-container {
     box-sizing: border-box;
+}
+
+.mat-mdc-card {
+    padding: 0;
+}
+
+.mdc-card {
+    justify-content: space-between;
 }
 
 .chat-header {
@@ -39,11 +44,9 @@
     cursor: pointer;
     height: 49px !important;
     color: rgba(0, 0, 0, 1);
-
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0 10px 0 10px;
 
     >span {
         font-weight: 700;
@@ -60,14 +63,20 @@
 .members-container {
     display: flex;
     align-items: center;
+    gap: 20px;
+}
+
+.members-list {
+    display: flex;
+    align-items: center;
     gap: 10px;
     font-size: 20px;
-
 
     >img {
         height: 40px;
         margin-left: -20px;
     }
+
 }
 
 .add-member-button {
@@ -94,6 +103,8 @@
     flex-direction: column;
     align-items: center;
     margin-top: 120px;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .posted-date-container {
@@ -124,11 +135,11 @@
     position: relative;
     width: 100%;
     padding: 20px 40px 20px 40px !important;
-    box-sizing: border-box;
     display: flex;
     gap: 30px;
     transition: background 0.3s ease;
     cursor: pointer;
+    box-sizing: border-box;
 
 
     &:hover {
@@ -252,13 +263,12 @@
     position: relative;
     width: 100%;
     padding: 20px 40px 20px 40px !important;
-    box-sizing: border-box;
     display: flex;
     flex-direction: row-reverse;
     gap: 30px;
     transition: background 0.3s ease;
     cursor: pointer;
-
+    box-sizing: border-box;
 
     &:hover {
         background: rgba(236, 238, 254, 1);
@@ -352,8 +362,10 @@
 .message-input-container {
     position: relative;
     width: 100%;
-    padding: 20px 40px 20px 40px;
+    padding: 20px;
     box-sizing: border-box;
+    max-height: 165px;
+    margin-bottom: 20px;
 
     textarea {
         background-color: white !important;
@@ -365,6 +377,7 @@
         box-sizing: border-box;
         font-family: Nunito;
         font-size: 18px;
+        resize: none;
     }
 }
 
@@ -428,7 +441,78 @@
 .emoji-mart {
     border-radius: 30px 30px 30px 30px;
     position: absolute;
-    bottom: 212px;
-    left: 86px;
+    bottom: 145px;
+    left: 50%;
+    transform: translateX(-50%);
     z-index: 10;
+}
+
+@media screen and (max-width: 768px) {
+    .chat-content {
+        margin-top: 60px;
+    }
+
+    .members-list {
+        display: none;
+    }
+
+    .chat-header {
+        height: 60px;
+        padding: 0 20px 0 20px;
+    }
+
+    .mat-icon {
+        height: 34px !important;
+        width: 34px !important;
+        font-size: 24px;
+    }
+
+    .message-container {
+        padding: 0 15px;
+
+        >.message-recieved {
+            font-size: 16px;
+        }
+
+        >.message-sender {
+            font-size: 16px;
+        }
+    }
+
+    .message-received-container {
+        padding: 15px !important;
+        gap: 10px;
+
+        >img {
+            height: 50px;
+            width: 50px;
+        }
+    }
+
+    .message-sender-container {
+        padding: 15px !important;
+        gap: 10px;
+
+        >img {
+            height: 50px;
+            width: 50px;
+        }
+    }
+
+    .message-input-container {
+        padding: 10px;
+        margin-bottom: 0;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .chat-header-button>span {
+        font-size: 20px;
+    }
+}
+
+@media screen and (max-width: 375px) {
+    .chat-header-button>span {
+        font-size: 16px;
+    }
 }
