@@ -1,0 +1,12 @@
+@mixin dFlex($g: 0px, $fd: row, $jc: center, $ai: center) {
+    display: flex;
+    justify-content: $jc;
+    align-items: $ai;
+    flex-direction: $fd;
+    gap: $g;
+  }
+  
+  $dark-purple: #444DF2;
+  $purple: #797EF3;
+  $light-purple: #ECEEFE;
+  $light-grey: lightgrey;

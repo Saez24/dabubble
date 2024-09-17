@@ -1,14 +1,4 @@
-@mixin dFlex($g: 0px, $fd: row, $jc: center, $ai: center) {
-  display: flex;
-  justify-content: $jc;
-  align-items: $ai;
-  flex-direction: $fd;
-  gap: $g;
-}
-
-$dark-purple: #444DF2;
-$light-purple: #797EF3;
-$light-grey: lightgrey;
+@import '../../../../mixin.scss';
 
 .mat-typography h1 {
   font-size: 46px;
@@ -101,7 +91,7 @@ $light-grey: lightgrey;
     div {
       height: 168px;
       width: 168px;
-      background-color: $light-purple;
+      background-color: $purple;
       border-radius: 100%;
       @include dFlex();
     }
@@ -181,7 +171,7 @@ $light-grey: lightgrey;
       height: 49px;
       border-radius: 25px;
       padding: 12px 25px 12px 25px;
-      border: 1px solid $light-purple;
+      border: 1px solid $purple;
       color: $dark-purple;
       font-size: 18px;
       transition: background-color 0.5s ease-in-out;
@@ -219,7 +209,7 @@ $light-grey: lightgrey;
 
     &:hover {
       cursor: pointer;
-      background-color: $light-purple;
+      background-color: $purple;
     }
 
     .mdc-button__label {
@@ -232,6 +222,10 @@ $light-grey: lightgrey;
 
 .create-account-container {
   display: none !important;
+}
+
+.file-input {
+  display: none;
 }
 
 .intro-animation-container {
