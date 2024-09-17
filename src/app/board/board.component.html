@@ -11,12 +11,12 @@
         <div class="sidenav-content">
             <mat-card class="chat-window-container" appearance="outlined">
                 <mat-card-content>
-                    <app-chat-window></app-chat-window>
+                    <app-chat-window (showThreadEvent)="showThread()"></app-chat-window>
                 </mat-card-content>
             </mat-card>
             <mat-card class="thread-container" appearance="outlined">
                 <mat-card-content>
-                    <app-thread></app-thread>
+                    <app-thread *ngIf="showThreadComponent" (closeThreadEvent)="closeThread()" @fadeInOut></app-thread>
                 </mat-card-content>
             </mat-card>
         </div>

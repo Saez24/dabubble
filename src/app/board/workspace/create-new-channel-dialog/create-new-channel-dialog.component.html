@@ -1,0 +1,36 @@
+<div class="dialog-content">
+    <header>
+        <h1 mat-dialog-title>Channel erstellen</h1>
+        <a mat-dialog-close><mat-icon>close</mat-icon></a>
+    </header>
+    <mat-dialog-content>
+    
+        <span>Channels dienen deinem Team zur Kommunikation. Am besten sollten sie themenbezogen sein  #marketing zum Beispiel.</span>
+    
+        <form action="">
+            <div class="channel-name">
+                <h2>Channel-Name</h2>
+                <mat-form-field appearance="outline">
+                    <mat-icon class="icon" svgIcon="hashtag" aria-hidden="false" aria-label="Workspace icon"></mat-icon>
+                    <input matInput placeholder="z.B. Kooperationsobjekte">
+                </mat-form-field>
+            </div>
+            <div class="channel-description">
+                <div>
+                    <h2>Beschreibung</h2>
+                    <span>(optional)</span>
+                </div>
+                    <mat-form-field appearance="outline">
+                        <mat-label>Die Funktion deines Channels</mat-label>
+                        <input matInput placeholder="Dein Text hier">
+                    </mat-form-field>
+            </div>
+        </form>
+        
+    </mat-dialog-content>
+    
+    <mat-dialog-actions>
+        <button mat-button mat-dialog-close>Erstellen</button>
+    </mat-dialog-actions>
+</div>
+
