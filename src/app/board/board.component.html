@@ -1,1 +1,28 @@
-<app-chat-window></app-chat-window>
+<div class="board-container">
+    <header>
+        <div class="logo-container">
+            <img src="./../../assets/images/main_logo.png" alt="DABubble Logo">
+        </div>
+    </header>
+    <mat-drawer-container class="mat-drawer-container" autosize>
+        <mat-drawer #drawer class="sidenav" [opened]="true" mode="side">
+            <app-workspace></app-workspace>
+        </mat-drawer>
+        <div class="sidenav-content">
+            <mat-card class="chat-window-container" appearance="outlined">
+                <mat-card-content>
+                    <app-chat-window></app-chat-window>
+                </mat-card-content>
+            </mat-card>
+            <mat-card class="thread-container" appearance="outlined">
+                <mat-card-content>
+                    <app-thread></app-thread>
+                </mat-card-content>
+            </mat-card>
+        </div>
+    </mat-drawer-container>
+    <div class="navigation-toggle-btn" (click)="drawer.toggle()">
+        <img src="../../assets/images/icons/toggle_workspace_icon.png" alt="">
+        <span>Workspace-Menü schließen</span>
+    </div>
+</div>

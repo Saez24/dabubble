@@ -24,7 +24,7 @@ export class GoogleAuthService {
 
   async googlePopupLogin(): Promise<void> {
     try {
-      const result = await signInWithPopup(this.auth, this.provider);
+      let result = await signInWithPopup(this.auth, this.provider);
       if (result.user) {
         this.router.navigateByUrl('board');
         console.log('Loged In as:', result.user.displayName, result.user.email);
@@ -35,15 +35,15 @@ export class GoogleAuthService {
     }
   }
 
-  async getRedirectIntel(): Promise<void> {
-    try {
-      const result = await getRedirectResult(this.auth);
-      if (result?.user) {
-        this.router.navigateByUrl('board');        
-      }
-    } catch (err: any) {
-      console.error(err);
-      throw err;
-    }
-  }
+  // async getRedirectIntel(): Promise<void> {
+  //   try {
+  //     let result = await getRedirectResult(this.auth);
+  //     if (result?.user) {
+  //       this.router.navigateByUrl('board');        
+  //     }
+  //   } catch (err: any) {
+  //     console.error(err);
+  //     throw err;
+  //   }
+  // }
 }

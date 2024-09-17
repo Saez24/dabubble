@@ -8,11 +8,9 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatButtonModule } from '@angular/material/button';
 import { Router, RouterModule } from '@angular/router';
 import { MatDividerModule } from '@angular/material/divider';
-import { GoogleAuthService } from '../../shared/services/authentication/google-auth-service/google-auth.service';
 
-/* Put into ServiceWorker.ts */
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
-import { UserCredential } from "firebase/auth";
+import { GoogleAuthService } from '../../shared/services/authentication/google-auth-service/google-auth.service';
+import { AuthService } from '../../shared/services/authentication/auth-service/auth.service';
 /* ------------------------- */
 
 export class MyErrorStateMatcher implements ErrorStateMatcher {
@@ -42,17 +40,16 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
 export class SignInComponent {
 
   googleAuthService = inject(GoogleAuthService);
+  authService = inject(AuthService);
   router = inject(Router);
-
-  /* Put into ServiceWorker.ts */
-  auth = getAuth();
-  /* ------------------------- */
 
   emailFormControl = new FormControl('', [Validators.required, Validators.email]);
   passwordFormControl = new FormControl('', [Validators.required]);
   nameFormControl = new FormControl('', [Validators.required]);
   checkboxFormControl = new FormControl(false, [Validators.requiredTrue]);
   formSubmitted = false;
+  passwordVisible: boolean = false;
+  loginError = false;
 
   matcher: MyErrorStateMatcher = new MyErrorStateMatcher();
 
@@ -61,25 +58,34 @@ export class SignInComponent {
     try {
       await this.googleAuthService.googlePopupLogin();
       this.router.navigateByUrl('board');
-    } catch (err) {
-      console.error('Google login error:', err);
+    }
+    catch (error) {
+      console.error('Google login error:', error);
     }
   }
 
 
-  guestSignIn(): void {
+  guestLogin(): void {
     this.router.navigateByUrl('board');
   }
 
-/* -------create user------- */
-  async createUser(email: string, password: string) {
-    try {
-      let response: UserCredential = await createUserWithEmailAndPassword(this.auth, email, password);
-      this.router.navigateByUrl('board');
-    } catch (err: any) {
-      console.error(err);
-      throw err;
+
+  async emailLogin(email: string, password: string): Promise<void> {
+    if (this.emailFormControl.valid && this.passwordFormControl.valid) {
+      try {
+        await this.authService.login(email, password);
+      }
+      catch (error) {
+        console.error('Login error:', error);
+        this.loginError = true;
+      }
+    }
+    else {
+      console.error('Invalid form');
     }
   }
-  /* ------------------------- */
+
+  showPassword(): void {
+    this.passwordVisible = !this.passwordVisible;
+  }
 }
