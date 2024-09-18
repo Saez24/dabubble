@@ -59,7 +59,7 @@
                 <span class="my-name">Frederik Beck <span class="message-time">15:06 Uhr</span></span>
                 <span *ngIf="messageArea" class="chat-message-sender">{{ message }}</span>
                 <div class="message-edit-container" *ngIf="showMessageEditArea">
-                    <textarea id="edit-message" type="text" [(ngModel)]="message"></textarea>
+                    <textarea class="message-input" id="edit-message" type="text" [(ngModel)]="message"></textarea>
                     <div class="message-edit-buttons">
                         <div class="message-icon">
                             <mat-icon fontIcon="sentiment_satisfied"></mat-icon>
@@ -83,7 +83,8 @@
         </div>
     </div>
     <div class="chat-message-input-container">
-        <textarea class="message-input" id="chatMessage" type="text" placeholder="Schreiben Sie Ihre Nachricht">
+        <textarea class="message-input" id="chatMessage" [(ngModel)]="chatMessage" type="text"
+            placeholder="Schreiben Sie Ihre Nachricht">
                         </textarea>
         <div class="message-icon-container">
             <div class="left-icon-container">
