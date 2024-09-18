@@ -62,8 +62,10 @@ mat-form-field {
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    height: 100%;
     gap: 24px;
+    height: 100%;
+    // box-sizing: border-box; // with this adjustment the container should not be possible to overflow.
+    // padding: 20px;
 
     .navigation-toggle-btn {
         position: absolute;

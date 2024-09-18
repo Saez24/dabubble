@@ -1,5 +1,9 @@
 @import '../../../mixin.scss';
 
+* {
+    box-sizing: border-box;
+}
+
 .workspace-content {
     padding: 20px;
 }
@@ -55,20 +59,26 @@ section {
         }
 
         .panel-container-open {
-            @include dFlex($g: 10px, $jc: flex-start);
-            padding: 4px 20px 4px 20px;
-            border-radius: 20px;
-            margin-bottom: 25px;
-            &:nth-child(1) {
-                margin-top: 25px;
-            }
-            &:hover {
-                background-color: $light-purple;
-                cursor: pointer;
-                .icon {
-                    color: $purple;
+            @include dFlex($fd: column, $g: 10px, $ai: flex-start);
+            > div {
+                @include dFlex($g: 15px);
+                padding: 4px 20px 4px 20px;
+                border-radius: 20px;
+                &:nth-child(1) {
+                    margin-top: 25px;
                 }
-            } 
+                &:nth-last-child(1) {
+                    margin-bottom: 25px;
+                }
+                &:hover {
+                    background-color: $light-purple;
+                    cursor: pointer;
+                    .icon {
+                        color: $purple;
+                    }
+                } 
+            }
+            
         }
 
         .add-channel-container {
@@ -176,9 +186,9 @@ section {
     }
 }
 
-.new-channel-button {
-    height: 24px !important;
-    width: 24px !important;
+.new-chat-button {
+    height: 40px;
+    width: 40px;
     border-radius: 100%;
     @include dFlex();
 
@@ -187,6 +197,11 @@ section {
         font-weight: 700;
         cursor: pointer;
         background-color: $light-purple;
+    }
+
+    .new-chat-icon {
+        width: 24px !important;
+        height: 24px !important; 
     }
 }
 
@@ -215,5 +230,6 @@ section {
 .dialog-container .mat-dialog-container {
     border-radius: 30px !important;
 }
+  
 
 

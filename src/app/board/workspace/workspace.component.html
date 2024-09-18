@@ -11,7 +11,7 @@
                 </div>
             </div>
             <div>
-                <a class="new-channel-button" ><mat-icon svgIcon="new-channel" aria-hidden="false"></mat-icon></a>
+                <a class="new-chat-button" ><mat-icon class="new-chat-icon" svgIcon="new-channel" aria-hidden="false"></mat-icon></a>
             </div>
         </header>
         
@@ -30,13 +30,15 @@
                                 <span>Channels</span>
                             </a>
                         </mat-expansion-panel-header>
-                        <div 
-                        *ngFor="let channel of channels; let i = index" class="panel-container-open" 
-                        (click)="clickChannel(i)" 
-                        [ngClass]="clickedChannels[i] ? 'clicked' : ''"
-                        >
-                            <mat-icon class="icon" svgIcon="hashtag" aria-hidden="false" aria-label="Hashtag icon"></mat-icon>
-                            <span>{{ channel }}</span>
+                        <div class="panel-container-open">
+                            <div 
+                                *ngFor="let channel of channels; let i = index" 
+                                (click)="clickChannel(i)" 
+                                [ngClass]="clickedChannels[i] ? 'clicked' : ''"
+                                >
+                                <mat-icon class="icon" svgIcon="hashtag" aria-hidden="false" aria-label="Hashtag icon"></mat-icon>
+                                <span>{{ channel }}</span>
+                            </div>
                         </div>
                         <a (click)="openDialog()" class="add-channel-container">
                             <mat-icon class="icon" svgIcon="add-circle" aria-hidden="false" aria-label="Add circle icon"></mat-icon>
@@ -51,14 +53,14 @@
                 <div class="panel-content">
                     <mat-expansion-panel hideToggle>
                         <mat-expansion-panel-header (click)="rotateArrow(1)">
-                            <div class="panel-container">
+                            <a class="panel-container">
                                 <mat-icon 
                                 class="icon" svgIcon="arrow" aria-hidden="false" aria-label="Arrow icon"
                                 [ngClass]="arrowRotated[1] ? 'arrow' : 'rotated'">
                                 </mat-icon>
                                 <mat-icon class="icon" svgIcon="chat" aria-hidden="false" aria-label="Workspace icon"></mat-icon>
                                 <span>Direktnachrichten</span>
-                            </div>
+                            </a>
                         </mat-expansion-panel-header>
                         <div class="chat-container-open">
                             <div 
