@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, ViewEncapsulation, inject } from '@angular/core';
 import { ChatWindowComponent } from "./chat-window/chat-window.component";
 import { WorkspaceComponent } from "./workspace/workspace.component";
 import { ThreadComponent } from './thread/thread.component';
@@ -11,6 +11,7 @@ import { FormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatMenuModule } from '@angular/material/menu';
+import { AuthService } from '../shared/services/authentication/auth-service/auth.service';
 
 @Component({
   selector: 'app-board',
@@ -38,8 +39,16 @@ import { MatMenuModule } from '@angular/material/menu';
   encapsulation: ViewEncapsulation.None
 })
 export class BoardComponent {
+  authService = inject(AuthService);
   searchInput: string = '';
   showThreadComponent: boolean = true;
+  currentUser = this.authService.auth.currentUser;
+
+  constructor() { }
+
+
+  ngOnInit() {
+  }
 
   closeThread() {
     this.showThreadComponent = false;

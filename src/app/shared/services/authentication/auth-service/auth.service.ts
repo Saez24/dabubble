@@ -2,7 +2,7 @@
 
 import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword, signOut, updateProfile, createUserWithEmailAndPassword } from "firebase/auth";
 import { UserCredential } from "firebase/auth";
 import { UserService } from '../../firestore/user-service/user.service';
 import { Auth } from '@angular/fire/auth';
@@ -25,22 +25,43 @@ export class AuthService {
       await this.userService.updateUserLoginState(result.user.uid, 'loggedIn');
       if (result.user) {
         this.router.navigateByUrl('board');
-        console.log('Loged In as:');
-        console.log('Name: ' + result.user.displayName);
-        console.log('Email: ' + result.user.email);
-        console.log('Avatar Path: ' + result.user.photoURL);
-        console.log('UId: ' + result.user.uid);
-        console.log(result.user);
-
       }
     } catch (err: any) {
       throw err;
     }
   }
 
+  // async updateAuthUser() {
+  //   const auth = getAuth();
+  //   if (auth.currentUser) {
+  //     updateProfile(auth.currentUser, {
+  //       displayName: "Paul Scholz",
+  //       photoURL: "../../assets/images/avatars/avatar2.svg",
+  //     }).then(() => {
+  //       // Profile updated!
+  //       // ...
+  //     }).catch((error) => {
+  //       // An error occurred
+  //       // ...
+  //     });
+  //   }
+  // }
 
-  async logout() {
 
+  async logout(): Promise<void> {
+    try {
+      if (this.auth.currentUser) {
+        await this.userService.updateUserLoginState(this.auth.currentUser.uid, 'loggedOut');
+        await signOut(this.auth);
+        console.log(this.auth.currentUser.uid); // This will be null after signOut
+      } else {
+        console.log('No user is currently logged in.');
+      }
+      this.router.navigateByUrl('');
+    } catch (err: any) {
+      console.error(err);
+      throw err;
+    }
   }
 
 
