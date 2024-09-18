@@ -54,13 +54,22 @@ input {
 }
 
 * {
--webkit-overflow-scrolling: touch;
+    -webkit-overflow-scrolling: touch;
 }
 
 *::-webkit-scrollbar {
-display: none;
+    display: none;
 }
 
 * {
-scrollbar-width: none;
+    scrollbar-width: none;
+}
+
+.emoji-mart {
+    border-radius: 30px 30px 30px 30px;
+    position: relative;
+    bottom: 155px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    z-index: 10 !important;
 }

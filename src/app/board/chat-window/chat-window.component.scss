@@ -4,12 +4,8 @@
     align-items: center;
     width: 100%;
     max-width: 980px;
-    margin: 20px auto;
     border-radius: 30px !important;
     overflow-x: hidden;
-}
-
-.chat-container {
     box-sizing: border-box;
 }
 
@@ -96,7 +92,8 @@
     display: flex !important;
     flex-direction: column;
     align-items: center;
-    margin-top: 76px;
+    margin-top: 98px;
+    margin-bottom: 68px;
     overflow-y: auto;
     overflow-x: hidden;
 }
@@ -266,6 +263,7 @@
     transition: background 0.3s ease;
     cursor: pointer;
     box-sizing: border-box;
+    justify-content: space-between;
 
     &:hover {
         background: rgba(236, 238, 254, 1);
@@ -325,6 +323,15 @@
             }
         }
     }
+}
+
+.message-area-container {
+    position: relative;
+    width: 100%;
+}
+
+.message-edit-container {
+    height: 145px;
 }
 
 .edit-message {
@@ -388,27 +395,20 @@
     }
 }
 
-.message-edit-container {
-    position: relative;
+.message-input {
+    background-color: white !important;
+    border: 1px solid rgba(173, 176, 217, 1) !important;
+    border-radius: 20px;
+    height: 100%;
     width: 100%;
+    padding: 20px;
     box-sizing: border-box;
-    max-height: 165px;
-    margin-bottom: 20px;
-
-    >.message-input {
-        background-color: white !important;
-        border: 1px solid rgba(173, 176, 217, 1) !important;
-        border-radius: 30px;
-        height: 100%;
-        width: 100%;
-        padding: 20px;
-        font-family: Nunito;
-        font-size: 18px;
-        resize: none;
-        hyphens: auto;
-        margin-bottom: 30px;
-    }
+    font-family: Nunito;
+    font-size: 18px;
+    resize: none;
+    hyphens: auto;
 }
+
 
 .message-edit-buttons {
     width: 100%;
@@ -418,10 +418,16 @@
     justify-content: space-between;
     box-sizing: border-box;
     right: 0;
-    gap: 10px;
+    padding: 10px;
+    align-items: center;
+    cursor: default;
 }
 
 .message-edit-action {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    ;
 
     >.save-btn {
         background: #444DF2;
@@ -430,8 +436,8 @@
 
     >button {
         border-radius: 30px;
-        height: 48px;
-        width: 141px;
+        height: 38px;
+        width: 130px;
         cursor: pointer;
         color: #444DF2;
         font-size: 18px;
@@ -443,11 +449,13 @@
 
 .chat-message-input-container {
     position: relative;
+    bottom: 68px;
+    height: 175px;
     width: 100%;
     padding: 20px;
     box-sizing: border-box;
 
-    textarea {
+    >.message-input {
         background-color: white !important;
         border: 1px solid rgba(173, 176, 217, 1) !important;
         border-radius: 30px;
@@ -517,15 +525,6 @@
 .separator {
     height: 30px;
     border: 1px solid #ADB0D9
-}
-
-.emoji-mart-chat {
-    border-radius: 30px 30px 30px 30px;
-    position: absolute;
-    bottom: 145px !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    z-index: 10 !important;
 }
 
 @media screen and (max-width: 768px) {
