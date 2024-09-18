@@ -1,18 +1,17 @@
-// .chat-container {
-//     display: flex;
-//     flex-direction: column;
-//     align-items: center;
-//     height: 100vh;
-//     width: 100%;
-//     max-width: 980px;
-//     margin: 20px auto;
-//     border-radius: 30px !important;
-//     overflow-x: hidden;
-// }
+.chat-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 980px;
+    margin: 20px auto;
+    border-radius: 30px !important;
+    overflow-x: hidden;
+}
 
-// .chat-container {
-//     box-sizing: border-box;
-// }
+.chat-container {
+    box-sizing: border-box;
+}
 
 .chat-header {
     border-top-left-radius: 30px !important;
@@ -25,7 +24,7 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    padding: 0 40px 0 40px;
+    padding: 0 30px;
     box-sizing: border-box;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
@@ -97,7 +96,7 @@
     display: flex !important;
     flex-direction: column;
     align-items: center;
-    margin-top: 120px;
+    margin-top: 76px;
     overflow-y: auto;
     overflow-x: hidden;
 }
@@ -122,7 +121,7 @@
         border-radius: 30px;
         position: relative;
         bottom: 50%;
-        z-index: 999;
+        z-index: 1;
     }
 }
 
@@ -193,7 +192,7 @@
         font-size: 18px;
     }
 
-    >.message-sender {
+    >.chat-message-sender {
         background: rgba(83, 90, 241, 1);
         padding: 15px;
         gap: 8px;
@@ -211,7 +210,7 @@
     text-align: center;
 }
 
-.answers {
+.answers-block {
     cursor: pointer;
     color: rgba(83, 90, 241, 1);
     font-weight: 400;
@@ -396,7 +395,7 @@
     max-height: 165px;
     margin-bottom: 20px;
 
-    textarea {
+    >.message-input {
         background-color: white !important;
         border: 1px solid rgba(173, 176, 217, 1) !important;
         border-radius: 30px;
@@ -442,13 +441,11 @@
     }
 }
 
-.message-input-container {
+.chat-message-input-container {
     position: relative;
     width: 100%;
     padding: 20px;
     box-sizing: border-box;
-    max-height: 165px;
-    margin-bottom: 20px;
 
     textarea {
         background-color: white !important;
@@ -522,13 +519,13 @@
     border: 1px solid #ADB0D9
 }
 
-.emoji-mart {
+.emoji-mart-chat {
     border-radius: 30px 30px 30px 30px;
     position: absolute;
-    bottom: 145px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 10;
+    bottom: 145px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    z-index: 10 !important;
 }
 
 @media screen and (max-width: 768px) {
