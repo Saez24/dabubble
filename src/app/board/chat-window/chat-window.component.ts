@@ -23,10 +23,36 @@ import { PickerComponent } from '@ctrl/ngx-emoji-mart';
 })
 export class ChatWindowComponent {
   showEmojiPicker = false;
-  message = '';
+  showMessageEdit = false;
+  showMessageEditArea = false;
+  messageArea = true;
+  message = 'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Facilis minus quae, natus asperiores, rem ipsa delectus dolorem iste soluta, repudiandae esse? Magnam facilis distinctio illo, fuga nisi suscipit perspiciatis iure.';
+  newMessage = '';
 
   showEmoji() {
     this.showEmojiPicker = !this.showEmojiPicker;
+  }
+
+  showMessageEditToggle() {
+    this.showMessageEdit = !this.showMessageEdit;
+  }
+
+  editMessage() {
+    this.messageArea = false;
+    this.showMessageEditToggle()
+    this.showMessageEditArea = true;
+  };
+
+  saveMessage() {
+    this.message += ' ' + this.newMessage;
+    this.newMessage = '';
+    this.showMessageEditArea = false;
+    this.messageArea = true;
+  }
+
+  cancelMessageEdit() {
+    this.showMessageEditArea = false;
+    this.messageArea = true;
   }
 
   addEmoji(event: any) {

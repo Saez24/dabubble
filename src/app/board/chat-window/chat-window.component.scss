@@ -163,6 +163,9 @@
     flex-direction: column;
     gap: 8px;
     box-sizing: border-box;
+    width: 100%;
+
+    ;
 
     >.sender-name {
         font-weight: 700;
@@ -325,6 +328,38 @@
     }
 }
 
+.edit-message {
+    width: 100%;
+    background-color: white;
+    padding: 8px 0;
+    gap: 5px;
+    border-radius: 0px 30px 30px 30px;
+    border: 1px solid rgba(173, 176, 217, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 45px;
+    left: 126px;
+    transform: translateX(80px);
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
+
+    >span {
+        border-radius: 30px;
+        padding: 10px;
+        font-size: 18px;
+        font-weight: 700;
+        cursor: pointer;
+        color: black;
+
+        &:hover {
+            background: #ECEEFE;
+            transition: background 0.3s ease;
+            color: #535AF1;
+        }
+    }
+}
+
 .reaction-name-popup {
     background-color: rgba(83, 90, 241, 1);
     height: 112px;
@@ -354,6 +389,59 @@
     }
 }
 
+.message-edit-container {
+    position: relative;
+    width: 100%;
+    box-sizing: border-box;
+    max-height: 165px;
+    margin-bottom: 20px;
+
+    textarea {
+        background-color: white !important;
+        border: 1px solid rgba(173, 176, 217, 1) !important;
+        border-radius: 30px;
+        height: 100%;
+        width: 100%;
+        padding: 20px;
+        font-family: Nunito;
+        font-size: 18px;
+        resize: none;
+        hyphens: auto;
+        margin-bottom: 30px;
+    }
+}
+
+.message-edit-buttons {
+    width: 100%;
+    position: absolute;
+    bottom: 0px;
+    display: flex;
+    justify-content: space-between;
+    box-sizing: border-box;
+    right: 0;
+    gap: 10px;
+}
+
+.message-edit-action {
+
+    >.save-btn {
+        background: #444DF2;
+        color: white;
+    }
+
+    >button {
+        border-radius: 30px;
+        height: 48px;
+        width: 141px;
+        cursor: pointer;
+        color: #444DF2;
+        font-size: 18px;
+        font-weight: 700;
+        background: white;
+        border: 1px solid #797EF3
+    }
+}
+
 .message-input-container {
     position: relative;
     width: 100%;
@@ -373,6 +461,7 @@
         font-family: Nunito;
         font-size: 18px;
         resize: none;
+        hyphens: auto;
     }
 }
 
