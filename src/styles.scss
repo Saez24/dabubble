@@ -54,14 +54,13 @@ input {
 }
 
 * {
-    -webkit-overflow-scrolling: touch; /* Sanftes Scrollen auf mobilen Geräten */
-  }
-  
-  *::-webkit-scrollbar {
-    display: none; /* Versteckt die Scrollbar */
-  }
-  
-  /* Für Firefox */
-  * {
-    scrollbar-width: none; /* Versteckt die Scrollbar in Firefox */
-  }
+-webkit-overflow-scrolling: touch;
+}
+
+*::-webkit-scrollbar {
+display: none;
+}
+
+* {
+scrollbar-width: none;
+}

@@ -13,10 +13,10 @@
         <div class="profile-menu-container" [matMenuTriggerFor]="menu" mat-button>
             <span>Guest</span>
             <img src="../../assets/images/avatars/avatar2.svg" alt="Profil Icon">
-            <mat-icon >keyboard_arrow_down</mat-icon>
+            <mat-icon>keyboard_arrow_down</mat-icon>
             <mat-menu #menu="matMenu">
-              <button mat-menu-item>Profil</button>
-              <button mat-menu-item>Log Out</button>
+                <button mat-menu-item>Item 1</button>
+                <button mat-menu-item>Item 2</button>
             </mat-menu>
         </div>
     </header>
@@ -32,7 +32,7 @@
             </mat-card>
             <mat-card class="thread-container" appearance="outlined" *ngIf="showThreadComponent">
                 <mat-card-content>
-                    <app-thread (closeThreadEvent)="closeThread()" @fadeInOut></app-thread>
+                    <app-thread (closeThreadEvent)="closeThread()"></app-thread>
                 </mat-card-content>
             </mat-card>
         </div>

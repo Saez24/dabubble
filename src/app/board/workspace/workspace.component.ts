@@ -23,7 +23,6 @@ import { CreateNewChannelDialog } from './create-new-channel-dialog/create-new-c
   templateUrl: './workspace.component.html',
   styleUrl: './workspace.component.scss', 
   changeDetection: ChangeDetectionStrategy.OnPush,
-  
 })
 export class WorkspaceComponent {
 

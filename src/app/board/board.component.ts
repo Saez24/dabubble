@@ -3,7 +3,6 @@ import { ChatWindowComponent } from "./chat-window/chat-window.component";
 import { WorkspaceComponent } from "./workspace/workspace.component";
 import { ThreadComponent } from './thread/thread.component';
 import { CommonModule, NgIf } from '@angular/common';
-import { trigger, state, style, animate, transition } from '@angular/animations';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatCardModule } from '@angular/material/card';
@@ -48,6 +47,6 @@ export class BoardComponent {
 
 
   showThread() {
-
+    this.showThreadComponent = true;
   }
 }
