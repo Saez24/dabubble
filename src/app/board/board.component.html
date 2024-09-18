@@ -11,12 +11,12 @@
             </button>
         </mat-form-field>
         <div class="profile-menu-container" [matMenuTriggerFor]="menu" mat-button>
-            <span>Guest</span>
-            <img src="../../assets/images/avatars/avatar2.svg" alt="Profil Icon">
+            <span>{{ currentUser?.displayName }}</span>
+            <img src="{{ currentUser?.photoURL }}" alt="Profil Icon">
             <mat-icon>keyboard_arrow_down</mat-icon>
             <mat-menu #menu="matMenu">
-                <button mat-menu-item>Item 1</button>
-                <button mat-menu-item>Item 2</button>
+                <button mat-menu-item>Profil</button>
+                <button mat-menu-item (click)="authService.logout()">Log Out</button>
             </mat-menu>
         </div>
     </header>
