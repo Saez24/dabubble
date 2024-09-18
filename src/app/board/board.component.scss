@@ -52,6 +52,7 @@ mat-form-field {
 
 .mat-drawer-content {
     border: none;
+    width: 100%;
 }
 
 .board-container {
@@ -64,8 +65,8 @@ mat-form-field {
     justify-content: flex-start;
     gap: 24px;
     height: 100%;
-    // box-sizing: border-box; // with this adjustment the container should not be possible to overflow.
-    // padding: 20px;
+    box-sizing: border-box; // with this adjustment the container should not be possible to overflow.
+    padding: 20px;
 
     .navigation-toggle-btn {
         position: absolute;
