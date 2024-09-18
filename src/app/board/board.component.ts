@@ -66,10 +66,6 @@ export class BoardComponent {
 
   toggleWorkspace() {
     this.drawer.toggle();
-    if(!this.workspaceOpen) {
-      this.workspaceOpen = true;
-    } else {
-      this.workspaceOpen = false;
-    }
+    this.workspaceOpen = !this.workspaceOpen;
   }
 }
