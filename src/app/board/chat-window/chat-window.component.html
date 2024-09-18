@@ -43,25 +43,36 @@
         </div>
         <div class="message-sender-container">
             <img src="assets/images/avatars/avatar1.svg" alt="">
-            <div class="message-container">
-                <div class="reaction-container-sender">
-                    <div class="reaction-icon"><img src="./assets/images/reaction/check_mark.png" alt=""></div>
-                    <div class="reaction-icon"><img src="./assets/images/reaction/hands_up.png" alt=""></div>
-                    <div class="reaction-icon"><mat-icon fontIcon="add_reaction"></mat-icon></div>
-                    <div class="reaction-icon"><mat-icon fontIcon="comment"></mat-icon></div>
-                    <div (click)="showMessageEditToggle()" class="reaction-icon edit-message-icon"><mat-icon
-                            fontIcon="more_vert"></mat-icon></div>
-                    <div *ngIf="showMessageEdit" class="edit-message">
-                        <span (click)="editMessage()">Nachricht bearbeiten</span>
+            <div class="message-area-container">
+                <div *ngIf="messageArea" class="message-container">
+                    <div class="reaction-container-sender">
+                        <div class="reaction-icon"><img src="./assets/images/reaction/check_mark.png" alt=""></div>
+                        <div class="reaction-icon"><img src="./assets/images/reaction/hands_up.png" alt=""></div>
+                        <div class="reaction-icon"><mat-icon fontIcon="add_reaction"></mat-icon></div>
+                        <div class="reaction-icon"><mat-icon fontIcon="comment"></mat-icon></div>
+                        <div (click)="showMessageEditToggle()" class="reaction-icon edit-message-icon"><mat-icon
+                                fontIcon="more_vert"></mat-icon></div>
+                        <div *ngIf="showMessageEdit" class="edit-message">
+                            <span (click)="editMessage()">Nachricht bearbeiten</span>
+                        </div>
+                    </div>
+
+                    <span class="my-name">Frederik Beck <span class="message-time">15:06 Uhr</span></span>
+                    <span class="chat-message-sender">{{ message }}</span>
+                    <div class="show-reactions">
+                        <div class="reaction-icon-button">
+                            <div class="reaction-name-popup">
+                                <img src="./assets/images/reaction/rocket.png" alt="">
+                                <h3>Sofia Müller</h3><span>Hat reagiert</span>
+                            </div><img src="./assets/images/reaction/check_mark.png" alt=""> 1
+                        </div>
+                        <div class="reaction-icon"><mat-icon fontIcon="add_reaction"></mat-icon></div>
                     </div>
                 </div>
-
-                <span class="my-name">Frederik Beck <span class="message-time">15:06 Uhr</span></span>
-                <span *ngIf="messageArea" class="chat-message-sender">{{ message }}</span>
-                <div class="message-edit-container" *ngIf="showMessageEditArea">
-                    <textarea class="message-input" id="edit-message" type="text" [(ngModel)]="message"></textarea>
+                <div *ngIf="showMessageEditArea" class="message-edit-container">
+                    <textarea class="message-input" id="edit-message" type="text" [(ngModel)]="newMessage"></textarea>
                     <div class="message-edit-buttons">
-                        <div class="message-icon">
+                        <div (click)="showEmoji()" class="message-icon">
                             <mat-icon fontIcon="sentiment_satisfied"></mat-icon>
                         </div>
                         <div class="message-edit-action">
@@ -69,15 +80,6 @@
                             <button class="save-btn" (click)="saveMessage()">Speichern</button>
                         </div>
                     </div>
-                </div>
-                <div class="show-reactions">
-                    <div class="reaction-icon-button">
-                        <div class="reaction-name-popup">
-                            <img src="./assets/images/reaction/rocket.png" alt="">
-                            <h3>Sofia Müller</h3><span>Hat reagiert</span>
-                        </div><img src="./assets/images/reaction/check_mark.png" alt=""> 1
-                    </div>
-                    <div class="reaction-icon"><mat-icon fontIcon="add_reaction"></mat-icon></div>
                 </div>
             </div>
         </div>
