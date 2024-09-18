@@ -19,40 +19,42 @@ export class AuthService {
   constructor() { }
 
 
-  async login(email: string, password: string): Promise<void> { 
+  async login(email: string, password: string): Promise<void> {
     try {
       let result: UserCredential = await signInWithEmailAndPassword(this.auth, email, password);
       await this.userService.updateUserLoginState(result.user.uid, 'loggedIn');
-        if (result.user) {
-          this.router.navigateByUrl('board');
-          console.log('Loged In as:');
-          console.log('Name: ' + result.user.displayName);
-          console.log('Email: ' + result.user.email);
-          console.log('Avatar Path: ' + result.user.photoURL);
-          console.log('UId: ' + result.user.uid);
-        }
+      if (result.user) {
+        this.router.navigateByUrl('board');
+        console.log('Loged In as:');
+        console.log('Name: ' + result.user.displayName);
+        console.log('Email: ' + result.user.email);
+        console.log('Avatar Path: ' + result.user.photoURL);
+        console.log('UId: ' + result.user.uid);
+        console.log(result.user);
+
+      }
     } catch (err: any) {
       throw err;
     }
   }
 
 
-  async logout() { 
+  async logout() {
 
   }
 
 
-  async guestLogin() { 
+  async guestLogin() {
 
   }
 
 
-  async resetPassword() { 
+  async resetPassword() {
 
   }
 
 
-  async sendPasswordResetMail() { 
+  async sendPasswordResetMail() {
 
   }
 }
