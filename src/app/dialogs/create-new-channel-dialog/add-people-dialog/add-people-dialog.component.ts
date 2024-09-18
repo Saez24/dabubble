@@ -6,6 +6,8 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatRadioModule } from '@angular/material/radio';
+import { Channel } from '../../../shared/models/channel.class';
+import { ChannelsService } from '../../../shared/services/channels/channels.service';
 
 @Component({
   selector: 'app-add-people-dialog',
@@ -16,7 +18,7 @@ import { MatRadioModule } from '@angular/material/radio';
     MatIconModule,
     MatRadioModule,
     MatButtonModule,
-    FormsModule
+    FormsModule,
   ],
   templateUrl: './add-people-dialog.component.html',
   styleUrls: ['./add-people-dialog.component.scss', '../create-new-channel-dialog.component.scss'],
@@ -25,23 +27,22 @@ import { MatRadioModule } from '@angular/material/radio';
 
 export class AddPeopleDialog {
 
-  contacts = [
-    { firstName: 'Anna', lastName: 'Müller', avatar: '../../../../assets/images/avatars/avatar1.svg', online: true },
-    { firstName: 'Ben', lastName: 'Schmidt', avatar:  '../../../../assets/images/avatars/avatar2.svg', online: true },
-    { firstName: 'Clara', lastName: 'Meier', avatar: '../../../../assets/images/avatars/avatar3.svg', online: true },
-    { firstName: 'David', lastName: 'Schneider', avatar: '../../../../assets/images/avatars/avatar4.svg', online: false },
-    { firstName: 'Ella', lastName: 'Fischer', avatar: '../../../../assets/images/avatars/avatar5.svg', online: true },
-    { firstName: 'Felix', lastName: 'Weber', avatar: '../../../../assets/images/avatars/avatar6.svg', online: true }
-  ];
-
+  channel = new Channel();
   selectedValue: string = 'addAll';
 
   @Input()
   color: ThemePalette
-  
-  nextDialog() {
 
+  constructor(
+    private channelsService: ChannelsService
+  ) {
+    this.channel = new Channel();
   }
+  
+  // createNewChannel() {
+  //   this.channelsService.addChannel(this.channel);
+  //   console.log('Kanal wurde erstellt:', this.channel);
+  // }
 
   onSelectionChange(event: any) {
     console.log('Selected value:', event.value);

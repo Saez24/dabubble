@@ -38,7 +38,7 @@
                                 [ngClass]="clickedChannels[i] ? 'clicked' : ''"
                                 >
                                 <mat-icon [ngClass]="clickedChannels[i] ? 'hashtag-black' : ''" class="icon" svgIcon="hashtag" aria-hidden="false" aria-label="Hashtag icon"></mat-icon>
-                                <span>{{ channel }}</span>
+                                <span>{{ channel.name }}</span>
                             </div>
                         </div>
                         <a (click)="openDialog()" class="add-channel-container">

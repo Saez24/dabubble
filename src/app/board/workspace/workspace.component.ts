@@ -7,6 +7,7 @@ import { NgClass, NgFor, NgStyle } from '@angular/common';
 import { ChannelsService } from '../../shared/services/channels/channels.service';
 import { MatDialog } from '@angular/material/dialog';
 import { CreateNewChannelDialog } from '../../dialogs/create-new-channel-dialog/create-new-channel-dialog.component';
+import { Channel } from '../../shared/models/channel.class';
 
 @Component({
   selector: 'app-workspace',
@@ -28,7 +29,7 @@ export class WorkspaceComponent {
 
   panelOpenState = false;
   arrowRotated: boolean[] = [false, false]; 
-  channels: string[] = [];
+  channels: Channel[] = [];
   clickedChannels: boolean[] = [];
   clickedUsers: boolean[] = [];
   icons: string[] = [];
@@ -48,6 +49,7 @@ export class WorkspaceComponent {
     private channelsService: ChannelsService,
   ) {
     this.channels = this.channelsService.getChannels();
+    console.log(this.channels);
     this.setClickedArrays();
    }
 

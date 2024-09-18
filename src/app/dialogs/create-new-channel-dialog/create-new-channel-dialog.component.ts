@@ -15,6 +15,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { IconsService } from '../../shared/services/icons/icons.service';
 import { AddPeopleDialog } from './add-people-dialog/add-people-dialog.component';
 import { ErrorStateMatcher } from '@angular/material/core';
+import { ChannelsService } from '../../shared/services/channels/channels.service';
+import { Channel } from '../../shared/models/channel.class';
 
 export class MyErrorStateMatcher implements ErrorStateMatcher {
   isErrorState(control: FormControl | null): boolean {
@@ -46,14 +48,14 @@ export class CreateNewChannelDialog {
 
   newChannelName: string = '';
   newChannelDescription: string = '';
-  channelList: { name: string, description: string } [] = [];
 
   constructor(
     private iconsService: IconsService, 
+    private channelsService: ChannelsService,
     private dialogRef: MatDialogRef<CreateNewChannelDialog>,
     private dialog: MatDialog
   ) {
-    this.loadChannelList();
+    // this.loadChannelList();
   }
 
   nameFormControl = new FormControl('', [Validators.required]);
@@ -63,14 +65,12 @@ export class CreateNewChannelDialog {
   nextDialog() {
     this.formSubmitted = true;
     if (this.newChannelName.trim()) {
-      this.channelList.push({
-        name: this.newChannelName,
-        description: this.newChannelDescription || ''
-      });
-      this.saveChannelList();
-      this.clearInputs();
-      this.dialogRef.close();
-      this.dialog.open(AddPeopleDialog);
+      this.channelsService.channel.push(this.newChannelName);
+      console.log(this.channelsService.channel);
+      // this.saveChannelList();  
+      this.clearInputs();  
+      this.dialogRef.close();  
+      this.dialog.open(AddPeopleDialog);  
     }
   }
 
@@ -79,16 +79,17 @@ export class CreateNewChannelDialog {
       this.newChannelDescription = '';
   }
 
-  saveChannelList() {
-    localStorage.setItem('channelList', JSON.stringify(this.channelList));
-  }
+  // saveChannelList() {
+  //   localStorage.setItem('channelList', JSON.stringify(this.channelsService.channels));
+  // }
 
-  loadChannelList() {
-    let storedList = localStorage.getItem('channelList');
-    if (storedList) {
-      this.channelList = JSON.parse(storedList);
-    }
-  }
+  // loadChannelList() {
+  //   let storedList = localStorage.getItem('channelList');
+  //   if (storedList) {
+  //     this.channelsService.channels = JSON.parse(storedList);
+  //     console.log(this.channelsService.channels);
+  //   }
+  // }
 
   isValid(): boolean {
     return this.newChannelName.trim().length > 0;

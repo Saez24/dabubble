@@ -33,7 +33,7 @@ import { IconsService } from '../shared/services/icons/icons.service';
     FormsModule,
     MatInputModule,
     MatFormFieldModule,
-    MatMenuModule
+    MatMenuModule,
   ],
   templateUrl: './board.component.html',
   styleUrls: ['./board.component.scss', '../../styles.scss'],

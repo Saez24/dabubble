@@ -1,15 +1,22 @@
 import { Injectable } from '@angular/core';
+import { Channel } from '../../models/channel.class';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ChannelsService {
 
-  channels: string[] = ['Entwicklerteam', 'Designteam', 'Marketingteam', 'Supportteam'];
+  channel: Channel[] | any = [];
+  channels = new Array<Channel>();
 
-  constructor() { }
+  constructor() {}
 
-  getChannels(): string[] {
-    return this.channels;
+  // addChannel(channel: Channel) {
+  //   this.channels.push(channel);
+  //   console.log('Neuer Kanal hinzugefügt:', channel);
+  // }
+
+  getChannels(): Channel[] {
+    return this.channel;
   }
 }

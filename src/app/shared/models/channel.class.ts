@@ -1,14 +1,9 @@
 export class Channel {
-    id: string | null;
-    name: string | null;
-    users: string[];
-    messages: string[];
+    id: number | null = null;
+    name: string | null = '';
+    description: string[] = [];
+    users: string[] | any[] = [];
+    messages: string[] = [];
 
-
-    constructor(obj?: any) {
-        this.id = obj ? obj.id : null;
-        this.name = obj ? obj.name : null;
-        this.users = obj ? obj.users : [];
-        this.messages = obj ? obj.messages : [];
-    }
+    constructor() { }
 }
