@@ -48,6 +48,22 @@ const ICONS = [
     svg: `<svg width="10" height="7" viewBox="0 0 10 7" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M4.12508 5.875L0.875076 2.625C0.479243 2.22917 0.390909 1.77625 0.610076 1.26625C0.828409 0.755417 1.21883 0.5 1.78133 0.5H8.21883C8.78133 0.5 9.17174 0.755417 9.39008 1.26625C9.60924 1.77625 9.52091 2.22917 9.12508 2.625L5.87508 5.875C5.75008 6 5.61466 6.09375 5.46883 6.15625C5.32299 6.21875 5.16674 6.25 5.00008 6.25C4.83341 6.25 4.67716 6.21875 4.53133 6.15625C4.38549 6.09375 4.25008 6 4.12508 5.875Z" fill="currentColor"/>
     </svg>`
+  },
+  {
+    name: 'open-menu',
+    svg: `<svg width="32" height="33" viewBox="0 0 32 33" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="8" y="8.5" width="16" height="16" rx="1" stroke="currentColor" stroke-width="2"/>
+    <path d="M13.7144 8.5V24.5" stroke="currentColor" stroke-width="2"/>
+    <path d="M17.143 18.7856L19.0752 16.8535C19.2704 16.6582 19.2704 16.3416 19.0752 16.1464L17.143 14.2142" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </svg>`
+  },
+  {
+    name: 'close-menu',
+    svg: `<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="8" y="8" width="16" height="16" rx="1" stroke="currentColor" stroke-width="2"/>
+    <path d="M13.7142 8V24" stroke="currentColor" stroke-width="2"/>
+    <path d="M19.4285 18.2856L17.4964 16.3535C17.3011 16.1582 17.3011 15.8416 17.4964 15.6464L19.4285 13.7142" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </svg>`
   }
 ]
 

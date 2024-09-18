@@ -6,7 +6,7 @@ import { IconsService } from '../../shared/services/icons/icons.service';
 import { NgClass, NgFor, NgStyle } from '@angular/common';
 import { ChannelsService } from '../../shared/services/channels/channels.service';
 import { MatDialog } from '@angular/material/dialog';
-import { CreateNewChannelDialog } from './create-new-channel-dialog/create-new-channel-dialog.component';
+import { CreateNewChannelDialog } from '../../dialogs/create-new-channel-dialog/create-new-channel-dialog.component';
 
 @Component({
   selector: 'app-workspace',
@@ -48,7 +48,6 @@ export class WorkspaceComponent {
     private channelsService: ChannelsService,
   ) {
     this.channels = this.channelsService.getChannels();
-    this.icons = this.iconsService.getIcons();
     this.setClickedArrays();
    }
 
@@ -74,7 +73,6 @@ export class WorkspaceComponent {
     this.clickedUsers = Array(this.users.length).fill(false);
   }
 
-  
   openDialog() {
     this.dialog.open(CreateNewChannelDialog);
   }

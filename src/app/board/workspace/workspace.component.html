@@ -37,7 +37,7 @@
                                 (click)="clickChannel(i)" 
                                 [ngClass]="clickedChannels[i] ? 'clicked' : ''"
                                 >
-                                <mat-icon class="icon" svgIcon="hashtag" aria-hidden="false" aria-label="Hashtag icon"></mat-icon>
+                                <mat-icon [ngClass]="clickedChannels[i] ? 'hashtag-black' : ''" class="icon" svgIcon="hashtag" aria-hidden="false" aria-label="Hashtag icon"></mat-icon>
                                 <span>{{ channel }}</span>
                             </div>
                         </div>

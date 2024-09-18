@@ -37,8 +37,12 @@
             </mat-card>
         </div>
     </mat-drawer-container>
-    <div class="navigation-toggle-btn" (click)="drawer.toggle()">
-        <img src="../../assets/images/icons/toggle_workspace_icon.png" alt="">
+    <div class="navigation-toggle-btn" (click)="toggleWorkspace()" [ngStyle]="{ 'display': workspaceOpen ? 'flex' : 'none' }">
+        <mat-icon class="icon" svgIcon="close-menu" aria-hidden="false" aria-label="Workspace icon"></mat-icon>
         <span>Workspace-Menü schließen</span>
+    </div>
+    <div class="navigation-toggle-btn" (click)="toggleWorkspace()" [ngStyle]="{ 'display': workspaceOpen ? 'none' : 'flex' }">
+        <mat-icon class="icon" svgIcon="open-menu" aria-hidden="false" aria-label="Workspace icon"></mat-icon>
+        <span>Workspace-Menü öffnen</span>
     </div>
 </div>

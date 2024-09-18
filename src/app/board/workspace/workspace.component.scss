@@ -4,6 +4,14 @@
     box-sizing: border-box;
 }
 
+span {
+    font-size: 18px;
+}
+
+.hashtag-black {
+    color: black !important;
+}
+
 .workspace-content {
     padding: 32px 30px 32px 30px;
 }
@@ -158,11 +166,13 @@ section {
 .arrow {
     transform: rotate(0deg) !important;
     width: 9.01px !important;
+    margin-right: 15px;
 }
 
 .rotated {
     transform: rotate(-90deg) !important;
     width: 9.01px !important;
+    margin-right: 15px;
 }
 
 .clicked {
