@@ -1,0 +1,31 @@
+@import '../../../../mixin.scss';
+
+.mdc-button {
+    height: 49px !important;
+    width: 125px !important;
+    border-radius: 25px !important;
+    background: $dark-purple !important;
+
+    &:hover {
+        cursor: pointer;
+        background-color: $purple !important;
+    }
+}
+
+.radio-group-container {
+    display: flex;
+    flex-direction: column;
+    width: 630px;
+}
+
+.group-link {
+    text-decoration: none;
+    color: $dark-purple;
+
+    &:hover {
+        text-decoration: underline;
+        text-decoration-color: $dark-purple !important;
+    }
+}
+
+
