@@ -34,7 +34,12 @@ mat-form-field {
 
     &:hover {
         cursor: pointer;
+        color: #535AF1;
     }
+}
+
+.profile-menu {
+    border-radius: 30px 0px 30px 30px !important;
 }
 
 .logo-container {

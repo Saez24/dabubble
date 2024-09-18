@@ -35,7 +35,7 @@ import {MatMenuModule} from '@angular/material/menu';
     MatMenuModule
   ],
   templateUrl: './board.component.html',
-  styleUrl: './board.component.scss'
+  styleUrls: ['./board.component.scss', '../../styles.scss'],
 })
 export class BoardComponent {
   searchInput: string = '';
