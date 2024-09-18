@@ -52,6 +52,7 @@ mat-form-field {
 
 .mat-drawer-content {
     border: none;
+    overflow-y: hidden !important;
 }
 
 .board-container {
