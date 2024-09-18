@@ -1,6 +1,6 @@
 
 export class Message {
-    id: string | null;
+    messageId: string | null;
     senderID: string | null;
     message: string | null;
     reaction: string | null;
@@ -8,7 +8,7 @@ export class Message {
 
 
     constructor(obj?: any) {
-        this.id = obj ? obj.id : null;
+        this.messageId = obj ? obj.messageId : null;
         this.senderID = obj ? obj.senderID : null;
         this.message = obj ? obj.message : null;
         this.reaction = obj ? obj.reaction : null;
