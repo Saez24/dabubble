@@ -25,6 +25,7 @@ export class ChatWindowComponent {
   showEmojiPicker = false;
   showMessageEdit = false;
   showMessageEditArea = false;
+  chatMessage = '';
   messageArea = true;
   message = 'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Facilis minus quae, natus asperiores, rem ipsa delectus dolorem iste soluta, repudiandae esse? Magnam facilis distinctio illo, fuga nisi suscipit perspiciatis iure.';
   newMessage = '';
@@ -56,7 +57,7 @@ export class ChatWindowComponent {
   }
 
   addEmoji(event: any) {
-    this.message += event.emoji.native;
+    this.chatMessage += event.emoji.native;
     console.log(event.emoji.native);
   }
 
