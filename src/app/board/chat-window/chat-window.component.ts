@@ -8,6 +8,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule } from '@angular/forms';
 import { CommonModule, NgIf } from '@angular/common';
 import { PickerComponent } from '@ctrl/ngx-emoji-mart';
+import { Message } from '../../shared/models/message.class';
+import { User } from '../../shared/models/user.class';
+import { Channel } from '../../shared/models/channel.class';
 
 
 
@@ -22,6 +25,9 @@ import { PickerComponent } from '@ctrl/ngx-emoji-mart';
   encapsulation: ViewEncapsulation.None
 })
 export class ChatWindowComponent {
+  messages: Message[] = [];
+  users: User[] = [];
+  channels: Channel[] = [];
   showEmojiPicker = false;
   showMessageEdit = false;
   showMessageEditArea = false;

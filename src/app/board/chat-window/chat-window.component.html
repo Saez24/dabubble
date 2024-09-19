@@ -70,7 +70,7 @@
                     </div>
                 </div>
                 <div *ngIf="showMessageEditArea" class="message-edit-container">
-                    <textarea class="message-input" id="edit-message" type="text" [(ngModel)]="newMessage"></textarea>
+                    <textarea class="message-input" id="edit-message" type="text" [(ngModel)]="message"></textarea>
                     <div class="message-edit-buttons">
                         <div (click)="showEmoji()" class="message-icon">
                             <mat-icon fontIcon="sentiment_satisfied"></mat-icon>

@@ -10,7 +10,7 @@
                 <mat-icon>search</mat-icon>
             </button>
         </mat-form-field>
-        <div class="profile-menu-container" [matMenuTriggerFor]="menu" mat-button>
+        <!-- <div class="profile-menu-container" [matMenuTriggerFor]="menu" mat-button>
             <span>{{ currentUser?.displayName }}</span>
             <img src="{{ currentUser?.photoURL }}" alt="Profil Icon">
             <mat-icon>keyboard_arrow_down</mat-icon>
@@ -18,7 +18,7 @@
                 <button mat-menu-item>Profil</button>
                 <button mat-menu-item (click)="authService.logout()">Log Out</button>
             </mat-menu>
-        </div>
+        </div> -->
     </header>
     <mat-drawer-container class="mat-drawer-container" autosize>
         <mat-drawer #drawer class="sidenav" [opened]="true" mode="side">
@@ -37,11 +37,13 @@
             </mat-card>
         </div>
     </mat-drawer-container>
-    <div class="navigation-toggle-btn" (click)="toggleWorkspace()" [ngStyle]="{ 'display': workspaceOpen ? 'flex' : 'none' }">
+    <div class="navigation-toggle-btn" (click)="toggleWorkspace()"
+        [ngStyle]="{ 'display': workspaceOpen ? 'flex' : 'none' }">
         <mat-icon class="icon" svgIcon="close-menu" aria-hidden="false" aria-label="Workspace icon"></mat-icon>
         <span>Workspace-Menü schließen</span>
     </div>
-    <div class="navigation-toggle-btn" (click)="toggleWorkspace()" [ngStyle]="{ 'display': workspaceOpen ? 'none' : 'flex' }">
+    <div class="navigation-toggle-btn" (click)="toggleWorkspace()"
+        [ngStyle]="{ 'display': workspaceOpen ? 'none' : 'flex' }">
         <mat-icon class="icon" svgIcon="open-menu" aria-hidden="false" aria-label="Workspace icon"></mat-icon>
         <span>Workspace-Menü öffnen</span>
     </div>
