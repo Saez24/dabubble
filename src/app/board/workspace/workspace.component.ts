@@ -29,7 +29,7 @@ export class WorkspaceComponent {
 
   panelOpenState = false;
   arrowRotated: boolean[] = [false, false]; 
-  channels: Channel[] = [];
+  channels: string[] | any = [];
   clickedChannels: boolean[] = [];
   clickedUsers: boolean[] = [];
   icons: string[] = [];
@@ -48,9 +48,9 @@ export class WorkspaceComponent {
     private iconsService: IconsService, 
     private channelsService: ChannelsService,
   ) {
-    this.channels = this.channelsService.getChannels();
+    this.channels = this.channelsService.getChannelData();
     console.log(this.channels);
-    this.setClickedArrays();
+    // this.setClickedArrays();
    }
 
    
@@ -70,10 +70,10 @@ export class WorkspaceComponent {
     this.clickedUsers[i] = true;
   }
 
-  setClickedArrays() {
-    this.clickedChannels = Array(this.channels.length).fill(false);
-    this.clickedUsers = Array(this.users.length).fill(false);
-  }
+  // setClickedArrays() {
+  //   this.clickedChannels = Array(this.channels.length).fill(false);
+  //   this.clickedUsers = Array(this.users.length).fill(false);
+  // }
 
   openDialog() {
     this.dialog.open(CreateNewChannelDialog);

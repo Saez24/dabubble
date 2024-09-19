@@ -55,7 +55,6 @@ export class CreateNewChannelDialog {
     private dialogRef: MatDialogRef<CreateNewChannelDialog>,
     private dialog: MatDialog
   ) {
-    // this.loadChannelList();
   }
 
   nameFormControl = new FormControl('', [Validators.required]);
@@ -63,33 +62,17 @@ export class CreateNewChannelDialog {
   formSubmitted = false;
 
   nextDialog() {
-    this.formSubmitted = true;
-    if (this.newChannelName.trim()) {
-      this.channelsService.channel.push(this.newChannelName);
-      console.log(this.channelsService.channel);
-      // this.saveChannelList();  
-      this.clearInputs();  
-      this.dialogRef.close();  
-      this.dialog.open(AddPeopleDialog);  
-    }
+    this.formSubmitted = true; 
+    this.channelsService.setChannelData(this.newChannelName, this.newChannelDescription);
+    this.clearInputs();
+    this.dialogRef.close();  
+    this.dialog.open(AddPeopleDialog);
   }
 
   clearInputs() {
-      this.newChannelName = '';
-      this.newChannelDescription = '';
-  }
-
-  // saveChannelList() {
-  //   localStorage.setItem('channelList', JSON.stringify(this.channelsService.channels));
-  // }
-
-  // loadChannelList() {
-  //   let storedList = localStorage.getItem('channelList');
-  //   if (storedList) {
-  //     this.channelsService.channels = JSON.parse(storedList);
-  //     console.log(this.channelsService.channels);
-  //   }
-  // }
+    this.newChannelName = '';
+    this.newChannelDescription = '';
+}
 
   isValid(): boolean {
     return this.newChannelName.trim().length > 0;
