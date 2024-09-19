@@ -1,80 +1,70 @@
-// .container {
-//   height: 85%;
-//   width: 30%;
-//   position: absolute;
-//   right: 16px;
-//   bottom: 16px;
-//   border-radius: 30px;
-// }
-
-::-webkit-scrollbar-thumb {
-  background: #888;
-  border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #555;
-}
-
 .thread-container {
-  height: 100vh;
-  width: 100%;
-  max-width: 500px;
-  border-radius: 30px !important;
-  overflow-x: hidden;
-  box-sizing: border-box;
-  padding: 20px;
-}
-
-.mat-mdc-card {
-  padding: 0;
-}
-
-.card-header {
-  height: 104px;
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 980px;
+  border-radius: 30px !important;
+  box-sizing: border-box;
+}
+
+.thread-header {
+  border-top-left-radius: 30px !important;
+  border-top-right-radius: 30px !important;
+  position: absolute;
+  top: 0;
+  height: 96px;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  padding: 0 40px;
+  padding: 0 30px;
+  box-sizing: border-box;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  position: relative;
 }
 
-.card-header-content {
+.thread-header-content {
   display: flex;
   align-items: center;
   gap: 6px;
 }
 
-.card-title {
+.thread-title {
   margin: 0 !important;
-  font-weight: 700;
-  font-size: 24px;
+  font-weight: 700 !important;
+  font-size: 24px !important;
 }
 
-.card-subtitle {
+.thread-subtitle {
   display: flex;
   font-size: 18px;
   font-weight: 400;
   color: #797EF3;
 }
 
-.card-body {
+.thread-content {
   width: 100%;
-  height: calc(100% - 104px);
-  padding-top: 14px;
+  box-sizing: border-box;
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 98px;
+  margin-bottom: 68px;
   overflow-y: auto;
   overflow-x: hidden;
+  padding-top: 26px;
 }
 
 .thread-message-container {
   display: flex;
   height: fit-content;
   gap: 16px;
-  padding: 12px 40px;
+  padding: 20px 40px 20px 40px !important;
   position: relative;
   transition: background 0.3s ease;
-  margin: 18px 0;
+  // margin: 26px 0;
+  width: -webkit-fill-available;
 
   &:hover {
     background-color: #ECEEFE;
@@ -94,7 +84,6 @@
 }
 
 .user-message-container {
-  padding-bottom: 22px;
   flex-direction: row-reverse;
 }
 
@@ -147,7 +136,8 @@
   align-items: center;
   font-size: 18px;
   gap: 16px;
-  padding: 0 40px;
+  padding:18px 40px;
+  width: -webkit-fill-available;
 }
 
 .answers-count {
@@ -179,24 +169,26 @@
   padding: 16px;
 }
 
-.message-input-container {
+.thread-message-input-container {
   position: relative;
+  bottom: 68px;
+  height: 175px;
   width: 100%;
-  padding: 0 20px;
+  padding: 20px;
   box-sizing: border-box;
-  padding-bottom: 0;
 
-  textarea {
-    background-color: white !important;
-    border: 1px solid rgba(173, 176, 217, 1) !important;
-    border-radius: 20px;
-    height: 145px;
-    width: 100%;
-    padding: 20px;
-    box-sizing: border-box;
-    font-family: Nunito;
-    font-size: 18px;
-    resize: none;
+  >.message-input {
+      background-color: white !important;
+      border: 1px solid rgba(173, 176, 217, 1) !important;
+      border-radius: 30px;
+      height: 145px;
+      width: 100%;
+      padding: 20px;
+      box-sizing: border-box;
+      font-family: Nunito;
+      font-size: 18px;
+      resize: none;
+      hyphens: auto;
   }
 }
 

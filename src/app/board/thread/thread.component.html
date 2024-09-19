@@ -1,138 +1,165 @@
-<!-- <div class="container"> -->
-<mat-card class="card-header">
-  <mat-card-content>
-    <div class="card-header-content">
-      <h1 class="card-title">Thread</h1>
-      <span class="card-subtitle"># testtesttest</span>
+<div class="thread-container max-width">
+  <div class="thread-header">
+    <div class="thread-header-content">
+      <h1 class="thread-title">Thread</h1>
+      <span class="thread-subtitle"># testtesttest</span>
     </div>
-    <button class="close-btn" mat-icon-button aria-label="Close Thread" (click)="closeThread()">
+    <button
+      class="close-btn"
+      mat-icon-button
+      aria-label="Close Thread"
+      (click)="closeThread()"
+    >
       <mat-icon>close</mat-icon>
     </button>
-
-    <div class="card-body">
-      <!-- Originalnachricht -->
-      <div class="thread-message-container">
-        <img
-          src="/assets/images/logo_big.png"
-          alt="Profile Image"
-          class="avatar"
-        />
-        <div class="message-details">
-          <div class="message-header">
-            <span class="message-sender">Noah Braun</span>
-            <span class="message-time">14:25</span>
-          </div>
-          <div class="message-bubble">
-            <p class="message-text">
-              Welche Version ist aktuell von Angular?
-            </p>
-          </div>
+  </div>
+  <div class="thread-content">
+    <!-- Originalnachricht -->
+    <div class="thread-message-container">
+      <img
+        src="/assets/images/logo_big.png"
+        alt="Profile Image"
+        class="avatar"
+      />
+      <div class="message-details">
+        <div class="message-header">
+          <span class="message-sender">Noah Braun</span>
+          <span class="message-time">14:25</span>
         </div>
-        <div class="emoji-box">
-          <mat-icon class="message-icon">add_reaction</mat-icon>
+        <div class="message-bubble">
+          <p class="message-text">Welche Version ist aktuell von Angular?</p>
         </div>
       </div>
-
-      <!-- Anzahl der Antworten -->
-      <div class="answers">
-        <div class="answers-count">
-          <span>2</span><span>Antworten</span>
-        </div>
-        <div class="line"></div>
+      <div class="emoji-box">
+        <mat-icon class="message-icon">add_reaction</mat-icon>
       </div>
+    </div>
 
-      <!-- Kommentar -->
-      <div class="thread-message-container">
-        <img
-          src="/assets/images/logo_big.png"
-          alt="Profile Image"
-          class="avatar"
-        />
-        <div class="message-details">
-          <div class="message-header">
-            <span class="message-sender">Somebody</span>
-            <span class="message-time">14:25</span>
-          </div>
-          <div class="message-bubble">
-            <p class="message-text">
-              Lorem ipsum dolor sit amet consectetur, adipisicing elit. Iure
-              voluptatibus porro aspernatur fugiat, nihil beatae labore numquam
-              ipsam aliquam facere sint, officiis a voluptatem molestiae tenetur
-              illo omnis fugit cum.
-            </p>
-          </div>
-          <div class="show-reactions">
-            <div class="reaction-icon-button">
-              <div class="reaction-name-popup">
-                <img src="./assets/images/reaction/check_mark.png" alt="Reaction Icon">
-                <h3>Sofia Müller</h3><span>Hat reagiert</span>
-              </div>
-              <img src="./assets/images/reaction/check_mark.png" alt="Reaction Icon"> 2
-            </div>
-            <div class="reaction-icon">
-              <mat-icon fontIcon="add_reaction"></mat-icon>
-            </div>
-          </div>
+    <!-- Anzahl der Antworten -->
+    <div class="answers">
+      <div class="answers-count"><span>2</span><span>Antworten</span></div>
+      <div class="line"></div>
+    </div>
+
+    <!-- Kommentar -->
+    <div class="thread-message-container">
+      <img
+        src="/assets/images/logo_big.png"
+        alt="Profile Image"
+        class="avatar"
+      />
+      <div class="message-details">
+        <div class="message-header">
+          <span class="message-sender">Somebody</span>
+          <span class="message-time">14:25</span>
         </div>
-        <div class="emoji-box">
-          <mat-icon class="message-icon">add_reaction</mat-icon>
+        <div class="message-bubble">
+          <p class="message-text">
+            Lorem ipsum dolor sit amet consectetur, adipisicing elit. Iure
+            voluptatibus porro aspernatur fugiat, nihil beatae labore numquam
+            ipsam aliquam facere sint, officiis a voluptatem molestiae tenetur
+            illo omnis fugit cum.
+          </p>
+        </div>
+        <div class="show-reactions">
+          <div class="reaction-icon-button">
+            <div class="reaction-name-popup">
+              <img
+                src="./assets/images/reaction/check_mark.png"
+                alt="Reaction Icon"
+              />
+              <h3>Sofia Müller</h3>
+              <span>Hat reagiert</span>
+            </div>
+            <img
+              src="./assets/images/reaction/check_mark.png"
+              alt="Reaction Icon"
+            />
+            2
+          </div>
+          <div class="reaction-icon">
+            <mat-icon fontIcon="add_reaction"></mat-icon>
+          </div>
         </div>
       </div>
+      <div class="emoji-box">
+        <mat-icon class="message-icon">add_reaction</mat-icon>
+      </div>
+    </div>
 
-      <!-- Eigene Nachricht -->
-      <div class="thread-message-container user-message-container">
-        <img
-          src="/assets/images/logo_big.png"
-          alt="Profile Image"
-          class="avatar"
-        />
-        <div class="message-details">
-          <div class="user-message-header">
-            <span class="message-sender">My name</span>
-            <span class="message-time">14:25</span>
-          </div>
-          <div class="user-message-bubble">
-            <p>
-              Ja das ist es.
-            </p>
-          </div>
-          <div class="show-reactions" style="justify-content: flex-end;">
-            <div class="reaction-icon-button">
-              <div class="reaction-name-popup">
-                <img src="./assets/images/reaction/rocket.png" alt="Reaction Icon">
-                <h3>Sofia Müller</h3><span>Hat reagiert</span>
-              </div>
-              <img src="./assets/images/reaction/check_mark.png" alt="Reaction Icon"> 1
+    <!-- Eigene Nachricht -->
+    <div class="thread-message-container user-message-container">
+      <img
+        src="/assets/images/logo_big.png"
+        alt="Profile Image"
+        class="avatar"
+      />
+      <div class="message-details">
+        <div class="user-message-header">
+          <span class="message-sender">My name</span>
+          <span class="message-time">14:25</span>
+        </div>
+        <div class="user-message-bubble">
+          <p>Ja das ist es.</p>
+        </div>
+        <div class="show-reactions" style="justify-content: flex-end">
+          <div class="reaction-icon-button">
+            <div class="reaction-name-popup">
+              <img
+                src="./assets/images/reaction/rocket.png"
+                alt="Reaction Icon"
+              />
+              <h3>Sofia Müller</h3>
+              <span>Hat reagiert</span>
             </div>
-            <div class="reaction-icon">
-              <mat-icon fontIcon="add_reaction"></mat-icon>
-            </div>
+            <img
+              src="./assets/images/reaction/check_mark.png"
+              alt="Reaction Icon"
+            />
+            1
+          </div>
+          <div class="reaction-icon">
+            <mat-icon fontIcon="add_reaction"></mat-icon>
           </div>
         </div>
-        <div class="emoji-box user-emoji-box">
-          <mat-icon class="message-icon">add_reaction</mat-icon>
-          <mat-icon class="message-icon">more_vert</mat-icon>
+      </div>
+      <div class="emoji-box user-emoji-box">
+        <mat-icon class="message-icon">add_reaction</mat-icon>
+        <mat-icon class="message-icon">more_vert</mat-icon>
+      </div>
+    </div>
+  </div>
+  <!-- Nachrichteneingabebereich -->
+  <div class="thread-message-input-container">
+    <textarea
+      class="message-input"
+      id="message"
+      [(ngModel)]="message"
+      placeholder="Schreiben Sie Ihre Nachricht"
+    ></textarea>
+    <div class="message-icon-container">
+      <div class="left-icon-container">
+        <div class="message-icon"><mat-icon fontIcon="add"></mat-icon></div>
+        <div class="separator"></div>
+        <div (click)="showEmoji()" class="message-icon">
+          <mat-icon fontIcon="sentiment_satisfied"></mat-icon>
+        </div>
+        <div class="message-icon">
+          <mat-icon fontIcon="alternate_email"></mat-icon>
+        </div>
+      </div>
+      <div class="right-icon-container">
+        <div class="message-icon send">
+          <mat-icon fontIcon="send"></mat-icon>
         </div>
       </div>
     </div>
-    <!-- Nachrichteneingabebereich -->
-    <div class="message-input-container">
-      <textarea id="message" [(ngModel)]="message" placeholder="Schreiben Sie Ihre Nachricht"></textarea>
-      <div class="message-icon-container">
-        <div class="left-icon-container">
-          <div class="message-icon"><mat-icon fontIcon="add"></mat-icon></div>
-          <div class="separator"></div>
-          <div (click)="showEmoji()" class="message-icon">
-            <mat-icon fontIcon="sentiment_satisfied"></mat-icon>
-          </div>
-          <div class="message-icon"><mat-icon fontIcon="alternate_email"></mat-icon></div>
-        </div>
-        <div class="right-icon-container">
-          <div class="message-icon send"><mat-icon fontIcon="send"></mat-icon></div>
-        </div>
-      </div>
-        <emoji-mart *ngIf="showEmojiPicker" (emojiSelect)="addEmoji($event)" [darkMode]="false" title="Pick your emoji…" emoji="point_up"></emoji-mart>
-    </div>
-  </mat-card-content>
-</mat-card>
-<!-- </div> -->
+    <emoji-mart
+      *ngIf="showEmojiPicker"
+      (emojiSelect)="addEmoji($event)"
+      [darkMode]="false"
+      title="Pick your emoji…"
+      emoji="point_up"
+    ></emoji-mart>
+  </div>
+</div>
