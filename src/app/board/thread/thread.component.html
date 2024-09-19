@@ -1,15 +1,10 @@
 <div class="thread-container max-width">
   <div class="thread-header">
     <div class="thread-header-content">
-      <h1 class="thread-title">Thread</h1>
-      <span class="thread-subtitle"># testtesttest</span>
+      <h1 class="thread-header-title">Thread</h1>
+      <span class="thread-header-subtitle"># testtesttest</span>
     </div>
-    <button
-      class="close-btn"
-      mat-icon-button
-      aria-label="Close Thread"
-      (click)="closeThread()"
-    >
+    <button mat-icon-button aria-label="Close Thread" (click)="closeThread()">
       <mat-icon>close</mat-icon>
     </button>
   </div>
@@ -21,13 +16,13 @@
         alt="Profile Image"
         class="avatar"
       />
-      <div class="message-details">
-        <div class="message-header">
-          <span class="message-sender">Noah Braun</span>
-          <span class="message-time">14:25</span>
+      <div class="thread-message-details">
+        <div class="thread-message-info">
+          <span class="thread-message-sender">Noah Braun</span>
+          <span class="thread-message-time">14:25</span>
         </div>
-        <div class="message-bubble">
-          <p class="message-text">Welche Version ist aktuell von Angular?</p>
+        <div class="thread-message-bubble">
+          <p>Welche Version ist aktuell von Angular?</p>
         </div>
       </div>
       <div class="emoji-box">
@@ -37,7 +32,7 @@
 
     <!-- Anzahl der Antworten -->
     <div class="answers">
-      <div class="answers-count"><span>2</span><span>Antworten</span></div>
+      <div class="answer-count"><span>2</span><span>Antworten</span></div>
       <div class="line"></div>
     </div>
 
@@ -48,22 +43,22 @@
         alt="Profile Image"
         class="avatar"
       />
-      <div class="message-details">
-        <div class="message-header">
-          <span class="message-sender">Somebody</span>
-          <span class="message-time">14:25</span>
+      <div class="thread-message-details">
+        <div class="thread-message-info">
+          <span class="thread-message-sender">Somebody</span>
+          <span class="thread-message-time">14:25</span>
         </div>
-        <div class="message-bubble">
-          <p class="message-text">
+        <div class="thread-message-bubble">
+          <p class="thread-message-text">
             Lorem ipsum dolor sit amet consectetur, adipisicing elit. Iure
             voluptatibus porro aspernatur fugiat, nihil beatae labore numquam
             ipsam aliquam facere sint, officiis a voluptatem molestiae tenetur
             illo omnis fugit cum.
           </p>
         </div>
-        <div class="show-reactions">
-          <div class="reaction-icon-button">
-            <div class="reaction-name-popup">
+        <div class="thread-show-reactions">
+          <div class="thread-reaction-icon-button">
+            <div class="thread-reaction-name-popup">
               <img
                 src="./assets/images/reaction/check_mark.png"
                 alt="Reaction Icon"
@@ -77,8 +72,8 @@
             />
             2
           </div>
-          <div class="reaction-icon">
-            <mat-icon fontIcon="add_reaction"></mat-icon>
+          <div>
+            <mat-icon>add_reaction</mat-icon>
           </div>
         </div>
       </div>
@@ -94,17 +89,26 @@
         alt="Profile Image"
         class="avatar"
       />
-      <div class="message-details">
-        <div class="user-message-header">
-          <span class="message-sender">My name</span>
-          <span class="message-time">14:25</span>
+      <div class="thread-message-details" *ngIf="threadMessageArea">
+        <div class="emoji-box user-emoji-box">
+          <mat-icon class="message-icon">add_reaction</mat-icon>
+          <mat-icon class="message-icon" (click)="toggleEditBtn()"
+            >more_vert</mat-icon
+          >
+          <div *ngIf="showMessageEdit" class="thread-edit-message">
+            <span (click)="editMessage()">Nachricht bearbeiten</span>
+          </div>
+        </div>
+        <div class="user-message-info">
+          <span class="thread-message-sender">My name</span>
+          <span class="thread-message-time">14:25</span>
         </div>
         <div class="user-message-bubble">
-          <p>Ja das ist es.</p>
+          <p>{{ message }}</p>
         </div>
-        <div class="show-reactions" style="justify-content: flex-end">
-          <div class="reaction-icon-button">
-            <div class="reaction-name-popup">
+        <div class="thread-show-reactions" style="justify-content: flex-end">
+          <div class="thread-reaction-icon-button">
+            <div class="thread-reaction-name-popup">
               <img
                 src="./assets/images/reaction/rocket.png"
                 alt="Reaction Icon"
@@ -118,14 +122,28 @@
             />
             1
           </div>
-          <div class="reaction-icon">
+          <div>
             <mat-icon fontIcon="add_reaction"></mat-icon>
           </div>
         </div>
       </div>
-      <div class="emoji-box user-emoji-box">
-        <mat-icon class="message-icon">add_reaction</mat-icon>
-        <mat-icon class="message-icon">more_vert</mat-icon>
+
+      <div *ngIf="showMessageEditArea" class="thread-message-edit-container">
+        <textarea
+          class="thread-edit-textarea"
+          id="thread-edit-message"
+          type="text"
+          [(ngModel)]="message"
+        ></textarea>
+        <div class="thread-message-edit-buttons">
+          <div (click)="showEmoji()" class="thread-message-icon">
+            <mat-icon fontIcon="sentiment_satisfied"></mat-icon>
+          </div>
+          <div class="thread-message-edit-action">
+            <button (click)="cancelMessageEdit()">Abbrechen</button>
+            <button class="save-btn" (click)="saveMessage()">Speichern</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -133,8 +151,8 @@
   <div class="thread-message-input-container">
     <textarea
       class="message-input"
-      id="message"
-      [(ngModel)]="message"
+      id="threadMessage"
+      [(ngModel)]="threadMessage"
       placeholder="Schreiben Sie Ihre Nachricht"
     ></textarea>
     <div class="message-icon-container">

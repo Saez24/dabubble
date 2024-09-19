@@ -17,13 +17,40 @@ import { RouterModule } from '@angular/router';
   encapsulation: ViewEncapsulation.None
 })
 export class ThreadComponent {
-
+ 
   showEmojiPicker = false;
-  message = '';
+  showMessageEdit = false;
+  showMessageEditArea = false;
+  threadMessage = '';
+  threadMessageArea = true;
+  message = 'Ja das stimmt.';
+  newMessage = '';
 
   @Output() closeThreadEvent = new EventEmitter<void>();
   closeThread() {
     this.closeThreadEvent.emit();
+  }
+
+  toggleEditBtn() {
+    this.showMessageEdit = !this.showMessageEdit;
+  }
+
+  editMessage() {
+    this.threadMessageArea = false;
+    this.toggleEditBtn()
+    this.showMessageEditArea = true;
+  };
+
+  saveMessage() {
+    this.message += ' ' + this.newMessage;
+    this.newMessage = '';
+    this.showMessageEditArea = false;
+    this.threadMessageArea = true;
+  }
+
+  cancelMessageEdit() {
+    this.showMessageEditArea = false;
+    this.threadMessageArea = true;
   }
 
   showEmoji() {
@@ -31,7 +58,7 @@ export class ThreadComponent {
   }
 
   addEmoji(event: any) {
-    this.message += event.emoji.native;
+    this.threadMessage += event.emoji.native;
     console.log(event.emoji.native);
   }
 
