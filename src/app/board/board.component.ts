@@ -66,7 +66,7 @@ export class BoardComponent {
     if (currentUser) {
       this.currentUserUid = currentUser.uid;  // Speichere die aktuelle Benutzer-ID
     } else {
-      console.error('Kein Benutzer angemeldet');
+      console.log('Kein Benutzer angemeldet');
     }
   }
 
