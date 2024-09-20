@@ -43,10 +43,10 @@ export class BoardComponent {
 
   @ViewChild('drawer') drawer!: MatDrawer;
 
-  // authService = inject(AuthService);
+  authService = inject(AuthService);
   searchInput: string = '';
   showThreadComponent: boolean = true;
-  // currentUser = this.authService.auth.currentUser;
+  currentUser = this.authService.auth.currentUser;
   workspaceOpen = true;
 
   constructor(private iconsService: IconsService) { }

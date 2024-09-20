@@ -37,8 +37,19 @@ mat-form-field {
     }
 }
 
-.cdk-overlay-pane {
+.mat-mdc-menu-panel {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
     border-radius: 30px 0px 30px 30px !important;
+    padding: 30px !important;
+    gap: 15px !important;
+
+    >.mat-mdc-menu-content, .mat-mdc-menu-content .mat-mdc-menu-item .mat-mdc-menu-item-text {
+        font-weight: 600 !important;
+        font-size: 24px !important;
+        line-height: 32.74px !important;
+    }
 }
 
 .logo-container {
