@@ -188,9 +188,6 @@ export class ChatWindowComponent implements OnInit {
     });
   }
 
-
-
-
   formatTimestamp(messageDate: Date): string {
     const today = new Date();
     const yesterday = new Date();
@@ -208,6 +205,5 @@ export class ChatWindowComponent implements OnInit {
       return messageDate.toLocaleDateString('de-DE', { day: 'numeric', month: 'long' });
     }
   }
-
 
 }
