@@ -10,7 +10,7 @@
                 <mat-icon>search</mat-icon>
             </button>
         </mat-form-field>
-        <!-- <div class="profile-menu-container" [matMenuTriggerFor]="menu" mat-button>
+        <div class="profile-menu-container" [matMenuTriggerFor]="menu" mat-button>
             <span>{{ currentUser?.displayName }}</span>
             <img src="{{ currentUser?.photoURL }}" alt="Profil Icon">
             <mat-icon>keyboard_arrow_down</mat-icon>
@@ -18,7 +18,7 @@
                 <button mat-menu-item>Profil</button>
                 <button mat-menu-item (click)="authService.logout()">Log Out</button>
             </mat-menu>
-        </div> -->
+        </div>
     </header>
     <mat-drawer-container class="mat-drawer-container" autosize>
         <mat-drawer #drawer class="sidenav" [opened]="true" mode="side">

@@ -13,6 +13,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatMenuModule } from '@angular/material/menu';
 import { AuthService } from '../shared/services/authentication/auth-service/auth.service';
 import { IconsService } from '../shared/services/icons/icons.service';
+import { collection, Firestore, onSnapshot, orderBy, query } from '@angular/fire/firestore';
+import { Message } from '../shared/models/message.class';
+import { Auth } from '@angular/fire/auth';
 
 @Component({
   selector: 'app-board',
@@ -43,16 +46,28 @@ export class BoardComponent {
 
   @ViewChild('drawer') drawer!: MatDrawer;
 
-  // authService = inject(AuthService);
+  authService = inject(AuthService);
   searchInput: string = '';
   showThreadComponent: boolean = true;
-  // currentUser = this.authService.auth.currentUser;
+  currentUser = this.authService.auth.currentUser;
   workspaceOpen = true;
+  messages: Message[] = [];
+  currentUserUid: string | null = null;
 
-  constructor(private iconsService: IconsService) { }
+  constructor(private iconsService: IconsService, private firestore: Firestore, private auth: Auth) { }
 
 
   ngOnInit() {
+    this.getCurrentUser();
+  }
+
+  getCurrentUser() {
+    const currentUser = this.auth.currentUser;
+    if (currentUser) {
+      this.currentUserUid = currentUser.uid;  // Speichere die aktuelle Benutzer-ID
+    } else {
+      console.error('Kein Benutzer angemeldet');
+    }
   }
 
   closeThread() {
@@ -68,4 +83,5 @@ export class BoardComponent {
     this.drawer.toggle();
     this.workspaceOpen = !this.workspaceOpen;
   }
+
 }
