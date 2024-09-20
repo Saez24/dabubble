@@ -50,10 +50,11 @@ export class AuthService {
 
   async logout(): Promise<void> {
     try {
-      if (this.auth.currentUser) {
-        await this.userService.updateUserLoginState(this.auth.currentUser.uid, 'loggedOut');
+      const currentUser = this.auth.currentUser; // Speichere den aktuellen Benutzer vor dem SignOut
+      if (currentUser) {
+        await this.userService.updateUserLoginState(currentUser.uid, 'loggedOut');
         await signOut(this.auth);
-        console.log(this.auth.currentUser.uid); // This will be null after signOut
+        console.log(currentUser.uid); // Verwende den gespeicherten Benutzer, anstatt auf this.auth.currentUser zuzugreifen
       } else {
         console.log('No user is currently logged in.');
       }
@@ -63,6 +64,7 @@ export class AuthService {
       throw err;
     }
   }
+
 
 
   async guestLogin() {
