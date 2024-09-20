@@ -13,6 +13,7 @@ import { User } from '../../shared/models/user.class';
 import { Channel } from '../../shared/models/channel.class';
 import { addDoc, collection, doc, Firestore, onSnapshot, orderBy, query, updateDoc } from '@angular/fire/firestore';
 import { Auth } from '@angular/fire/auth';
+import { UserService } from '../../shared/services/firestore/user-service/user.service';
 
 
 
@@ -40,16 +41,17 @@ export class ChatWindowComponent implements OnInit {
   currentUserUid: string | null = null;
   editingMessageId: string | null = null;
 
-  constructor(private firestore: Firestore, private auth: Auth) { }
+  constructor(private firestore: Firestore, private auth: Auth, private userService: UserService) { }
 
   ngOnInit() {
+    this.getCurrentUser()
     this.loadMessages();
   }
 
   getCurrentUser() {
     const currentUser = this.auth.currentUser;
     if (currentUser) {
-      this.currentUserUid = currentUser.uid;  // Speichere die aktuelle Benutzer-ID
+      this.currentUserUid = currentUser.uid;
     } else {
       console.log('Kein Benutzer angemeldet');
     }
@@ -147,36 +149,65 @@ export class ChatWindowComponent implements OnInit {
     }
   }
 
-
   async loadMessages() {
     const messagesRef = collection(this.firestore, 'messages');
     const messagesQuery = query(messagesRef, orderBy('timestamp'));
 
-    onSnapshot(messagesQuery, (snapshot) => {
-      this.messages = snapshot.docs.map(doc => {
-        const message = doc.data() as Message;
-        message.isOwnMessage = message.senderID === this.currentUserUid;
+    onSnapshot(messagesQuery, async (snapshot) => {
+      let lastDisplayedDate: string | null = null;
 
-        // Füge das formatierte Datum zur Nachricht hinzu
-        message.formattedTimestamp = this.formatTimestamp(message.timestamp);
+      this.messages = await Promise.all(snapshot.docs.map(async (doc) => {
+        const messageData = doc.data();
+        const message = new Message(messageData, this.currentUserUid);
+
+        // Überprüfen, ob senderID nicht null ist
+        if (message.senderID) {
+          const senderUser = await this.userService.getUserById(message.senderID);
+          // Setze den Avatar für die Nachricht oder einen Standard-Avatar, wenn kein Avatar verfügbar ist
+          message.senderAvatar = senderUser?.avatarPath || './assets/images/avatars/avatar5.svg';
+        } else {
+          // Setze Standard-Avatar, wenn senderID null ist
+          message.senderAvatar = './assets/images/avatars/avatar5.svg';
+        }
+
+        const messageTimestamp = messageData['timestamp'];
+        const messageDate = new Date(messageTimestamp.seconds * 1000);
+        const formattedDate = this.formatTimestamp(messageDate);
+
+        if (formattedDate !== lastDisplayedDate) {
+          message.displayDate = formattedDate;
+          lastDisplayedDate = formattedDate;
+        } else {
+          message.displayDate = null;
+        }
+
+        message.formattedTimestamp = messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
         return message;
-      });
+      }));
     });
   }
 
-  // Funktion zur Formatierung des Timestamps
-  formatTimestamp(timestamp: any): string {
-    const messageDate = new Date(timestamp.seconds * 1000); // Firebase timestamp konvertieren
-    const today = new Date();
 
-    // Prüfen, ob das Datum heute ist
+
+
+  formatTimestamp(messageDate: Date): string {
+    const today = new Date();
+    const yesterday = new Date();
+    yesterday.setDate(today.getDate() - 1);
+
     const isToday = messageDate.toDateString() === today.toDateString();
+    const isYesterday = messageDate.toDateString() === yesterday.toDateString();
 
     if (isToday) {
-      return messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      return 'Heute'; // Wenn die Nachricht von heute ist
+    } else if (isYesterday) {
+      return 'Gestern'; // Wenn die Nachricht von gestern ist
     } else {
-      return messageDate.toLocaleDateString([], { day: '2-digit', month: '2-digit', year: 'numeric' }) + ' ' +
-        messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      // Format "13. September"
+      return messageDate.toLocaleDateString('de-DE', { day: 'numeric', month: 'long' });
     }
   }
+
+
 }

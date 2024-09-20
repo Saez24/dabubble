@@ -8,19 +8,26 @@ export class Message {
     senderName: string | null;
     message: string | null;
     reaction: string | null;
-    answers: number | [];
-    isOwnMessage: boolean;
+    answers: number[] | [];
     formattedTimestamp: string;
+    isOwnMessage: boolean = false;
+    displayDate: string | null;
+    senderAvatar: string | null | undefined;
 
-
-    constructor(obj?: any) {
+    constructor(obj?: any, currentUserUid?: string | null) {
         this.messageId = obj ? obj.messageId : null;
         this.senderID = obj ? obj.senderID : null;
         this.senderName = obj ? obj.senderName : null;
         this.message = obj ? obj.message : null;
         this.reaction = obj ? obj.reaction : null;
         this.answers = obj ? obj.answers : [];
-        this.isOwnMessage = false;
         this.formattedTimestamp = '';
+        this.displayDate = null;
+
+
+        // Typensicherer Vergleich, um sowohl null als auch undefined abzudecken
+        if (currentUserUid && this.senderID) {
+            this.isOwnMessage = this.senderID === currentUserUid;
+        }
     }
 }
