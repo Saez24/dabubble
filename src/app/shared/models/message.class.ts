@@ -3,7 +3,7 @@ export class Message {
     timestamp(timestamp: any): string {
         throw new Error('Method not implemented.');
     }
-    messageId: string | null;
+    messageId: string;
     senderID: string | null;
     senderName: string | null;
     message: string | null;

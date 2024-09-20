@@ -53,7 +53,7 @@
                         <div (click)="showMessageEditToggle()" class="reaction-icon edit-message-icon"><mat-icon
                                 fontIcon="more_vert"></mat-icon></div>
                         <div *ngIf="showMessageEdit" class="edit-message">
-                            <span (click)="editMessage()">Nachricht bearbeiten</span>
+                            <span>Nachricht bearbeiten</span>
                         </div>
                     </div>
 
@@ -77,12 +77,66 @@
                         </div>
                         <div class="message-edit-action">
                             <button (click)="cancelMessageEdit()">Abbrechen</button>
-                            <button class="save-btn" (click)="saveMessage()">Speichern</button>
+                            <button class="save-btn">Speichern</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
+
+
+        <div class="message-sender-container" *ngFor="let message of messages">
+            <img *ngIf="message.isOwnMessage; else otherUser" src="assets/images/avatars/avatar1.svg" alt="">
+            <ng-template #otherUser>
+                <img src="assets/images/avatars/avatar2.svg" alt="Avatar des anderen Benutzers">
+            </ng-template>
+            <div class="message-area-container">
+                <div *ngIf="!isEditing(message.messageId)" class="message-container">
+                    <div class="reaction-container-sender">
+                        <div class="reaction-icon"><img src="./assets/images/reaction/check_mark.png" alt=""></div>
+                        <div class="reaction-icon"><img src="./assets/images/reaction/hands_up.png" alt=""></div>
+                        <div class="reaction-icon"><mat-icon fontIcon="add_reaction"></mat-icon></div>
+                        <div class="reaction-icon"><mat-icon fontIcon="comment"></mat-icon></div>
+                        <div (click)="showMessageEditToggle()" class="reaction-icon edit-message-icon"><mat-icon
+                                fontIcon="more_vert"></mat-icon></div>
+                        <div *ngIf="showMessageEdit" class="edit-message">
+                            <span (click)="editMessage(message.messageId)">Nachricht bearbeiten</span>
+                        </div>
+                    </div>
+
+                    <span class="my-name">{{ message.senderName }} <span class="message-time">{{
+                            message.formattedTimestamp }}
+                            Uhr</span></span>
+                    <span class="chat-message-sender">{{ message.message }}</span>
+                    <div class="show-reactions">
+                        <div class="reaction-icon-button">
+                            <div class="reaction-name-popup">
+                                <img src="./assets/images/reaction/rocket.png" alt="">
+                                <h3>Sofia Müller</h3><span>Hat reagiert</span>
+                            </div><img src="./assets/images/reaction/check_mark.png" alt=""> 1
+                        </div>
+                        <div class="reaction-icon"><mat-icon fontIcon="add_reaction"></mat-icon></div>
+                    </div>
+                </div>
+                <div *ngIf="isEditing(message.messageId)" class="message-edit-container">
+                    <textarea class="message-input" id="edit-message" type="text"
+                        [(ngModel)]="message.message"></textarea>
+                    <div class="message-edit-buttons">
+                        <div (click)="showEmoji()" class="message-icon">
+                            <mat-icon fontIcon="sentiment_satisfied"></mat-icon>
+                        </div>
+                        <div class="message-edit-action">
+                            <button (click)="cancelMessageEdit()">Abbrechen</button>
+                            <button (click)="saveMessage(message)" class="save-btn">Speichern</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
     </div>
     <div class="chat-message-input-container">
         <textarea class="message-input" id="chatMessage" [(ngModel)]="chatMessage" type="text"
@@ -97,7 +151,7 @@
                 <div class="message-icon"><mat-icon fontIcon="alternate_email"></mat-icon></div>
             </div>
             <div class="right-icon-container">
-                <div class="message-icon send"><mat-icon fontIcon="send"></mat-icon></div>
+                <div (click)="sendMessage()" class="message-icon send"><mat-icon fontIcon="send"></mat-icon></div>
             </div>
         </div>
         <emoji-mart class="emoji-mart-chat" *ngIf="showEmojiPicker" (emojiSelect)="addEmoji($event)" [darkMode]="false"
