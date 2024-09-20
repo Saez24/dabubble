@@ -253,7 +253,7 @@
   position: absolute;
   bottom: 212px;
   left: 86px;
-  z-index: 10;
+  z-index: 9999;
 }
 
 .emoji-box {
@@ -371,8 +371,7 @@
   align-items: center;
   justify-content: center;
   position: absolute;
-  top: 45px;
-  left: 24px;
+  top: 16px;
   transform: translateX(80px);
   transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
 
@@ -418,7 +417,6 @@
   >button {
       border-radius: 30px;
       height: 38px;
-      width: 130px;
       cursor: pointer;
       color: #444DF2;
       font-size: 18px;

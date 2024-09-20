@@ -39,10 +39,11 @@ export class ThreadComponent {
     this.threadMessageArea = false;
     this.toggleEditBtn()
     this.showMessageEditArea = true;
+    this.newMessage = this.message ? this.message : '';
   };
 
   saveMessage() {
-    this.message += ' ' + this.newMessage;
+    this.message = this.newMessage;
     this.newMessage = '';
     this.showMessageEditArea = false;
     this.threadMessageArea = true;
@@ -66,7 +67,7 @@ export class ThreadComponent {
   clickOutside(event: Event) {
     const target = event.target as HTMLElement;
 
-    if (this.showEmojiPicker && !target.closest('emoji-mart') && !target.closest('.message-icon')) {
+    if (this.showEmojiPicker && !target.closest('emoji-mart') && !target.closest('.thread-message-icon')) {
       this.showEmojiPicker = false;
     }
   }

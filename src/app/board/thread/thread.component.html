@@ -4,7 +4,12 @@
       <h1 class="thread-header-title">Thread</h1>
       <span class="thread-header-subtitle"># testtesttest</span>
     </div>
-    <button mat-icon-button aria-label="Close Thread" (click)="closeThread()">
+    <button
+      mat-icon-button
+      aria-label="Close Thread"
+      class="close-btn"
+      (click)="closeThread()"
+    >
       <mat-icon>close</mat-icon>
     </button>
   </div>
@@ -133,7 +138,7 @@
           class="thread-edit-textarea"
           id="thread-edit-message"
           type="text"
-          [(ngModel)]="message"
+          [(ngModel)]="newMessage"
         ></textarea>
         <div class="thread-message-edit-buttons">
           <div (click)="showEmoji()" class="thread-message-icon">
@@ -159,7 +164,7 @@
       <div class="left-icon-container">
         <div class="message-icon"><mat-icon fontIcon="add"></mat-icon></div>
         <div class="separator"></div>
-        <div (click)="showEmoji()" class="message-icon">
+        <div (click)="showEmoji()" class="thread-message-icon">
           <mat-icon fontIcon="sentiment_satisfied"></mat-icon>
         </div>
         <div class="message-icon">
