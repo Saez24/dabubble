@@ -108,9 +108,9 @@ export class ChatWindowComponent implements OnInit, AfterViewChecked {
     }
   }
 
-  @Output() showThreadEvent = new EventEmitter<void>();
-  showThread() {
-    this.showThreadEvent.emit();
+  @Output() showThreadEvent = new EventEmitter<Message>();
+  showThread(message: Message) {
+    this.showThreadEvent.emit(message);
   }
 
   async sendMessage() {

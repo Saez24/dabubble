@@ -17,17 +17,17 @@
     <!-- Originalnachricht -->
     <div class="thread-message-container">
       <img
-        src="/assets/images/logo_big.png"
+      [src]="selectedMessage?.senderAvatar"
         alt="Profile Image"
         class="avatar"
       />
       <div class="thread-message-details">
         <div class="thread-message-info">
-          <span class="thread-message-sender">Noah Braun</span>
-          <span class="thread-message-time">14:25</span>
+          <span class="thread-message-sender">{{ selectedMessage?.senderName }}</span>
+          <span class="thread-message-time">{{ selectedMessage?.formattedTimestamp }}</span>
         </div>
         <div class="thread-message-bubble">
-          <p>Welche Version ist aktuell von Angular?</p>
+          <p>{{ selectedMessage?.message }}</p>
         </div>
       </div>
       <div class="emoji-box">
@@ -42,111 +42,120 @@
     </div>
 
     <!-- Kommentar -->
-    <div class="thread-message-container">
-      <img
-        src="/assets/images/logo_big.png"
-        alt="Profile Image"
-        class="avatar"
-      />
-      <div class="thread-message-details">
-        <div class="thread-message-info">
-          <span class="thread-message-sender">Somebody</span>
-          <span class="thread-message-time">14:25</span>
-        </div>
-        <div class="thread-message-bubble">
-          <p class="thread-message-text">
-            Lorem ipsum dolor sit amet consectetur, adipisicing elit. Iure
-            voluptatibus porro aspernatur fugiat, nihil beatae labore numquam
-            ipsam aliquam facere sint, officiis a voluptatem molestiae tenetur
-            illo omnis fugit cum.
-          </p>
-        </div>
-        <div class="thread-show-reactions">
-          <div class="thread-reaction-icon-button">
-            <div class="thread-reaction-name-popup">
+    <div *ngFor="let message of messages" style="width: 100%;">
+      <div class="thread-message-container" *ngIf="!message.isOwnMessage">
+        <img
+          src="/assets/images/logo_big.png"
+          alt="Profile Image"
+          class="avatar"
+        />
+        <div class="thread-message-details">
+          <div class="thread-message-info">
+            <span class="thread-message-sender">{{ message.senderName }}</span>
+            <span class="thread-message-time">{{ message.formattedTimestamp }}</span>
+          </div>
+          <div class="thread-message-bubble">
+            <p class="thread-message-text">
+              {{ message.message }}
+            </p>
+          </div>
+          <div class="thread-show-reactions">
+            <div class="thread-reaction-icon-button">
+              <div class="thread-reaction-name-popup">
+                <img
+                  src="./assets/images/reaction/check_mark.png"
+                  alt="Reaction Icon"
+                />
+                <h3>Sofia Müller</h3>
+                <span>Hat reagiert</span>
+              </div>
               <img
                 src="./assets/images/reaction/check_mark.png"
                 alt="Reaction Icon"
               />
-              <h3>Sofia Müller</h3>
-              <span>Hat reagiert</span>
+              2
             </div>
-            <img
-              src="./assets/images/reaction/check_mark.png"
-              alt="Reaction Icon"
-            />
-            2
-          </div>
-          <div>
-            <mat-icon>add_reaction</mat-icon>
+            <div>
+              <mat-icon>add_reaction</mat-icon>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="emoji-box">
-        <mat-icon class="message-icon">add_reaction</mat-icon>
+        <div class="emoji-box">
+          <mat-icon class="message-icon">add_reaction</mat-icon>
+        </div>
       </div>
     </div>
 
     <!-- Eigene Nachricht -->
-    <div class="thread-message-container user-message-container">
-      <img
-        src="/assets/images/logo_big.png"
-        alt="Profile Image"
-        class="avatar"
-      />
-      <div class="thread-message-details" *ngIf="threadMessageArea">
-        <div class="emoji-box user-emoji-box">
-          <mat-icon class="message-icon">add_reaction</mat-icon>
-          <mat-icon class="message-icon" (click)="toggleEditBtn()"
-            >more_vert</mat-icon
-          >
-          <div *ngIf="showMessageEdit" class="thread-edit-message">
-            <span (click)="editMessage()">Nachricht bearbeiten</span>
+    <div *ngFor="let message of messages" style="width: 100%;">
+      <div
+        class="thread-message-container user-message-container"
+        *ngIf="message.isOwnMessage"
+      >
+        <img
+          src="/assets/images/logo_big.png"
+          alt="Profile Image"
+          class="avatar"
+        />
+        <div class="thread-message-details" *ngIf="threadMessageArea">
+          <div class="emoji-box user-emoji-box">
+            <mat-icon class="message-icon">add_reaction</mat-icon>
+            <mat-icon class="message-icon" (click)="toggleEditBtn()"
+              >more_vert</mat-icon
+            >
+            <div *ngIf="showMessageEdit" class="thread-edit-message">
+              <span (click)="editMessage()">Nachricht bearbeiten</span>
+            </div>
           </div>
-        </div>
-        <div class="user-message-info">
-          <span class="thread-message-sender">My name</span>
-          <span class="thread-message-time">14:25</span>
-        </div>
-        <div class="user-message-bubble">
-          <p>{{ message }}</p>
-        </div>
-        <div class="thread-show-reactions" style="justify-content: flex-end">
-          <div class="thread-reaction-icon-button">
-            <div class="thread-reaction-name-popup">
+          <div class="user-message-info">
+            <span class="thread-message-sender">{{ message.senderName }}</span>
+            <span class="thread-message-time">{{
+              message.formattedTimestamp
+            }}</span>
+          </div>
+          <div class="user-message-bubble">
+            <p>{{ message.message }}</p>
+            <!-- threadMessage -->
+          </div>
+          <div class="thread-show-reactions" style="justify-content: flex-end">
+            <div class="thread-reaction-icon-button">
+              <div class="thread-reaction-name-popup">
+                <img
+                  src="./assets/images/reaction/rocket.png"
+                  alt="Reaction Icon"
+                />
+                <h3>Sofia Müller</h3>
+                <span>Hat reagiert</span>
+              </div>
               <img
-                src="./assets/images/reaction/rocket.png"
+                src="./assets/images/reaction/check_mark.png"
                 alt="Reaction Icon"
               />
-              <h3>Sofia Müller</h3>
-              <span>Hat reagiert</span>
+              1
             </div>
-            <img
-              src="./assets/images/reaction/check_mark.png"
-              alt="Reaction Icon"
-            />
-            1
-          </div>
-          <div>
-            <mat-icon fontIcon="add_reaction"></mat-icon>
+            <div>
+              <mat-icon fontIcon="add_reaction"></mat-icon>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div *ngIf="showMessageEditArea" class="thread-message-edit-container">
-        <textarea
-          class="thread-edit-textarea"
-          id="thread-edit-message"
-          type="text"
-          [(ngModel)]="newMessage"
-        ></textarea>
-        <div class="thread-message-edit-buttons">
-          <div (click)="showEmoji()" class="thread-message-icon">
-            <mat-icon fontIcon="sentiment_satisfied"></mat-icon>
-          </div>
-          <div class="thread-message-edit-action">
-            <button (click)="cancelMessageEdit()">Abbrechen</button>
-            <button class="save-btn" (click)="saveMessage()">Speichern</button>
+        <div *ngIf="showMessageEditArea" class="thread-message-edit-container">
+          <textarea
+            class="thread-edit-textarea"
+            id="thread-edit-message"
+            type="text"
+            [(ngModel)]="editingMessage"
+          ></textarea>
+          <div class="thread-message-edit-buttons">
+            <div (click)="showEmoji()" class="thread-message-icon">
+              <mat-icon fontIcon="sentiment_satisfied"></mat-icon>
+            </div>
+            <div class="thread-message-edit-action">
+              <button (click)="cancelMessageEdit()">Abbrechen</button>
+              <button class="save-btn" (click)="saveMessage()">
+                Speichern
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -157,8 +166,8 @@
     <textarea
       class="message-input"
       id="threadMessage"
-      [(ngModel)]="threadMessage"
       placeholder="Schreiben Sie Ihre Nachricht"
+      [(ngModel)]="newThreadMessage"
     ></textarea>
     <div class="message-icon-container">
       <div class="left-icon-container">
@@ -172,7 +181,7 @@
         </div>
       </div>
       <div class="right-icon-container">
-        <div class="message-icon send">
+        <div class="message-icon send" (click)="sendMessage()">
           <mat-icon fontIcon="send"></mat-icon>
         </div>
       </div>

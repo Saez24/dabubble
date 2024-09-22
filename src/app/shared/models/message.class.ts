@@ -21,7 +21,7 @@ export class Message {
         this.message = obj ? obj.message : null;
         this.reaction = obj ? obj.reaction : null;
         this.answers = obj ? obj.answers : null;
-        this.formattedTimestamp = '';
+        this.formattedTimestamp = obj ? obj.formattedTimestamp : '';
         this.displayDate = null;
 
 

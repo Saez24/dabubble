@@ -27,12 +27,12 @@
         <div class="sidenav-content">
             <mat-card class="chat-window-container" appearance="outlined">
                 <mat-card-content>
-                    <app-chat-window (showThreadEvent)="showThread()"></app-chat-window>
+                    <app-chat-window (showThreadEvent)="showThread($event)"></app-chat-window>
                 </mat-card-content>
             </mat-card>
             <mat-card class="thread-container" appearance="outlined" *ngIf="showThreadComponent">
                 <mat-card-content>
-                    <app-thread (closeThreadEvent)="closeThread()"></app-thread>
+                    <app-thread [selectedMessage]="selectedMessage" (closeThreadEvent)="closeThread()"></app-thread>
                 </mat-card-content>
             </mat-card>
         </div>
