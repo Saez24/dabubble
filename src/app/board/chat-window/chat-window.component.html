@@ -1,6 +1,6 @@
 <div class="chat-container max-width">
-    <div class="chat-header">
-        <div class="chat-header-button"><span># Entwicklerteam</span>
+    <div class="chat-header" *ngFor="let message of messages">
+        <div class="chat-header-button"><span># {{ getChannelName(message.channelId) }}</span>
             <mat-icon fontIcon="keyboard_arrow_down"></mat-icon>
         </div>
         <div class="members-container">

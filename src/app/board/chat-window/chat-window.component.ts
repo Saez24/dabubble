@@ -40,12 +40,16 @@ export class ChatWindowComponent implements OnInit, AfterViewChecked {
   editedMessage = '';
   currentUserUid: string | null = null;
   editingMessageId: string | null = null;
+  channelId: string | null = null;
+  selectedChannelId: string | null = null;
+
 
   @ViewChild('chatWindow') private chatWindow!: ElementRef;
   constructor(private firestore: Firestore, private auth: Auth, private userService: UserService, private cd: ChangeDetectorRef) { }
 
   ngOnInit() {
-    this.getCurrentUser()
+    this.getCurrentUser();
+    this.loadChannels();
     this.loadMessages();
   }
 
@@ -53,8 +57,30 @@ export class ChatWindowComponent implements OnInit, AfterViewChecked {
     const currentUser = this.auth.currentUser;
     if (currentUser) {
       this.currentUserUid = currentUser.uid;
+    }
+  }
+
+  async loadChannels() {
+    const channelsRef = collection(this.firestore, 'channels');
+    const channelsQuery = query(channelsRef);
+
+    onSnapshot(channelsQuery, (snapshot) => {
+      this.channels = snapshot.docs.map(doc => {
+        const channelData = doc.data() as Channel;
+        return { ...channelData, id: doc.id }; // ID nach channelData hinzufügen
+      });
+    });
+  }
+
+  getChannelName(channelId: string | null) {
+    const channel = this.channels.find(c => c.id === channelId);
+
+    if (channel) {
+      this.selectedChannelId = channel.id; // Setze die selectedChannelId
+      return channel.name;
     } else {
-      console.log('Kein Benutzer angemeldet');
+      this.selectedChannelId = null; // Setze die selectedChannelId auf null, wenn kein Kanal gefunden wird
+      return 'Unbekannter Kanal';
     }
   }
 
@@ -113,36 +139,43 @@ export class ChatWindowComponent implements OnInit, AfterViewChecked {
     this.showThreadEvent.emit(message);
   }
 
+  showError() {
+    console.error("Kein Kanal ausgewählt.");
+  }
+
   async sendMessage() {
+    if (!this.selectedChannelId) {
+      this.showError(); // Fehler, wenn kein Kanal ausgewählt ist
+      return;
+    }
+
     if (this.chatMessage.trim()) {
       const currentUser = this.auth.currentUser;
 
       if (currentUser) {
         const messagesRef = collection(this.firestore, 'messages');
 
-        const newMessageRef = doc(messagesRef);
-
         const newMessage: Message = new Message({
           senderID: currentUser.uid,
           senderName: currentUser.displayName,
           message: this.chatMessage,
+          channelId: this.selectedChannelId, // Verwende die gespeicherte channelId
           reaction: '',
-          answers: '',
+          answers: [],
         });
 
         await addDoc(messagesRef, {
           senderID: newMessage.senderID,
           senderName: newMessage.senderName,
           message: newMessage.message,
+          channelId: newMessage.channelId,
           reaction: newMessage.reaction,
           answers: newMessage.answers,
           timestamp: new Date(),
         });
 
-        console.log("Nachricht gesendet, lade Nachrichten neu.");
-
-        this.chatMessage = ''; // Leere das Eingabefeld
-        this.loadMessages(); // Lade Nachrichten neu
+        this.chatMessage = ''; // Eingabefeld leeren
+        this.loadMessages(); // Nachrichten neu laden
       } else {
         console.error('Kein Benutzer angemeldet');
       }
@@ -155,7 +188,6 @@ export class ChatWindowComponent implements OnInit, AfterViewChecked {
 
     onSnapshot(messagesQuery, async (snapshot) => {
       let lastDisplayedDate: string | null = null;
-      console.log('Snapshot received:', snapshot.docs.length);
 
       this.messages = await Promise.all(snapshot.docs.map(async (doc) => {
         const messageData = doc.data();
@@ -222,41 +254,4 @@ export class ChatWindowComponent implements OnInit, AfterViewChecked {
       return messageDate.toLocaleDateString('de-DE', { day: 'numeric', month: 'long' });
     }
   }
-
-  // async sendAnswer() {
-  //   if (this.chatMessage.trim()) {
-  //     const currentUser = this.auth.currentUser;
-
-  //     if (currentUser) {
-  //       const messagesRef = collection(this.firestore, 'messages/answers');
-
-  //       const newMessageRef = doc(messagesRef);
-
-  //       const newMessage: Message = new Message({
-  //         senderID: currentUser.uid,
-  //         senderName: currentUser.displayName,
-  //         message: this.chatMessage,
-  //         reaction: '',
-  //         answers: [],
-  //       });
-
-  //       await addDoc(messagesRef, {
-  //         senderID: newMessage.senderID,
-  //         senderName: newMessage.senderName,
-  //         message: newMessage.message,
-  //         reaction: newMessage.reaction,
-  //         answers: newMessage.answers,
-  //         timestamp: new Date(),
-  //       });
-
-  //       console.log("Nachricht gesendet, lade Nachrichten neu.");
-
-  //       this.chatMessage = ''; // Leere das Eingabefeld
-  //       this.loadMessages(); // Lade Nachrichten neu
-  //     } else {
-  //       console.error('Kein Benutzer angemeldet');
-  //     }
-  //   }
-  // }
-
 }
