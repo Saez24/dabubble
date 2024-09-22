@@ -8,7 +8,7 @@ export class Message {
     senderName: string | null;
     message: string | null;
     reaction: string | null;
-    answers: number[] | [];
+    answers: string | null;
     formattedTimestamp: string;
     isOwnMessage: boolean = false;
     displayDate: string | null;
@@ -20,7 +20,7 @@ export class Message {
         this.senderName = obj ? obj.senderName : null;
         this.message = obj ? obj.message : null;
         this.reaction = obj ? obj.reaction : null;
-        this.answers = obj ? obj.answers : [];
+        this.answers = obj ? obj.answers : null;
         this.formattedTimestamp = '';
         this.displayDate = null;
 

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, HostListener, OnInit, Output, ViewEncapsulation } from '@angular/core';
+import { AfterViewChecked, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -6,7 +6,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule } from '@angular/forms';
-import { CommonModule, NgIf } from '@angular/common';
+import { CommonModule, NgFor, NgIf } from '@angular/common';
 import { PickerComponent } from '@ctrl/ngx-emoji-mart';
 import { Message } from '../../shared/models/message.class';
 import { User } from '../../shared/models/user.class';
@@ -21,13 +21,13 @@ import { UserService } from '../../shared/services/firestore/user-service/user.s
   selector: 'app-chat-window',
   standalone: true,
   imports: [MatCardModule, MatButtonModule, MatIconModule, MatDividerModule, FormsModule,
-    MatFormFieldModule, MatInputModule, CommonModule, PickerComponent, NgIf],
+    MatFormFieldModule, MatInputModule, CommonModule, PickerComponent, NgIf, NgFor],
   templateUrl: './chat-window.component.html',
   styleUrl: './chat-window.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  encapsulation: ViewEncapsulation.None
+  changeDetection: ChangeDetectionStrategy.Default,
+  encapsulation: ViewEncapsulation.None,
 })
-export class ChatWindowComponent implements OnInit {
+export class ChatWindowComponent implements OnInit, AfterViewChecked {
   messages: Message[] = [];
   users: User[] = [];
   channels: Channel[] = [];
@@ -41,7 +41,8 @@ export class ChatWindowComponent implements OnInit {
   currentUserUid: string | null = null;
   editingMessageId: string | null = null;
 
-  constructor(private firestore: Firestore, private auth: Auth, private userService: UserService) { }
+  @ViewChild('chatWindow') private chatWindow!: ElementRef;
+  constructor(private firestore: Firestore, private auth: Auth, private userService: UserService, private cd: ChangeDetectorRef) { }
 
   ngOnInit() {
     this.getCurrentUser()
@@ -65,14 +66,16 @@ export class ChatWindowComponent implements OnInit {
     this.showMessageEdit = !this.showMessageEdit;
   }
 
-  editMessage(messageId: string) {
-    this.editingMessageId = messageId;
+  editMessage(docId: string) {
+    this.editingMessageId = docId; // Verwende die Dokument-ID
     this.showMessageEditArea = true;
   }
 
+
   saveMessage(message: Message) {
-    if (message.messageId) { // Sicherstellen, dass die messageId existiert
-      const messageRef = doc(this.firestore, `messages/${message.messageId}`);
+    if (this.editingMessageId) { // Nutze die `editingMessageId` (Dokument-ID) anstelle von `message.messageId`
+      const messageRef = doc(this.firestore, `messages/${this.editingMessageId}`); // Verweise auf die Dokument-ID
+
       updateDoc(messageRef, { message: message.message }).then(() => {
         this.editingMessageId = null;
         this.showMessageEditArea = false;
@@ -87,10 +90,9 @@ export class ChatWindowComponent implements OnInit {
     this.showMessageEditArea = false;
   }
 
-  isEditing(messageId: string): boolean {
-    return this.editingMessageId === messageId;
+  isEditing(docId: string): boolean {
+    return this.editingMessageId === docId; // Prüfe gegen die Firestore-Dokument-ID
   }
-
 
   addEmoji(event: any) {
     this.chatMessage += event.emoji.native;
@@ -121,16 +123,14 @@ export class ChatWindowComponent implements OnInit {
         const newMessageRef = doc(messagesRef);
 
         const newMessage: Message = new Message({
-          messageId: newMessageRef.id,
           senderID: currentUser.uid,
           senderName: currentUser.displayName,
           message: this.chatMessage,
           reaction: '',
-          answers: [],
+          answers: '',
         });
 
         await addDoc(messagesRef, {
-          messageId: newMessage.messageId,
           senderID: newMessage.senderID,
           senderName: newMessage.senderName,
           message: newMessage.message,
@@ -155,10 +155,12 @@ export class ChatWindowComponent implements OnInit {
 
     onSnapshot(messagesQuery, async (snapshot) => {
       let lastDisplayedDate: string | null = null;
+      console.log('Snapshot received:', snapshot.docs.length);
 
       this.messages = await Promise.all(snapshot.docs.map(async (doc) => {
         const messageData = doc.data();
         const message = new Message(messageData, this.currentUserUid);
+        message.messageId = doc.id;
 
         // Überprüfen, ob senderID nicht null ist
         if (message.senderID) {
@@ -182,10 +184,25 @@ export class ChatWindowComponent implements OnInit {
         }
 
         message.formattedTimestamp = messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
         return message;
       }));
+      this.scrollToBottom();
+      this.cd.detectChanges();
     });
+  }
+
+  ngAfterViewChecked() {
+    this.scrollToBottom(); // Stelle sicher, dass das Chat-Fenster nach jeder View-Änderung nach unten scrollt
+  }
+
+  scrollToBottom(): void {
+    if (this.chatWindow) {
+      try {
+        this.chatWindow.nativeElement.scrollTop = this.chatWindow.nativeElement.scrollHeight;
+      } catch (err) {
+        console.error('Scroll to bottom failed:', err);
+      }
+    }
   }
 
   formatTimestamp(messageDate: Date): string {
@@ -205,5 +222,41 @@ export class ChatWindowComponent implements OnInit {
       return messageDate.toLocaleDateString('de-DE', { day: 'numeric', month: 'long' });
     }
   }
+
+  // async sendAnswer() {
+  //   if (this.chatMessage.trim()) {
+  //     const currentUser = this.auth.currentUser;
+
+  //     if (currentUser) {
+  //       const messagesRef = collection(this.firestore, 'messages/answers');
+
+  //       const newMessageRef = doc(messagesRef);
+
+  //       const newMessage: Message = new Message({
+  //         senderID: currentUser.uid,
+  //         senderName: currentUser.displayName,
+  //         message: this.chatMessage,
+  //         reaction: '',
+  //         answers: [],
+  //       });
+
+  //       await addDoc(messagesRef, {
+  //         senderID: newMessage.senderID,
+  //         senderName: newMessage.senderName,
+  //         message: newMessage.message,
+  //         reaction: newMessage.reaction,
+  //         answers: newMessage.answers,
+  //         timestamp: new Date(),
+  //       });
+
+  //       console.log("Nachricht gesendet, lade Nachrichten neu.");
+
+  //       this.chatMessage = ''; // Leere das Eingabefeld
+  //       this.loadMessages(); // Lade Nachrichten neu
+  //     } else {
+  //       console.error('Kein Benutzer angemeldet');
+  //     }
+  //   }
+  // }
 
 }
