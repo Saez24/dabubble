@@ -48,7 +48,7 @@ export class ThreadComponent implements OnInit {
     if (currentUser) {
       this.currentUserUid = currentUser.uid;
     } else {
-      console.log('Kein Benutzer angemeldet');
+      // console.log('Kein Benutzer angemeldet');
     }
   }
 
@@ -88,7 +88,6 @@ export class ThreadComponent implements OnInit {
       this.messages = snapshot.docs.map(doc => {
         const data = doc.data();
         const formattedDate = this.formatFirebaseTimestamp(data['timestamp']);
-        console.log('Hallo dies ist das enddatum', formattedDate)
 
         return new Message({
           messageId: doc.id,
@@ -101,9 +100,9 @@ export class ThreadComponent implements OnInit {
       });
 
 
-      console.log('Nachrichten erfolgreich geladen:', this.messages);
+      // console.log('Nachrichten erfolgreich geladen:', this.messages);
     }, (error) => {
-      console.error('Fehler beim Laden der Nachrichten:', error);
+      // console.error('Fehler beim Laden der Nachrichten:', error);
     });
   }
 
