@@ -93,7 +93,7 @@
         *ngIf="message.isOwnMessage"
       >
         <img
-          src="/assets/images/logo_big.png"
+        [src]="message.senderAvatar"
           alt="Profile Image"
           class="avatar"
         />

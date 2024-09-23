@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, HostListener, ViewEncapsulation, EventEmitter, Output, OnInit, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, HostListener, ViewEncapsulation, EventEmitter, Output, OnInit, Input, SimpleChanges, OnChanges } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -23,7 +23,7 @@ import { Firestore } from '@angular/fire/firestore';
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None
 })
-export class ThreadComponent implements OnInit {
+export class ThreadComponent implements OnInit, OnChanges {
   messages: Message[] = [];
   users: User[] = [];
   showEmojiPicker = false;
@@ -43,12 +43,18 @@ export class ThreadComponent implements OnInit {
     this.loadMessages();
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['selectedMessage'] && this.selectedMessage) {
+      this.loadMessages(); // Lade Nachrichten erneut, wenn die ausgewählte Nachricht sich ändert
+    }
+  }
+
   getCurrentUser() {
     const currentUser = this.auth.currentUser;
     if (currentUser) {
       this.currentUserUid = currentUser.uid;
     } else {
-      // console.log('Kein Benutzer angemeldet');
+      console.log('Kein Benutzer angemeldet');
     }
   }
 
@@ -62,6 +68,7 @@ export class ThreadComponent implements OnInit {
           senderName: currentUser.displayName,
           message: this.newThreadMessage,
           reaction: '',
+          parentMessageId: this.selectedMessage ? this.selectedMessage.messageId : null
         });
 
         this.saveMessageToDatabase(message);
@@ -79,13 +86,14 @@ export class ThreadComponent implements OnInit {
       message: message.message,
       reaction: message.reaction,
       timestamp: new Date(),
+      parentMessageId: message.parentMessageId
     });
   }
 
   loadMessages() {
     const messagesRef = collection(this.firestore, 'messages');
     onSnapshot(messagesRef, (snapshot) => {
-      this.messages = snapshot.docs.map(doc => {
+      const allMessages: Message[] = snapshot.docs.map(doc => {
         const data = doc.data();
         const formattedDate = this.formatFirebaseTimestamp(data['timestamp']);
 
@@ -96,10 +104,15 @@ export class ThreadComponent implements OnInit {
           message: data['message'],
           reaction: data['reaction'],
           formattedTimestamp: formattedDate,
+          parentMessageId: data['parentMessageId']
         }, this.currentUserUid);
       });
 
-
+      if (this.selectedMessage) {
+        this.messages = allMessages.filter(msg => msg.parentMessageId === this.selectedMessage?.messageId);
+      } else {
+        this.messages = []; // Leere Liste, wenn keine Nachricht ausgewählt ist
+      }
       // console.log('Nachrichten erfolgreich geladen:', this.messages);
     }, (error) => {
       // console.error('Fehler beim Laden der Nachrichten:', error);
@@ -108,7 +121,7 @@ export class ThreadComponent implements OnInit {
 
   formatFirebaseTimestamp(timestamp: { seconds: number; nanoseconds?: number }): string | null {
     if (!timestamp || typeof timestamp.seconds !== 'number') {
-      return null; // oder ein Standardwert, wenn der Timestamp ungültig ist
+      return null;
     }
 
     const date = new Date(timestamp.seconds * 1000);

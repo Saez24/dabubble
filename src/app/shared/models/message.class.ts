@@ -14,6 +14,7 @@ export class Message {
     isOwnMessage: boolean = false;
     displayDate: string | null;
     senderAvatar: string | null | undefined;
+    parentMessageId: string | null;
 
     constructor(obj?: any, currentUserUid?: string | null) {
         this.messageId = obj ? obj.messageId : null;
@@ -25,6 +26,7 @@ export class Message {
         this.answers = obj ? obj.answers : [];
         this.formattedTimestamp = '';
         this.displayDate = null;
+        this.parentMessageId = obj ? obj.parentMessageId : null; //Um ThreadNachricht dem ausgewaehlten Kommentar zuzuweisen!
 
 
         // Typensicherer Vergleich, um sowohl null als auch undefined abzudecken
