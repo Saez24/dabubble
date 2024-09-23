@@ -46,4 +46,16 @@ export class UserService {
       loginState: 'loggedOut',
     });
   }
+
+  async getUserById(userId: string): Promise<User | null> {
+    const userRef = this.getUserDocReference(userId);
+    const userDoc = await getDoc(userRef);
+
+    if (userDoc.exists()) {
+      return new User({ ...userDoc.data(), id: userDoc.id });
+    } else {
+      return null;
+    }
+  }
+
 }

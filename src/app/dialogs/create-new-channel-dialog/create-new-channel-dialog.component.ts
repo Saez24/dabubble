@@ -1,5 +1,5 @@
 import { Component, ViewEncapsulation } from '@angular/core';
-import { FormControl, FormGroupDirective, FormsModule, NgForm, Validators } from '@angular/forms';
+import { FormControl, FormsModule, Validators } from '@angular/forms';
 import {
   MatDialog,
   MatDialogActions,
@@ -13,10 +13,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { IconsService } from '../../shared/services/icons/icons.service';
-import { AddPeopleDialog } from './add-people-dialog/add-people-dialog.component';
 import { ErrorStateMatcher } from '@angular/material/core';
 import { ChannelsService } from '../../shared/services/channels/channels.service';
-import { Channel } from '../../shared/models/channel.class';
+import { AddPeopleDialog } from './add-people-dialog/add-people-dialog.component';
 
 export class MyErrorStateMatcher implements ErrorStateMatcher {
   isErrorState(control: FormControl | null): boolean {
@@ -51,29 +50,38 @@ export class CreateNewChannelDialog {
 
   constructor(
     private iconsService: IconsService, 
-    private channelsService: ChannelsService,
+    // private channelsService: ChannelsService,
     private dialogRef: MatDialogRef<CreateNewChannelDialog>,
-    private dialog: MatDialog
-  ) {
-  }
+    private dialog: MatDialog,
+  ) { }
 
   nameFormControl = new FormControl('', [Validators.required]);
   matcher: MyErrorStateMatcher = new MyErrorStateMatcher();
   formSubmitted = false;
 
-  nextDialog() {
+  // Method to validate the form, open new dialog and rending data to the new dialog
+  openNextDialog() {
     this.formSubmitted = true; 
-    this.channelsService.setChannelData(this.newChannelName, this.newChannelDescription);
-    this.clearInputs();
-    this.dialogRef.close();  
-    this.dialog.open(AddPeopleDialog);
-  }
+  
+    this.dialog.open(AddPeopleDialog, {
+      data: {
+        name: this.newChannelName,
+        description: this.newChannelDescription,
+      }
+    });
 
+    this.clearInputs();
+    this.dialogRef.close();
+  }
+  
+
+  // Method to clear the input fields
   clearInputs() {
     this.newChannelName = '';
     this.newChannelDescription = '';
 }
 
+  // Method to check if the form is valid
   isValid(): boolean {
     return this.newChannelName.trim().length > 0;
   }

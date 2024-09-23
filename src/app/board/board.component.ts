@@ -58,6 +58,7 @@ export class BoardComponent {
   workspaceOpen = true;
   messages: Message[] = [];
   currentUserUid: string | null = null;
+  selectedMessage: Message | null = null;
   showOverlay: boolean = false;
 
   constructor(private iconsService: IconsService, private firestore: Firestore, private auth: Auth, public dialog: MatDialog,) { }
@@ -78,11 +79,13 @@ export class BoardComponent {
 
   closeThread() {
     this.showThreadComponent = false;
+    this.selectedMessage = null;
   }
 
 
-  showThread() {
+  showThread(message: Message) {
     this.showThreadComponent = true;
+    this.selectedMessage = message;
   }
 
   toggleWorkspace() {

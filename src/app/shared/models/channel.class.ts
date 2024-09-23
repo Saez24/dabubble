@@ -1,15 +1,14 @@
 export class Channel {
-    id: number | null = null;
-    name: string = '';
-    description: string = '';
-    users: string[] = [];
-    messages: string[] = [];
+    id: string;
+    name: string | null;
+    description: string | null;
+    users: string[] | [];
+    newChannelName: any;
 
-    constructor(id: number | null = null, name: string = '', description: string = '', users: string[] = [], messages: string[] = []) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.users = users;
-        this.messages = messages;
+    constructor(obj? : any) {
+        this.id = obj ? obj.id : null;
+        this.name = obj ? obj.name : null;
+        this.description = obj ? obj.description : null;
+        this.users = obj ? obj.users : [];
     }
 }

@@ -8,6 +8,7 @@ import { ChannelsService } from '../../shared/services/channels/channels.service
 import { MatDialog } from '@angular/material/dialog';
 import { CreateNewChannelDialog } from '../../dialogs/create-new-channel-dialog/create-new-channel-dialog.component';
 import { Channel } from '../../shared/models/channel.class';
+import { collection, Firestore, onSnapshot, orderBy, query } from '@angular/fire/firestore';
 
 @Component({
   selector: 'app-workspace',
@@ -27,12 +28,12 @@ import { Channel } from '../../shared/models/channel.class';
 })
 export class WorkspaceComponent {
 
-  panelOpenState = false;
-  arrowRotated: boolean[] = [false, false]; 
-  channels: string[] | any = [];
+  channels: Channel[] = [];
   clickedChannels: boolean[] = [];
   clickedUsers: boolean[] = [];
   icons: string[] = [];
+  panelOpenState = false;
+  arrowRotated: boolean[] = [false, false]; 
 
   users = [
     { firstName: 'Anna', lastName: 'Müller', avatar: '../../../../assets/images/avatars/avatar1.svg', online: true },
@@ -47,33 +48,54 @@ export class WorkspaceComponent {
     public dialog: MatDialog,
     private iconsService: IconsService, 
     private channelsService: ChannelsService,
-  ) {
-    this.channels = this.channelsService.getChannelData();
-    console.log(this.channels);
-    // this.setClickedArrays();
-   }
+    private firestore: Firestore
+  ) { }
 
-   
+   ngOnInit() {
+    this.loadChannels();
+  }
+  
+  async loadChannels() {
+    const channelsRef = collection(this.firestore, 'channels');
+    const channelsQuery = query(channelsRef, orderBy('name'));
+  
+    onSnapshot(channelsQuery, async (snapshot) => {
+      this.channels = await Promise.all(snapshot.docs.map(async (doc) => {
+        const channelData = doc.data();
+        const channel = new Channel(channelData); 
+        return channel;
+      }));
+    });
+  }
+  
+
+  // method to rotate arrow icon
   rotateArrow(i: number){
     this.arrowRotated[i] = !this.arrowRotated[i];  
   }
 
-  clickChannel (i: number) {
+  // method to change background color for channel or user container
+  clickContainer(i: number, type: 'channel' | 'user') {
+    if (type === 'channel') {
+      this.clickChannelContainer(i);
+    } else if (type === 'user') {
+      this.clickUserContainer(i)
+    }
+  }
+
+  // helper method to toggle the clickContainer method
+  clickChannelContainer (i: number) {
     this.clickedChannels.fill(false);
     this.clickedUsers.fill(false);
     this.clickedChannels[i] = true;
   }
 
-  clickUser (i: number) {
+  // helper method to toggle the clickContainer method
+  clickUserContainer (i: number) {
     this.clickedUsers.fill(false);
     this.clickedChannels.fill(false);
     this.clickedUsers[i] = true;
   }
-
-  // setClickedArrays() {
-  //   this.clickedChannels = Array(this.channels.length).fill(false);
-  //   this.clickedUsers = Array(this.users.length).fill(false);
-  // }
 
   openDialog() {
     this.dialog.open(CreateNewChannelDialog);

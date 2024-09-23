@@ -1,6 +1,6 @@
 <div class="chat-container max-width">
-    <div class="chat-header">
-        <div class="chat-header-button"><span># Entwicklerteam</span>
+    <div class="chat-header" *ngFor="let message of messages">
+        <div class="chat-header-button"><span># {{ getChannelName(message.channelId) }}</span>
             <mat-icon fontIcon="keyboard_arrow_down"></mat-icon>
         </div>
         <div class="members-container">
@@ -13,128 +13,82 @@
             <mat-icon class="add-member-button" fontIcon="person_add"></mat-icon>
         </div>
     </div>
-    <div class="chat-content">
-        <div class="posted-date-container">
-            <span class="posted-date">14. September</span>
-        </div>
-        <div class="message-received-container">
-            <img src="assets/images/avatars/avatar1.svg" alt="">
-            <div class="message-container">
-                <div class="reaction-container-received">
-                    <div class="reaction-icon"><img src="./assets/images/reaction/check_mark.png" alt=""></div>
-                    <div class="reaction-icon"><img src="./assets/images/reaction/hands_up.png" alt=""></div>
-                    <div class="reaction-icon"><mat-icon fontIcon="add_reaction"></mat-icon></div>
-                    <div class="reaction-icon"><mat-icon fontIcon="comment"></mat-icon></div>
-                </div>
-                <span class="sender-name">Noa Braun
-                    <span class="message-time">14:25 Uhr</span>
-                </span>
-                <span class="message-recieved">Welche Version ist aktuell von Angular</span>
-                <span (click)="showThread()" class="answers-block">2 Antworten
-                    <span class="message-time">Letzte Antwort
-                        <span class="message-time">14:25</span>
+    <div #chatWindow class="chat-content">
+
+        <div class="max-width" *ngFor="let message of messages; let i = index">
+            <div *ngIf="message.displayDate" class="posted-date-container">
+                <span class="posted-date">{{ message.displayDate }}</span>
+            </div>
+            <div *ngIf="!message.isOwnMessage" class="message-received-container">
+                <img [src]="message.senderAvatar" alt="">
+                <div class="message-container">
+                    <div class="reaction-container-received">
+                        <div class="reaction-icon"><img src="./assets/images/reaction/check_mark.png" alt=""></div>
+                        <div class="reaction-icon"><img src="./assets/images/reaction/hands_up.png" alt=""></div>
+                        <div class="reaction-icon"><mat-icon fontIcon="add_reaction"></mat-icon></div>
+                        <div class="reaction-icon"><mat-icon fontIcon="comment"></mat-icon></div>
+                    </div>
+                    <span class="sender-name">{{ message.senderName }}
+                        <span class="message-time">{{ message.formattedTimestamp }}</span>
                     </span>
-                </span>
+                    <span class="message-recieved">{{ message.message }}</span>
+                    <span (click)="showThread(message)" class="answers-block">2 Antworten
+                        <span class="message-time">Letzte Antwort
+                            <span class="message-time">14:25</span>
+                        </span>
+                    </span>
 
-            </div>
-        </div>
-        <div class="posted-date-container">
-            <span class="posted-date">Heute</span>
-        </div>
-        <div class="message-sender-container">
-            <img src="assets/images/avatars/avatar1.svg" alt="">
-            <div class="message-area-container">
-                <div *ngIf="messageArea" class="message-container">
-                    <div class="reaction-container-sender">
-                        <div class="reaction-icon"><img src="./assets/images/reaction/check_mark.png" alt=""></div>
-                        <div class="reaction-icon"><img src="./assets/images/reaction/hands_up.png" alt=""></div>
-                        <div class="reaction-icon"><mat-icon fontIcon="add_reaction"></mat-icon></div>
-                        <div class="reaction-icon"><mat-icon fontIcon="comment"></mat-icon></div>
-                        <div (click)="showMessageEditToggle()" class="reaction-icon edit-message-icon"><mat-icon
-                                fontIcon="more_vert"></mat-icon></div>
-                        <div *ngIf="showMessageEdit" class="edit-message">
-                            <span>Nachricht bearbeiten</span>
-                        </div>
-                    </div>
-
-                    <span class="my-name">Frederik Beck <span class="message-time">15:06 Uhr</span></span>
-                    <span class="chat-message-sender">{{ message }}</span>
-                    <div class="show-reactions">
-                        <div class="reaction-icon-button">
-                            <div class="reaction-name-popup">
-                                <img src="./assets/images/reaction/rocket.png" alt="">
-                                <h3>Sofia Müller</h3><span>Hat reagiert</span>
-                            </div><img src="./assets/images/reaction/check_mark.png" alt=""> 1
-                        </div>
-                        <div class="reaction-icon"><mat-icon fontIcon="add_reaction"></mat-icon></div>
-                    </div>
-                </div>
-                <div *ngIf="showMessageEditArea" class="message-edit-container">
-                    <textarea class="message-input" id="edit-message" type="text" [(ngModel)]="message"></textarea>
-                    <div class="message-edit-buttons">
-                        <div (click)="showEmoji()" class="message-icon">
-                            <mat-icon fontIcon="sentiment_satisfied"></mat-icon>
-                        </div>
-                        <div class="message-edit-action">
-                            <button (click)="cancelMessageEdit()">Abbrechen</button>
-                            <button class="save-btn">Speichern</button>
-                        </div>
-                    </div>
                 </div>
             </div>
-        </div>
 
 
+            <div *ngIf="message.isOwnMessage" class="message-sender-container">
+                <img src="assets/images/avatars/avatar1.svg" alt="">
 
-        <div class="message-sender-container" *ngFor="let message of messages">
-            <img *ngIf="message.isOwnMessage; else otherUser" src="assets/images/avatars/avatar1.svg" alt="">
-            <ng-template #otherUser>
-                <img src="assets/images/avatars/avatar2.svg" alt="Avatar des anderen Benutzers">
-            </ng-template>
-            <div class="message-area-container">
-                <div *ngIf="!isEditing(message.messageId)" class="message-container">
-                    <div class="reaction-container-sender">
-                        <div class="reaction-icon"><img src="./assets/images/reaction/check_mark.png" alt=""></div>
-                        <div class="reaction-icon"><img src="./assets/images/reaction/hands_up.png" alt=""></div>
-                        <div class="reaction-icon"><mat-icon fontIcon="add_reaction"></mat-icon></div>
-                        <div class="reaction-icon"><mat-icon fontIcon="comment"></mat-icon></div>
-                        <div (click)="showMessageEditToggle()" class="reaction-icon edit-message-icon"><mat-icon
-                                fontIcon="more_vert"></mat-icon></div>
-                        <div *ngIf="showMessageEdit" class="edit-message">
-                            <span (click)="editMessage(message.messageId)">Nachricht bearbeiten</span>
+                <div class="message-area-container">
+                    <div *ngIf="!isEditing(message.messageId)" class="message-container">
+                        <div class="reaction-container-sender">
+                            <div class="reaction-icon"><img src="./assets/images/reaction/check_mark.png" alt=""></div>
+                            <div class="reaction-icon"><img src="./assets/images/reaction/hands_up.png" alt=""></div>
+                            <div class="reaction-icon"><mat-icon fontIcon="add_reaction"></mat-icon></div>
+                            <div class="reaction-icon"><mat-icon fontIcon="comment"></mat-icon></div>
+                            <div (click)="showMessageEditToggle()" class="reaction-icon edit-message-icon"><mat-icon
+                                    fontIcon="more_vert"></mat-icon></div>
+                            <div *ngIf="showMessageEdit" class="edit-message">
+                                <span (click)="editMessage(message.messageId)">Nachricht bearbeiten</span>
+                            </div>
+                        </div>
+
+                        <span class="my-name">{{ message.senderName }} <span class="message-time">{{
+                                message.formattedTimestamp }}
+                                Uhr</span></span>
+                        <span class="chat-message-sender">{{ message.message }}</span>
+                        <div class="show-reactions">
+                            <div class="reaction-icon-button">
+                                <div class="reaction-name-popup">
+                                    <img src="./assets/images/reaction/rocket.png" alt="">
+                                    <h3>Sofia Müller</h3><span>Hat reagiert</span>
+                                </div><img src="./assets/images/reaction/check_mark.png" alt=""> 1
+                            </div>
+                            <div class="reaction-icon"><mat-icon fontIcon="add_reaction"></mat-icon></div>
                         </div>
                     </div>
-
-                    <span class="my-name">{{ message.senderName }} <span class="message-time">{{
-                            message.formattedTimestamp }}
-                            Uhr</span></span>
-                    <span class="chat-message-sender">{{ message.message }}</span>
-                    <div class="show-reactions">
-                        <div class="reaction-icon-button">
-                            <div class="reaction-name-popup">
-                                <img src="./assets/images/reaction/rocket.png" alt="">
-                                <h3>Sofia Müller</h3><span>Hat reagiert</span>
-                            </div><img src="./assets/images/reaction/check_mark.png" alt=""> 1
-                        </div>
-                        <div class="reaction-icon"><mat-icon fontIcon="add_reaction"></mat-icon></div>
-                    </div>
-                </div>
-                <div *ngIf="isEditing(message.messageId)" class="message-edit-container">
-                    <textarea class="message-input" id="edit-message" type="text"
-                        [(ngModel)]="message.message"></textarea>
-                    <div class="message-edit-buttons">
-                        <div (click)="showEmoji()" class="message-icon">
-                            <mat-icon fontIcon="sentiment_satisfied"></mat-icon>
-                        </div>
-                        <div class="message-edit-action">
-                            <button (click)="cancelMessageEdit()">Abbrechen</button>
-                            <button (click)="saveMessage(message)" class="save-btn">Speichern</button>
+                    <div *ngIf="isEditing(message.messageId)" class="message-edit-container">
+                        <textarea class="message-input" id="edit-message" type="text"
+                            [(ngModel)]="message.message"></textarea>
+                        <div class="message-edit-buttons">
+                            <div (click)="showEmoji()" class="message-icon">
+                                <mat-icon fontIcon="sentiment_satisfied"></mat-icon>
+                            </div>
+                            <div class="message-edit-action">
+                                <button (click)="cancelMessageEdit()">Abbrechen</button>
+                                <button (click)="saveMessage(message)" class="save-btn">Speichern</button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
 
 
     </div>

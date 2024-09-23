@@ -17,6 +17,7 @@
                            name="channelName"
                            [(ngModel)]="newChannelName"
                            [errorStateMatcher]="matcher"
+                           maxlength="20"
                            >
                            @if (nameFormControl.hasError('required')) {
                             <mat-error>Bitte geben Sie einen Namen ein.</mat-error>
@@ -32,7 +33,9 @@
                     <input matInput 
                            placeholder="Dein Text hier"
                            name="channelDescription"
-                           [(ngModel)]="newChannelDescription">
+                           [(ngModel)]="newChannelDescription"
+                           maxlength="200"
+                           >
                 </mat-form-field>
             </div>
         </form>
@@ -41,7 +44,7 @@
     
     <div class="dialog-footer">
         <mat-dialog-actions>
-            <button mat-flat-button [disabled]="!isValid()" (click)="nextDialog()">Erstellen</button>
+            <button mat-flat-button [disabled]="!isValid()" (click)="openNextDialog()">Erstellen</button>
         </mat-dialog-actions>
     </div>
     
