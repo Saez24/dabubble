@@ -70,10 +70,10 @@
                             [ngClass]="clickedUsers[i] ? 'clicked' : ''"
                             >
                                 <div>
-                                  <img [src]="user.avatar" alt="Avatar Image">
-                                  <div [ngStyle]="{ 'background': users[i].online ? '#92C83E' : '#686868' }" class="status"></div>
+                                  <img [src]="user.avatarPath" alt="Avatar Image">
+                                  <div [ngStyle]="{ 'background': users[i].loginState === 'loggedIn' ? '#92C83E' : '#686868' }" class="status"></div>
                                 </div>
-                                <span>{{ user.firstName }} {{ user.lastName }}</span>
+                                <span>{{ user.name }} </span>
                             </div>
                         </div>
                     </mat-expansion-panel>    

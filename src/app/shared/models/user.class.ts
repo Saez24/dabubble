@@ -6,6 +6,7 @@ export class User {
     name: string | null;
     avatarPath: string | null;
     loginState: loginState | null;
+    channels: string[] = [];
 
     constructor(obj?: any) {
         this.id = obj ? obj.id: null;
@@ -13,5 +14,6 @@ export class User {
         this.name = obj ? obj.name: null;
         this.avatarPath = obj ? obj.avatarPath: null;
         this.loginState = obj ? obj.loginStatus: 'loggedOut';
+        this.channels = obj ? obj.channels: null;
     }
 }

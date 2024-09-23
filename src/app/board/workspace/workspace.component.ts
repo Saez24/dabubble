@@ -9,6 +9,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { CreateNewChannelDialog } from '../../dialogs/create-new-channel-dialog/create-new-channel-dialog.component';
 import { Channel } from '../../shared/models/channel.class';
 import { collection, Firestore, onSnapshot, orderBy, query } from '@angular/fire/firestore';
+import { Auth } from '@angular/fire/auth';
+import { User } from '../../shared/models/user.class';
 
 @Component({
   selector: 'app-workspace',
@@ -29,29 +31,25 @@ import { collection, Firestore, onSnapshot, orderBy, query } from '@angular/fire
 export class WorkspaceComponent {
 
   channels: Channel[] = [];
+  users: User[] = [];
   clickedChannels: boolean[] = [];
   clickedUsers: boolean[] = [];
   icons: string[] = [];
   panelOpenState = false;
   arrowRotated: boolean[] = [false, false]; 
-
-  users = [
-    { firstName: 'Anna', lastName: 'Müller', avatar: '../../../../assets/images/avatars/avatar1.svg', online: true },
-    { firstName: 'Ben', lastName: 'Schmidt', avatar:  '../../../../assets/images/avatars/avatar2.svg', online: true },
-    { firstName: 'Clara', lastName: 'Meier', avatar: '../../../../assets/images/avatars/avatar3.svg', online: true },
-    { firstName: 'David', lastName: 'Schneider', avatar: '../../../../assets/images/avatars/avatar4.svg', online: false },
-    { firstName: 'Ella', lastName: 'Fischer', avatar: '../../../../assets/images/avatars/avatar5.svg', online: true },
-    { firstName: 'Felix', lastName: 'Weber', avatar: '../../../../assets/images/avatars/avatar6.svg', online: true }
-  ];
+  currentUserUid: string | null = null;
 
   constructor(
     public dialog: MatDialog,
     private iconsService: IconsService, 
     private channelsService: ChannelsService,
-    private firestore: Firestore
+    private firestore: Firestore,
+    private auth: Auth
   ) { }
 
    ngOnInit() {
+    this.getCurrentUser();
+    this.loadUsers();
     this.loadChannels();
   }
   
@@ -61,11 +59,29 @@ export class WorkspaceComponent {
   
     onSnapshot(channelsQuery, async (snapshot) => {
       this.channels = await Promise.all(snapshot.docs.map(async (doc) => {
-        const channelData = doc.data();
-        const channel = new Channel(channelData); 
-        return channel;
+        const channelData = doc.data() as Channel;
+        return { ...channelData, id: doc.id };
       }));
     });
+  }
+
+  async loadUsers() {
+    const usersRef = collection(this.firestore, 'users');
+    const usersQuery = query(usersRef, orderBy('name'));
+  
+    onSnapshot(usersQuery, async (snapshot) => {
+      this.users = await Promise.all(snapshot.docs.map(async (doc) => {
+        const userData = doc.data() as User;
+        return { ...userData, id: doc.id };
+      }));
+    });
+  }
+
+  getCurrentUser() {
+    const currentUser = this.auth.currentUser;
+    if (currentUser) {
+      this.currentUserUid = currentUser.uid;
+    }
   }
   
 
@@ -98,7 +114,11 @@ export class WorkspaceComponent {
   }
 
   openDialog() {
-    this.dialog.open(CreateNewChannelDialog);
+    this.dialog.open(CreateNewChannelDialog, {
+      data: {
+        users: this.users,
+      }
+    });
   }
 }
 

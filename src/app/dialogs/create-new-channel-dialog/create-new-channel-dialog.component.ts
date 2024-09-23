@@ -1,6 +1,7 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, Inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { FormControl, FormsModule, Validators } from '@angular/forms';
 import {
+  MAT_DIALOG_DATA,
   MatDialog,
   MatDialogActions,
   MatDialogClose,
@@ -16,6 +17,7 @@ import { IconsService } from '../../shared/services/icons/icons.service';
 import { ErrorStateMatcher } from '@angular/material/core';
 import { ChannelsService } from '../../shared/services/channels/channels.service';
 import { AddPeopleDialog } from './add-people-dialog/add-people-dialog.component';
+import { User } from '../../shared/models/user.class';
 
 export class MyErrorStateMatcher implements ErrorStateMatcher {
   isErrorState(control: FormControl | null): boolean {
@@ -43,7 +45,7 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
   encapsulation: ViewEncapsulation.None
   
 })
-export class CreateNewChannelDialog {
+export class CreateNewChannelDialog implements OnInit {
 
   newChannelName: string = '';
   newChannelDescription: string = '';
@@ -53,7 +55,11 @@ export class CreateNewChannelDialog {
     // private channelsService: ChannelsService,
     private dialogRef: MatDialogRef<CreateNewChannelDialog>,
     private dialog: MatDialog,
+    @Inject(MAT_DIALOG_DATA) public users: [],
   ) { }
+  ngOnInit(): void {
+    console.log('User sind:', this.users);
+  }
 
   nameFormControl = new FormControl('', [Validators.required]);
   matcher: MyErrorStateMatcher = new MyErrorStateMatcher();
@@ -67,13 +73,13 @@ export class CreateNewChannelDialog {
       data: {
         name: this.newChannelName,
         description: this.newChannelDescription,
+        users: this.users,
       }
     });
 
     this.clearInputs();
     this.dialogRef.close();
   }
-  
 
   // Method to clear the input fields
   clearInputs() {
