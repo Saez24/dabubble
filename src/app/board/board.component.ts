@@ -13,9 +13,10 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatMenuModule } from '@angular/material/menu';
 import { AuthService } from '../shared/services/authentication/auth-service/auth.service';
 import { IconsService } from '../shared/services/icons/icons.service';
-import { collection, Firestore, onSnapshot, orderBy, query } from '@angular/fire/firestore';
+import { collection, doc, Firestore, onSnapshot, orderBy, query } from '@angular/fire/firestore';
 import { Message } from '../shared/models/message.class';
 import { Auth } from '@angular/fire/auth';
+import { User } from '../shared/models/user.class';
 
 @Component({
   selector: 'app-board',
@@ -49,13 +50,14 @@ export class BoardComponent {
   authService = inject(AuthService);
   searchInput: string = '';
   showThreadComponent: boolean = true;
-  currentUser = this.authService.auth.currentUser;
+  currentUser: User | null = null;
   workspaceOpen = true;
   messages: Message[] = [];
   currentUserUid: string | null = null;
   selectedMessage: Message | null = null;
 
-  constructor(private iconsService: IconsService, private firestore: Firestore, private auth: Auth) { }
+
+  constructor(private iconsService: IconsService, private firestore: Firestore, private auth: Auth,) { }
 
 
   ngOnInit() {
@@ -66,9 +68,36 @@ export class BoardComponent {
     const currentUser = this.auth.currentUser;
     if (currentUser) {
       this.currentUserUid = currentUser.uid;  // Speichere die aktuelle Benutzer-ID
+      console.log(this.currentUserUid);
+      this.loadUserData(currentUser.uid);
     } else {
       console.log('Kein Benutzer angemeldet');
     }
+  }
+
+  loadUserData(uid: string) {
+    const userDocRef = doc(this.firestore, `users/${uid}`);
+    onSnapshot(userDocRef, (doc) => {
+      if (doc.exists()) {
+        // Typprüfung und Zuweisung
+        const data = doc.data() as {
+          name: string;
+          avatarPath: string;
+
+        };
+
+        // Neuen User erstellen
+        this.currentUser = new User({
+          name: data.name,
+          avatarPath: data.avatarPath,
+
+        });
+
+        console.log('Benutzerinformationen:', this.currentUser);
+      } else {
+        console.log('Kein Benutzerdokument gefunden');
+      }
+    });
   }
 
   closeThread() {

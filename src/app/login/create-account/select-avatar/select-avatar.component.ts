@@ -9,6 +9,7 @@ import { CreateAccountComponent } from '../create-account.component';
 import { Router } from '@angular/router';
 import { Auth } from '@angular/fire/auth';
 import { UserService } from '../../../shared/services/firestore/user-service/user.service';
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 @Component({
   selector: 'app-select-avatar',
@@ -25,9 +26,14 @@ export class SelectAvatarComponent implements OnInit {
   selectedAvatar: string | null = null;
   avatarSelected = false;
 
+
   constructor(private _location: Location, private avatarsService: AvatarsService, private auth: Auth, private userService: UserService, private router: Router) {
-    this.avatars = this.avatarsService.getAvatars();
+    this.loadAvatars();
     this.shuffleAvatars();
+  }
+
+  async loadAvatars() {
+    this.avatars = await this.avatarsService.getAvatars();
   }
 
   ngOnInit(): void {
@@ -69,4 +75,28 @@ export class SelectAvatarComponent implements OnInit {
       console.error('No user is logged in or avatar not selected');
     }
   }
+
+  uploadAvatar(event: Event) {
+    const fileInput = event.target as HTMLInputElement;
+    const file = fileInput.files?.[0];
+    const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg'];
+
+    if (file && allowedTypes.includes(file.type)) {
+      const storage = getStorage();
+      const avatarRef = ref(storage, `avatar_images/custom/${new Date().getTime()}_${file.name}`);
+
+      uploadBytes(avatarRef, file).then(() => {
+        console.log('Upload successful!');
+        return getDownloadURL(avatarRef);
+      }).then((downloadURL) => {
+        console.log('File available at', downloadURL);
+        this.selectedAvatar = downloadURL;
+      }).catch((error) => {
+        console.error('Upload failed', error);
+      });
+    } else {
+      console.error('File type not supported');
+    }
+  }
+
 }

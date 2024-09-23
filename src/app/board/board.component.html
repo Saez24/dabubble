@@ -11,8 +11,8 @@
             </button>
         </mat-form-field>
         <div class="profile-menu-container" [matMenuTriggerFor]="menu" mat-button>
-            <span>{{ currentUser?.displayName }}</span>
-            <img src="{{ currentUser?.photoURL }}" alt="Profil Icon">
+            <span>{{ currentUser?.name }}</span>
+            <img src="{{ currentUser?.avatarPath }}" alt="Profil Icon">
             <mat-icon>keyboard_arrow_down</mat-icon>
             <mat-menu #menu="matMenu">
                 <button mat-menu-item>Profil</button>
