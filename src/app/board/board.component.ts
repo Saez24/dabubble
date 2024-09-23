@@ -10,8 +10,11 @@ import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatDialog } from '@angular/material/dialog';
+import { ProfileDialogComponent } from '../dialogs/profile-dialog/profile-dialog.component';
 import { MatMenuModule } from '@angular/material/menu';
 import { AuthService } from '../shared/services/authentication/auth-service/auth.service';
+import { UserService } from '../shared/services/firestore/user-service/user.service';
 import { IconsService } from '../shared/services/icons/icons.service';
 import { collection, Firestore, onSnapshot, orderBy, query } from '@angular/fire/firestore';
 import { Message } from '../shared/models/message.class';
@@ -37,6 +40,7 @@ import { Auth } from '@angular/fire/auth';
     MatInputModule,
     MatFormFieldModule,
     MatMenuModule,
+    ProfileDialogComponent
   ],
   templateUrl: './board.component.html',
   styleUrls: ['./board.component.scss', '../../styles.scss'],
@@ -47,14 +51,16 @@ export class BoardComponent {
   @ViewChild('drawer') drawer!: MatDrawer;
 
   authService = inject(AuthService);
+  userService = inject(UserService);
   searchInput: string = '';
   showThreadComponent: boolean = true;
   currentUser = this.authService.auth.currentUser;
   workspaceOpen = true;
   messages: Message[] = [];
   currentUserUid: string | null = null;
+  showOverlay: boolean = false;
 
-  constructor(private iconsService: IconsService, private firestore: Firestore, private auth: Auth) { }
+  constructor(private iconsService: IconsService, private firestore: Firestore, private auth: Auth, public dialog: MatDialog,) { }
 
 
   ngOnInit() {
@@ -82,6 +88,21 @@ export class BoardComponent {
   toggleWorkspace() {
     this.drawer.toggle();
     this.workspaceOpen = !this.workspaceOpen;
+  }
+
+
+  toggleUserMenu() {
+    this.showOverlay = !this.showOverlay;
+  }
+
+
+  openUserProfile() {
+    this.userService.showProfile = true;
+    // this.dialog.open(ProfileDialogComponent);
+  }
+
+  stopPropagation(event: Event) {
+    event.stopPropagation();
   }
 
 }

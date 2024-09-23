@@ -1,1 +1,34 @@
-<p>profile-dialog works!</p>
+<div class="container">
+    <div class="headline">
+        <h3>Profil</h3>
+        <img src="../../../assets/images/icons/close.png" alt="" (click)="closeUserProfile()">
+    </div>
+    <img src="../../../assets/images/avatars/avatar3.svg" alt="" class="avatar-img">
+    <div class="name-box">
+        <div>
+            <h2>Peter Scholz</h2>
+        </div>
+        <!-- @if (currentUser()?.loginState == 'loggedIn') {
+            <span class="status">
+                <img src="/img/status_online.png" alt="" class="state-icon"> Online
+            </span>
+            } @else if (currentUser()?.loginState == 'idle') {
+            <span class="status">
+                <img src="/icons/user_idle.png" alt="" class="state-icon"> Abwesend
+            </span>
+            } @else if (currentUser()?.loginState == 'loggedOut') {
+            <span class="status">
+                <img src="/icons/user_offline.png" alt="" class="state-icon"> Offline
+            </span>
+            } -->
+
+    </div>
+
+    <div class="email-container">
+        <img src="/img/mail_black.png" alt="">
+        <div>
+            <span>Email Adresse</span>
+            <span class="email-address">peter&#64;gmail.com</span>
+        </div>
+    </div>
+</div>

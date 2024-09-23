@@ -8,10 +8,64 @@ header {
     box-sizing: border-box;
 }
 
-mat-form-field {
-    border-radius: 42px;
-    background-color: #ffffff;
-    width: 989px;
+.input-search-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    position: relative;
+    width: 40%;
+    background: #fff;
+    border-radius: 50px;
+    padding: 17.5px 55px 17.5px 45px;
+
+    >input {
+        font-family: "Nunito";
+        height: 30px;
+        width: 100%;
+        border: unset;
+        outline: none;
+        font-size: 24px;
+        font-weight: 400;
+
+        &::placeholder {
+            color: rgba(0, 0, 0, 0.5);
+        }
+    }
+
+    >img {
+        position: absolute;
+        right: 16px;
+        height: 35px;
+        width: 35px;
+        border-radius: 100%;
+        padding: 4px;
+
+        &:hover {
+            cursor: pointer;
+            background: rgba(0, 0, 0, 0.1);
+        }
+    }
+}
+
+.cdk-overlay-container {
+    position: fixed;
+    z-index: 1000;
+    background-color: #00000033;
+}
+
+.cdk-overlay-connected-position-bounding-box {
+    top: 148px !important;
+}
+
+.mat-mdc-icon-button.mat-mdc-button-base {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mdc-text-field--filled .mdc-line-ripple::before {
+    border-bottom: none;
 }
 
 .profile-menu-container {
@@ -34,21 +88,56 @@ mat-form-field {
 
     &:hover {
         cursor: pointer;
+        color: #535AF1;
     }
 }
 
+.mat-elevation-z8,
+.mat-mdc-elevation-specific.mat-elevation-z8,
 .mat-mdc-menu-panel {
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-    border-radius: 30px 0px 30px 30px !important;
-    padding: 30px !important;
-    gap: 15px !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 30px 0px 30px 30px;
+    padding: 30px;
+    gap: 15px;
+    width: auto;
+    height: auto;
+    max-width: none;
+}
 
-    >.mat-mdc-menu-content, .mat-mdc-menu-content .mat-mdc-menu-item .mat-mdc-menu-item-text {
-        font-weight: 600 !important;
-        font-size: 24px !important;
-        line-height: 32.74px !important;
+.mat-mdc-menu-content {
+    padding: 0 0 !important;
+}
+
+.mat-body, .mat-body-2, .mat-typography .mat-body, .mat-typography .mat-body-2, .mat-typography {
+    font-family: "Nunito";
+    font-weight: 600;
+    font-size: 24px;
+    line-height: 32.74px;
+}
+
+.profil-menu-link-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+
+    >.profil-menu-links {
+        text-align: center;
+        font-family: "Nunito";
+        font-weight: 600;
+        font-size: 24px;
+        line-height: 32.74px;
+        padding: 10px 70px;
+
+        &:hover {
+            cursor: pointer;
+            border-radius: 40px;
+            color: #535AF1;
+            background: #ECEEFE;
+        }
     }
 }
 
@@ -169,10 +258,4 @@ mat-toolbar-row {
 .thread-container {
     min-width: 485px;
     width: 485px;
-}
-
-.mat-mdc-card-content:last-child,
-.mat-mdc-card-content:first-child,
-.mat-mdc-card-content {
-    padding: 0 !important;
 }
