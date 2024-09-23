@@ -45,7 +45,7 @@
     <div *ngFor="let message of messages" style="width: 100%;">
       <div class="thread-message-container" *ngIf="!message.isOwnMessage">
         <img
-          src="/assets/images/logo_big.png"
+        [src]="message.senderAvatar"
           alt="Profile Image"
           class="avatar"
         />
@@ -100,11 +100,11 @@
         <div class="thread-message-details" *ngIf="threadMessageArea">
           <div class="emoji-box user-emoji-box">
             <mat-icon class="message-icon">add_reaction</mat-icon>
-            <mat-icon class="message-icon" (click)="toggleEditBtn()"
+            <mat-icon class="message-icon" (click)="toggleEditBtn(message)"
               >more_vert</mat-icon
             >
             <div *ngIf="showMessageEdit" class="thread-edit-message">
-              <span (click)="editMessage()">Nachricht bearbeiten</span>
+              <span (click)="editMessage(message)">Nachricht bearbeiten</span>
             </div>
           </div>
           <div class="user-message-info">
@@ -152,7 +152,7 @@
             </div>
             <div class="thread-message-edit-action">
               <button (click)="cancelMessageEdit()">Abbrechen</button>
-              <button class="save-btn" (click)="saveMessage()">
+              <button class="save-btn" (click)="saveMessage(message)">
                 Speichern
               </button>
             </div>

@@ -10,7 +10,7 @@ import { Message } from '../../shared/models/message.class';
 import { User } from '../../shared/models/user.class';
 import { UserService } from '../../shared/services/firestore/user-service/user.service';
 import { Auth } from '@angular/fire/auth';
-import { addDoc, collection, onSnapshot, } from 'firebase/firestore';
+import { addDoc, collection, doc, onSnapshot, updateDoc, } from 'firebase/firestore';
 import { Firestore } from '@angular/fire/firestore';
 
 
@@ -45,7 +45,7 @@ export class ThreadComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['selectedMessage'] && this.selectedMessage) {
-      this.loadMessages(); // Lade Nachrichten erneut, wenn die ausgewählte Nachricht sich ändert
+      this.loadMessages();
     }
   }
 
@@ -111,7 +111,7 @@ export class ThreadComponent implements OnInit, OnChanges {
       if (this.selectedMessage) {
         this.messages = allMessages.filter(msg => msg.parentMessageId === this.selectedMessage?.messageId);
       } else {
-        this.messages = []; // Leere Liste, wenn keine Nachricht ausgewählt ist
+        this.messages = [];
       }
       // console.log('Nachrichten erfolgreich geladen:', this.messages);
     }, (error) => {
@@ -136,32 +136,41 @@ export class ThreadComponent implements OnInit, OnChanges {
     return date.toLocaleString('de-DE', options);
   }
 
-
-
-
-
   @Output() closeThreadEvent = new EventEmitter<void>();
   closeThread() {
     this.closeThreadEvent.emit();
   }
 
-  toggleEditBtn() {
+  toggleEditBtn(message: Message) {
     this.showMessageEdit = !this.showMessageEdit;
   }
 
-  editMessage() {
+  editMessage(message: Message) {
     this.threadMessageArea = false;
-    this.toggleEditBtn()
+    this.toggleEditBtn(message);
     this.showMessageEditArea = true;
-    this.editingMessage = this.threadMessage ? this.threadMessage : '';
-  };
+    this.editingMessage = message.message || ''; // Fallback auf leeren String
+  }
 
-  saveMessage() {
+
+  async saveMessage(message: Message) {
+    console.log("Speichere Nachricht:", this.editingMessage);
+
+    if (this.editingMessage.trim() === '') {
+      console.error("Nachricht darf nicht leer sein!");
+      return;
+    }
+
+    const messageRef = doc(this.firestore, 'messages', message.messageId);
+    await updateDoc(messageRef, {
+      message: this.editingMessage
+    });
+
     this.threadMessage = this.editingMessage;
-    this.editingMessage = '';
     this.showMessageEditArea = false;
     this.threadMessageArea = true;
   }
+
 
   cancelMessageEdit() {
     this.showMessageEditArea = false;
