@@ -14,8 +14,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatButtonModule } from '@angular/material/button';
 import { SelectAvatarComponent } from './select-avatar/select-avatar.component';
-import { Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Location } from '@angular/common';
+import { UserService } from '../../shared/services/firestore/user-service/user.service';
+import { Auth, createUserWithEmailAndPassword } from '@angular/fire/auth';
 
 export class MyErrorStateMatcher implements ErrorStateMatcher {
   isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
@@ -27,14 +29,14 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
 @Component({
   selector: 'app-create-account',
   standalone: true,
-  imports: [FormsModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule, MatIconModule, MatCheckboxModule, MatButtonModule, SelectAvatarComponent, RouterModule],
+  imports: [FormsModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule, MatIconModule, MatCheckboxModule, MatButtonModule, SelectAvatarComponent, RouterModule,],
   templateUrl: './create-account.component.html',
   styleUrl: './create-account.component.scss',
   encapsulation: ViewEncapsulation.None
 })
 export class CreateAccountComponent {
 
-  constructor(private location: Location, private router: Router) { }
+  constructor(private location: Location, private router: Router, private userService: UserService, private auth: Auth, private route: ActivatedRoute) { }
 
   emailFormControl = new FormControl('', [Validators.required, Validators.email]);
   passwordFormControl = new FormControl('', [Validators.required]);
@@ -44,6 +46,13 @@ export class CreateAccountComponent {
   matcher: MyErrorStateMatcher = new MyErrorStateMatcher();
   passwordVisible: boolean = false;
 
+
+  userName: string = '';
+  email: string = '';
+  password: string = '';
+  avatars: string[] = [];
+  selectedAvatar: string | null = null;
+  avatarSelected = false;
 
   /**
    * This function is called when the "Weiter" button is clicked in the create account component.
@@ -64,8 +73,46 @@ export class CreateAccountComponent {
     this.checkboxFormControl.updateValueAndValidity();
 
     if (this.isFormValid()) {
-      this.router.navigate(['select-avatar']);
+      const name = this.nameFormControl.value!;
+      const email = this.emailFormControl.value!;  // Setze einen leeren String, falls email null ist
+      const password = this.passwordFormControl.value!;  // Setze einen leeren String, falls password null ist
+
+      // Übergebe E-Mail, Passwort und Name an createAccount()
+      this.createAccount(email, password, name);
+
     } else {
+      // Optional: Fehlermeldung oder visuelles Feedback
+    }
+  }
+
+
+  createAccount(email: string, password: string, name: string) {
+    if (email && password) {
+      createUserWithEmailAndPassword(this.auth, email, password)
+        .then((userCredential) => {
+          const user = userCredential.user;
+
+          // Benutzerdaten mit Avatar vorbereiten
+          const firestoreUser = {
+            uid: user.uid,
+            email: user.email,
+            name: name,
+            avatarPath: this.selectedAvatar
+          };
+
+          // Speichert den Benutzer in Firestore
+          this.userService.createFirestoreUser(firestoreUser)
+            .then(() => {
+              console.log('User successfully created in Firestore');
+              this.router.navigate(['select-avatar'], { queryParams: { name: name, email: email, password: password } });
+            })
+            .catch((error) => {
+              console.error('Error creating user in Firestore:', error.message);
+            });
+        })
+        .catch((error) => {
+          this.emailFormControl.setErrors({ emailExists: true });
+        });
     }
   }
 

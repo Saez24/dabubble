@@ -16,6 +16,12 @@ export class UserService {
 
   constructor(private firestore: Firestore) { }
 
+  updateUserInFirestore(uid: string, data: any) {
+    const userDocRef = doc(this.firestore, `users/${uid}`);
+    return updateDoc(userDocRef, data);  // Aktualisiert das Benutzer-Dokument
+  }
+
+
   async updateUserLoginState(userId: string, loginState: string) {
     try {
       let userRef = this.getUserDocReference(userId);
@@ -36,13 +42,13 @@ export class UserService {
   }
 
 
-  createFirestoreUser(user: any) {
-    setDoc(doc(this.firestore, "users", user.uid), {
+  createFirestoreUser(user: any): Promise<void> {
+    const userRef = doc(this.firestore, `users/${user.uid}`);
+    return setDoc(userRef, {
+      uid: user.uid,
       email: user.email,
-      name: user.displayName,
-      avatarPath: user.photoURL,
-      id: user.uid,
-      loginState: 'loggedOut',
+      name: user.name,
+      avatarPath: user.avatarPath,
     });
   }
 
