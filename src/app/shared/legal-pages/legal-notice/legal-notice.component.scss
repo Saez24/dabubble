@@ -41,7 +41,7 @@ a {
   display: none !important;
 }
 
-.content{
+.content {
   overflow-y: auto;
   border-radius: 30px;
   word-break: break-word;
@@ -64,4 +64,8 @@ a {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
+}
+
+.intro-animation-container {
+  display: none !important;
 }
