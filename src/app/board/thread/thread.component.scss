@@ -135,19 +135,14 @@
   align-items: center;
   font-size: 18px;
   gap: 16px;
-  padding:18px 40px;
+  padding: 18px 40px;
   width: -webkit-fill-available;
-}
-
-.answer-count {
-  display: flex;
-  gap: 6px;
 }
 
 .line {
   height: 1px;
   background-color: black;
-  width: 100%;
+  width: 69%;
   background-color: #ADB0D9;
 }
 
@@ -177,17 +172,17 @@
   box-sizing: border-box;
 
   >.thread-message-input {
-      background-color: white !important;
-      border: 1px solid rgba(173, 176, 217, 1) !important;
-      border-radius: 30px;
-      height: 145px;
-      width: 100%;
-      padding: 20px;
-      box-sizing: border-box;
-      font-family: Nunito;
-      font-size: 18px;
-      resize: none;
-      hyphens: auto;
+    background-color: white !important;
+    border: 1px solid rgba(173, 176, 217, 1) !important;
+    border-radius: 30px;
+    height: 145px;
+    width: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+    font-family: Nunito;
+    font-size: 18px;
+    resize: none;
+    hyphens: auto;
   }
 }
 
@@ -346,17 +341,17 @@
   box-sizing: border-box;
 
   >.thread-edit-textarea {
-      background-color: white !important;
-      border: 1px solid rgba(173, 176, 217, 1) !important;
-      border-radius: 20px;
-      height: 100%;
-      width: 100%;
-      padding: 20px;
-      box-sizing: border-box;
-      font-family: Nunito;
-      font-size: 18px;
-      resize: none;
-      hyphens: auto;
+    background-color: white !important;
+    border: 1px solid rgba(173, 176, 217, 1) !important;
+    border-radius: 20px;
+    height: 100%;
+    width: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+    font-family: Nunito;
+    font-size: 18px;
+    resize: none;
+    hyphens: auto;
   }
 }
 
@@ -376,18 +371,18 @@
   transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
 
   >span {
-      border-radius: 30px;
-      padding: 10px;
-      font-size: 18px;
-      font-weight: 700;
-      cursor: pointer;
-      color: black;
+    border-radius: 30px;
+    padding: 10px;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    color: black;
 
-      &:hover {
-          background: #ECEEFE;
-          transition: background 0.3s ease;
-          color: #535AF1;
-      }
+    &:hover {
+      background: #ECEEFE;
+      transition: background 0.3s ease;
+      color: #535AF1;
+    }
   }
 }
 
@@ -410,19 +405,18 @@
   gap: 10px;
 
   >.save-btn {
-      background: #444DF2;
-      color: white;
+    background: #444DF2;
+    color: white;
   }
 
   >button {
-      border-radius: 30px;
-      height: 38px;
-      cursor: pointer;
-      color: #444DF2;
-      font-size: 18px;
-      font-weight: 700;
-      background: white;
-      border: 1px solid #797EF3
+    border-radius: 30px;
+    height: 38px;
+    cursor: pointer;
+    color: #444DF2;
+    font-size: 18px;
+    font-weight: 700;
+    background: white;
+    border: 1px solid #797EF3
   }
 }
-

@@ -37,7 +37,7 @@
 
     <!-- Anzahl der Antworten -->
     <div class="answers">
-      <div class="answer-count"><span>2</span><span>{{selectedMessage?.answers}} Antworten</span></div>
+      <span>{{selectedMessage?.answers?.length}} Antworten</span>
       <div class="line"></div>
     </div>
 
@@ -45,7 +45,7 @@
     <div *ngFor="let message of messages" style="width: 100%;">
       <div class="thread-message-container" *ngIf="!message.isOwnMessage">
         <img
-        [src]="message.senderAvatar"
+          src="/assets/images/logo_big.png"
           alt="Profile Image"
           class="avatar"
         />
