@@ -95,6 +95,7 @@ export class ChatWindowComponent implements OnInit, AfterViewChecked {
   editMessage(docId: string) {
     this.editingMessageId = docId; // Verwende die Dokument-ID
     this.showMessageEditArea = true;
+    this.showMessageEdit = false;
   }
 
 
