@@ -10,7 +10,7 @@ import { Message } from '../../shared/models/message.class';
 import { User } from '../../shared/models/user.class';
 import { UserService } from '../../shared/services/firestore/user-service/user.service';
 import { Auth } from '@angular/fire/auth';
-import { addDoc, collection, doc, onSnapshot, updateDoc, } from 'firebase/firestore';
+import { addDoc, arrayUnion, collection, doc, onSnapshot, updateDoc, } from 'firebase/firestore';
 import { Firestore } from '@angular/fire/firestore';
 
 
@@ -30,7 +30,7 @@ export class ThreadComponent implements OnInit, OnChanges {
   showMessageEdit = false;
   showMessageEditArea = false;
   threadMessageArea = true;
-  threadMessage = 'Ja das stimmt.';
+  threadMessage = '';
   newThreadMessage = '';
   editingMessage = '';
   currentUser: User | null = null;
@@ -71,23 +71,27 @@ export class ThreadComponent implements OnInit, OnChanges {
           parentMessageId: this.selectedMessage ? this.selectedMessage.messageId : null
         });
 
-        this.saveMessageToDatabase(message);
+        this.saveMessageToDatabase(message, this.selectedMessage);
         this.newThreadMessage = '';
       }
     }
   }
 
-  async saveMessageToDatabase(message: Message) {
-    const messagesRef = collection(this.firestore, "messages");
+  async saveMessageToDatabase(message: Message, selectedMessage: Message | null) {
+    if (selectedMessage) {
+      const messageRef = doc(this.firestore, 'messages', selectedMessage.messageId);
 
-    await addDoc(messagesRef, {
-      senderID: message.senderID,
-      senderName: message.senderName,
-      message: message.message,
-      reaction: message.reaction,
-      timestamp: new Date(),
-      parentMessageId: message.parentMessageId
-    });
+      await updateDoc(messageRef, {
+        answers: arrayUnion({
+          senderID: message.senderID,
+          senderName: message.senderName,
+          message: message.message,
+          timestamp: new Date(),
+          isOwnMessage: true,
+          reaction: '',
+        })
+      });
+    }
   }
 
   loadMessages() {
@@ -104,12 +108,14 @@ export class ThreadComponent implements OnInit, OnChanges {
           message: data['message'],
           reaction: data['reaction'],
           formattedTimestamp: formattedDate,
-          parentMessageId: data['parentMessageId']
+          parentMessageId: data['parentMessageId'],
+          answers: data['answers'] || []
         }, this.currentUserUid);
       });
 
       if (this.selectedMessage) {
-        this.messages = allMessages.filter(msg => msg.parentMessageId === this.selectedMessage?.messageId);
+        const selectedMessage = allMessages.find(msg => msg.messageId === this.selectedMessage?.messageId);
+        this.messages = selectedMessage ? selectedMessage.answers : [];
       } else {
         this.messages = [];
       }
@@ -118,6 +124,7 @@ export class ThreadComponent implements OnInit, OnChanges {
       // console.error('Fehler beim Laden der Nachrichten:', error);
     });
   }
+
 
   formatFirebaseTimestamp(timestamp: { seconds: number; nanoseconds?: number }): string | null {
     if (!timestamp || typeof timestamp.seconds !== 'number') {
@@ -152,25 +159,19 @@ export class ThreadComponent implements OnInit, OnChanges {
     this.editingMessage = message.message || ''; // Fallback auf leeren String
   }
 
+  async saveEditedMessage(message: Message) {
+    if (this.selectedMessage) {
+      const messageRef = doc(this.firestore, 'messages', this.selectedMessage.messageId);
 
-  async saveMessage(message: Message) {
-    console.log("Speichere Nachricht:", this.editingMessage);
-
-    if (this.editingMessage.trim() === '') {
-      console.error("Nachricht darf nicht leer sein!");
-      return;
+      await updateDoc(messageRef, {
+        answers: this.selectedMessage.answers.map((answer: any) =>
+          answer.messageId === message.messageId ? { ...answer, message: this.editingMessage } : answer
+        )
+      });
     }
-
-    const messageRef = doc(this.firestore, 'messages', message.messageId);
-    await updateDoc(messageRef, {
-      message: this.editingMessage
-    });
-
-    this.threadMessage = this.editingMessage;
     this.showMessageEditArea = false;
     this.threadMessageArea = true;
   }
-
 
   cancelMessageEdit() {
     this.showMessageEditArea = false;

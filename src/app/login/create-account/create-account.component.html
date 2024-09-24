@@ -27,6 +27,9 @@
                 @if (emailFormControl.hasError('required')) {
                 <mat-error>Bitte geben Sie eine E-Mail ein.</mat-error>
                 }
+                @if (emailFormControl.hasError('emailExists')) {
+                <mat-error>Diese E-Mail-Adresse wird bereits verwendet.</mat-error>
+                }
             </mat-form-field>
 
             <mat-form-field>

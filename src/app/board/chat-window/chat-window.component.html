@@ -32,7 +32,7 @@
                         <span class="message-time">{{ message.formattedTimestamp }}</span>
                     </span>
                     <span class="message-recieved">{{ message.message }}</span>
-                    <span (click)="showThread(message)" class="answers-block">2 Antworten
+                    <span (click)="showThread(message)" class="answers-block">{{ message?.answers?.length || 0 }} Antworten
                         <span class="message-time">Letzte Antwort
                             <span class="message-time">14:25</span>
                         </span>

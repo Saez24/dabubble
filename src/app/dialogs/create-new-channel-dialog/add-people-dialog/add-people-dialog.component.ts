@@ -9,7 +9,9 @@ import { MatRadioModule } from '@angular/material/radio';
 import { ChannelsService } from '../../../shared/services/channels/channels.service';
 import { CreateNewChannelDialog } from '../create-new-channel-dialog.component';
 import { Channel } from '../../../shared/models/channel.class';
-import { Firestore, doc, updateDoc, addDoc, collection, onSnapshot, query, orderBy } from '@angular/fire/firestore';
+import { Firestore, doc, updateDoc, addDoc, collection, onSnapshot, query, orderBy, arrayUnion } from '@angular/fire/firestore';
+import { Auth } from '@angular/fire/auth';
+import { User } from '../../../shared/models/user.class';
 
 @Component({
   selector: 'app-add-people-dialog',
@@ -34,6 +36,9 @@ export class AddPeopleDialog implements OnInit {
   channel: Channel | null = null;
   newChannelName: string = '';
   newChannelDescription: string = '';
+  users: User[] = [];
+  userId: string | null = null;
+  currentUserUid: string | null = null;
 
   @Input()
   color: ThemePalette
@@ -42,42 +47,61 @@ export class AddPeopleDialog implements OnInit {
   constructor(
     // private channelsService: ChannelsService, 
     private firestore: Firestore,
-    @Inject(MAT_DIALOG_DATA) public data: { name: string, description: string },
-  ) { }
+    private auth: Auth,
+    @Inject(MAT_DIALOG_DATA) public data: any,
+  ) { 
+  }
 
   ngOnInit(): void {
-    this.checkdataFromDialog();
+    this.checkDataFromDialog();
+    this.getCurrentUser();
   }
 
-  checkdataFromDialog() {
-    if (this.data) {
-      this.newChannelName = this.data.name || '';
-      this.newChannelDescription = this.data.description || '';
-    } else {
-      this.newChannelName = '';
-      this.newChannelDescription = '';
+  getCurrentUser() {
+    const currentUser = this.auth.currentUser;
+    if (currentUser) {
+      this.currentUserUid = currentUser.uid;
     }
   }
-    
-  async createNewChannel() {
-    const channelsRef = collection(this.firestore, 'channels');
-    const newChannelRef = doc(channelsRef);
 
-    const newChannel: Channel = new Channel({
-        id: newChannelRef.id,
+  checkDataFromDialog() {
+      this.newChannelName = this.data.name || '';
+      this.newChannelDescription = this.data.description || '';
+      this.users = this.data.users.users || [];
+  }
+
+async createNewChannel() {
+ let currentUser = this.auth.currentUser;
+
+  if (currentUser) {
+    let channelsRef = collection(this.firestore, 'channels');
+    let usersRef = collection(this.firestore, 'users');
+    let userDocRef = doc(usersRef, currentUser.uid);
+
+    if (this.selectedValue == 'addAll') {
+
+      let newChannel: Channel = new Channel({
         name: this.newChannelName,
         description: this.newChannelDescription,
-        users: [this.selectedValue],
-    });
+        users: this.users,
+        channelAuthor: this.currentUserUid,
+      });
 
-    await addDoc(channelsRef, {
-        id: newChannel.id,
+      await addDoc(channelsRef, {
         name: newChannel.name,
         description: newChannel.description,
         users: newChannel.users,
-    });
+        channelAuthorId: newChannel.channelAuthor,
+      });
 
-  } 
+      await updateDoc(userDocRef, {
+        channels: arrayUnion(newChannel.name)
+      });
+    } else {
+      console.log('Keine User ausgewählt');
+    }
+  }
+}
 
   onSelectionChange(event: any) {
     this.selectedValue = event.value;

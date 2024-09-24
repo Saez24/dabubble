@@ -33,12 +33,12 @@
                         </mat-expansion-panel-header>
                         <div class="panel-container-open">
                             <div 
-                                *ngFor="let channel of channels; let i = index" 
+                                *ngFor="let currentUserChannel of currentUserChannels; let i = index" 
                                 (click)="clickContainer(i, 'channel')" 
                                 [ngClass]="clickedChannels[i] ? 'clicked' : ''"
                                 >
                                 <mat-icon [ngClass]="clickedChannels[i] ? 'hashtag-black' : ''" class="icon" svgIcon="hashtag" aria-hidden="false" aria-label="Hashtag icon"></mat-icon>
-                                <span>{{ channel.name }}</span>
+                                <span>{{ currentUserChannel }}</span>
                             </div>
                         </div>
                         <a (click)="openDialog()" class="add-channel-container">
@@ -70,10 +70,10 @@
                             [ngClass]="clickedUsers[i] ? 'clicked' : ''"
                             >
                                 <div>
-                                  <img [src]="user.avatar" alt="Avatar Image">
-                                  <div [ngStyle]="{ 'background': users[i].online ? '#92C83E' : '#686868' }" class="status"></div>
+                                  <img [src]="user.avatarPath" alt="Avatar Image">
+                                  <div [ngStyle]="{ 'background': users[i].loginState === 'loggedIn' ? '#92C83E' : '#686868' }" class="status"></div>
                                 </div>
-                                <span>{{ user.firstName }} {{ user.lastName }}</span>
+                                <span>{{ user.name }} </span>
                             </div>
                         </div>
                     </mat-expansion-panel>    
