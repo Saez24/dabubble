@@ -8,6 +8,17 @@
             <mat-radio-group [(ngModel)]="selectedValue" (change)="onSelectionChange($event)" class="radio-group-container">
                 <mat-radio-button class="radio-button" color="primary" value="addAll"><span>Alle Mitglieder von <a class="group-link" href="">OfficeTeam</a> hinzufügen</span></mat-radio-button>
                 <mat-radio-button class="radio-button" color="primary" value="specific"><span>Bestimmte Leute hinzufügen</span></mat-radio-button>
+                
+                <div *ngIf="selectedValue === 'specific'" class="specific-container">
+                    <div class="example-form-field">
+                        <input matInput type="search" [(ngModel)]="searchTerm" (input)="filterUsers()" placeholder="Suche nach Benutzern">
+                    </div>
+                    
+                    <div *ngFor="let user of filteredUsers">
+                        <p>{{ user.name }}</p>
+                    </div>
+                </div>
+
             </mat-radio-group>
         
     </mat-dialog-content>

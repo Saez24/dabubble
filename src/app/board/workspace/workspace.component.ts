@@ -38,8 +38,8 @@ export class WorkspaceComponent {
   panelOpenState = false;
   arrowRotated: boolean[] = [false, false]; 
   currentUserUid: string | null = null;
-  currentUserChannels: string[] = [];
-
+  currentUserChannels: Channel[] = [];
+  
   constructor(
     public dialog: MatDialog,
     private iconsService: IconsService, 
@@ -47,23 +47,42 @@ export class WorkspaceComponent {
     private firestore: Firestore,
     private auth: Auth
   ) { }
+  
+  ngOnInit() {
+    this.loadData();
+  }
 
-   ngOnInit() {
-    this.checkAuthState();
-    this.getData();
+  loadData() {
+    this.auth.onAuthStateChanged((user) => {
+      if (user) {
+        this.currentUserUid = user.uid;
+        this.loadUsers();
+        this.loadChannels(this.currentUserUid);
+      } else {
+        console.log('Kein Benutzer angemeldet');
+      }
+    });
   }
   
-  async loadChannels() {
+  async loadChannels(currentUserUid: string) {
     let channelsRef = collection(this.firestore, 'channels');
     let channelsQuery = query(channelsRef, orderBy('name'));
-  
+
     onSnapshot(channelsQuery, async (snapshot) => {
-      this.channels = await Promise.all(snapshot.docs.map(async (doc) => {
-        let channelData = doc.data() as Channel;
-        // console.log(channelData, doc.id);
-        return { ...channelData, id: doc.id };
-      }));
-    });  
+        this.channels = await Promise.all(snapshot.docs.map(async (doc) => {
+            let channelData = doc.data() as Channel;
+            return { ...channelData, id: doc.id };
+        }));
+
+        if (currentUserUid) {
+            let userChannels = this.channels.filter(channel => {
+                return channel.members && channel.members.includes(currentUserUid);
+            });
+            this.currentUserChannels = userChannels;
+        } else {
+          this.currentUserChannels = [];
+        }
+    });
   }
 
   async loadUsers() {
@@ -75,49 +94,7 @@ export class WorkspaceComponent {
         let userData = doc.data() as User;
         return { ...userData, id: doc.id };
       }));
-    });
-  }
-
-  checkAuthState() {
-    this.auth.onAuthStateChanged((user) => {
-      if (user) {
-        this.currentUserUid = user.uid;
-        this.getUserChannels(user.uid);
-      } else {
-        console.log('Kein Benutzer angemeldet');
-      }
-    });
-  }
-
-  getData() {
-    this.loadChannels();
-    this.loadUsers();
-    console.log(this.users);
-    console.log(this.channels);
-  }
-
-  getCurrentUser() {
-    const currentUser = this.auth.currentUser;
-    if (currentUser) {
-      this.currentUserUid = currentUser.uid; 
-      this.getUserChannels(currentUser.uid);
-    } else {
-      console.log('Kein Benutzer angemeldet');
-    }
-  }
-
-  getUserChannels(uid: string) {
-    const userDocRef = doc(this.firestore, `users/${uid}`);
-    onSnapshot(userDocRef, (doc) => {
-      if (doc.exists()) {
-        const data = doc.data() as {
-          channels: string[];
-        };
-        this.currentUserChannels = data.channels,
-        console.log('Benutzerinformationen:', this.currentUserChannels);
-      } else {
-        console.log('Kein Benutzerdokument gefunden');
-      }
+      // console.log('Geladene User:', this.users);
     });
   }
 
@@ -157,6 +134,33 @@ export class WorkspaceComponent {
     });
   }
 }
+
+// Alternative Methode, um auf die Kanäle des Nutzers zuzugreifen
+
+  // getUserChannels(uid: string) {
+  //   const userDocRef = doc(this.firestore, `users/${uid}`);
+  //   onSnapshot(userDocRef, (doc) => {
+  //     if (doc.exists()) {
+  //       const data = doc.data() as {
+  //         channels: string[];
+  //       };
+  //       this.currentUserChannels = data.channels,
+  //       console.log('Benutzerinformationen:', this.currentUserChannels);
+  //     } else {
+  //       console.log('Kein Benutzerdokument gefunden');
+  //     }
+  //   });
+  // }
+
+
+    // getCurrentUser() {
+  //   const currentUser = this.auth.currentUser;
+  //   if (currentUser) {
+  //     this.currentUserUid = currentUser.uid; 
+  //   } else {
+  //     console.log('Kein Benutzer angemeldet');
+  //   }
+  // }
 
 
 
