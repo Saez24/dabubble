@@ -27,6 +27,8 @@ export class AuthService {
       let result: UserCredential = await signInWithEmailAndPassword(this.auth, email, password);
       await this.userService.updateUserLoginState(result.user.uid, 'loggedIn');
       if (result.user) {
+        this.currentUser = result.user;
+        console.log('Auth.service: logged in as: ', this.currentUser.uid);
         this.router.navigateByUrl('board');
       }
     } catch (err: any) {

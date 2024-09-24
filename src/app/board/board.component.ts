@@ -71,10 +71,10 @@ export class BoardComponent {
 
   getCurrentUser() {
     const currentUser = this.currentUser;
-    if (currentUser && currentUser.uid != null && currentUser.uid != undefined) {
+    if (currentUser) {
       this.currentUserUid = currentUser.uid;  // Speichere die aktuelle Benutzer-ID
       console.log('User logged in: ', this.currentUserUid);
-      this.loadUserData(currentUser.uid);
+      this.loadUserData(currentUser.uid!);
     } else {
       console.log('Kein Benutzer angemeldet');
     }
@@ -126,18 +126,13 @@ export class BoardComponent {
   }
 
 
-  toggleUserMenu() {
+  toggleProfileMenu() {
     this.showOverlay = !this.showOverlay;
   }
 
 
   openUserProfile() {
     this.userService.showProfile = true;
-    // this.dialog.open(ProfileDialogComponent);
-  }
-
-  stopPropagation(event: Event) {
-    event.stopPropagation();
   }
 
 }

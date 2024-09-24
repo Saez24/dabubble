@@ -4,10 +4,11 @@
         <img src="../../../assets/images/icons/close.png" alt="" (click)="closeUserProfile()">
     </div>
     <img src="../../../assets/images/avatars/avatar3.svg" alt="" class="avatar-img">
-    <div class="name-box">
-        <div>
+    <div class="name-container">
             <h2>Peter Scholz</h2>
-        </div>
+            <span>Bearbeiten</span>
+    </div>
+    <div class="status-container">
         <!-- @if (currentUser()?.loginState == 'loggedIn') {
             <span class="status">
                 <img src="/img/status_online.png" alt="" class="state-icon"> Online
@@ -21,11 +22,11 @@
                 <img src="/icons/user_offline.png" alt="" class="state-icon"> Offline
             </span>
             } -->
-
+            <img src="../../../assets/images/icons/Online.png" alt="" class="state-icon">
+            <span>Aktive</span>
     </div>
-
     <div class="email-container">
-        <img src="/img/mail_black.png" alt="">
+        <img src="../../../assets/images/icons/mail.png" alt="">
         <div>
             <span>Email Adresse</span>
             <span class="email-address">peter&#64;gmail.com</span>

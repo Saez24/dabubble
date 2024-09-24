@@ -48,12 +48,6 @@ header {
     }
 }
 
-.cdk-overlay-container {
-    position: fixed;
-    z-index: 1000;
-    background-color: #00000033;
-}
-
 .cdk-overlay-connected-position-bounding-box {
     top: 148px !important;
 }
@@ -93,29 +87,30 @@ header {
     }
 }
 
-.mat-elevation-z8,
-.mat-mdc-elevation-specific.mat-elevation-z8,
-.mat-mdc-menu-panel {
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    background-color: #00000033;
+    cursor: auto;
+}
+
+.profile-menu {
+    position: absolute;
+    top: 148px;
+    right: 20px;
+    z-index: 10;
     display: flex;
     justify-content: center;
     align-items: center;
     border-radius: 30px 0px 30px 30px;
-    padding: 30px;
     gap: 15px;
-    width: auto;
-    height: auto;
-    max-width: none;
-}
+    background-color: #fff;
 
-.mat-mdc-menu-content {
-    padding: 0 0 !important;
-}
 
-.mat-body, .mat-body-2, .mat-typography .mat-body, .mat-typography .mat-body-2, .mat-typography {
-    font-family: "Nunito";
-    font-weight: 600;
-    font-size: 24px;
-    line-height: 32.74px;
 }
 
 .profil-menu-link-container {
@@ -124,6 +119,7 @@ header {
     justify-content: center;
     align-items: center;
     gap: 15px;
+    padding: 30px;
 
     >.profil-menu-links {
         text-align: center;
@@ -140,6 +136,10 @@ header {
             background: #ECEEFE;
         }
     }
+}
+
+.profil-details {
+padding: 45px 40px;
 }
 
 .logo-container {

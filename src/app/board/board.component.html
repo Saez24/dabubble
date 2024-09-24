@@ -7,41 +7,20 @@
             <input name="searchText" type="text" placeholder="Devspace durchsuchen">
             <img src="../../assets/images/icons/search.png" alt="search icon">
         </div>
-
-        <div class="profile-menu-container" [matMenuTriggerFor]="menu" mat-button (click)="$event.stopPropagation()">
-            <span>{{ currentUser?.displayName }}</span>
-            <img src="{{ currentUser?.photoURL }}" alt="Profil Icon">
+        <div class="profile-menu-container" (click)="toggleProfileMenu()">
+            <span>{{ this.authService.currentUser?.displayName }}</span>
+            <img src="{{ this.authService.currentUser?.photoURL }}" alt="Profil Icon">
             <mat-icon>keyboard_arrow_down</mat-icon>
-            <mat-menu #menu="matMenu">
-                @if (!this.userService.showProfile) {
-                    <div class="profil-menu-link-container" >
+            <div class="overlay" *ngIf="showOverlay">
+                <div class="profile-menu" (click)="toggleProfileMenu()">
+                    <div class="profil-menu-link-container" *ngIf="!this.userService.showProfile">
                         <div class="profil-menu-links" (click)="openUserProfile()">Profil</div>
                         <div class="profil-menu-links" (click)="authService.logout()">Log Out</div>
                     </div>
-                }
-                @else if (this.userService.showProfile) {
-                    <app-profile-dialog></app-profile-dialog>
-                }
-            </mat-menu>
+                    <app-profile-dialog class="profil-details" *ngIf="this.userService.showProfile"></app-profile-dialog>
+                </div>
+            </div>
         </div>
-
-        <!-- <div class="user-container" (click)="toggleProfileMenu()">
-            <span>{{ currentUser()?.name }}</span>
-            <img class="account-photo" src="{{ currentUser()?.avatarPath }}" alt="account-photo">
-    
-            @if (currentUser()?.loginState == 'idle') {
-            <img src="/icons/user_idle.png" alt="" class="state-icon">
-            } @else {
-            <img src="/icons/user_online.png" alt="" class="state-icon">
-            }
-            <svg class="arrow-down-user" width="10" height="7" viewBox="0 0 10 7" fill="none"
-                xmlns="http://www.w3.org/2000/svg">
-                <path
-                    d="M4.12483 5.875L0.874832 2.625C0.478999 2.22917 0.390665 1.77625 0.609832 1.26625C0.828165 0.755417 1.21858 0.5 1.78108 0.5H8.21858C8.78108 0.5 9.1715 0.755417 9.38983 1.26625C9.609 1.77625 9.52067 2.22917 9.12483 2.625L5.87483 5.875C5.74983 6 5.61442 6.09375 5.46858 6.15625C5.32275 6.21875 5.1665 6.25 4.99983 6.25C4.83317 6.25 4.67692 6.21875 4.53108 6.15625C4.38525 6.09375 4.24983 6 4.12483 5.875Z"
-                    fill="black" />
-            </svg>
-        </div> -->
-
     </header>
     <mat-drawer-container class="mat-drawer-container" autosize>
         <mat-drawer #drawer class="sidenav" [opened]="true" mode="side">
