@@ -71,34 +71,31 @@ export class AddPeopleDialog implements OnInit {
   }
 
 async createNewChannel() {
-  const currentUser = this.auth.currentUser;
+ let currentUser = this.auth.currentUser;
 
   if (currentUser) {
-    const channelsRef = collection(this.firestore, 'channels');
-    const usersRef = collection(this.firestore, 'users');
-    const userDocRef = doc(usersRef, currentUser.uid);
+    let channelsRef = collection(this.firestore, 'channels');
+    let usersRef = collection(this.firestore, 'users');
+    let userDocRef = doc(usersRef, currentUser.uid);
 
     if (this.selectedValue == 'addAll') {
 
-      const newChannel: Channel = new Channel({
+      let newChannel: Channel = new Channel({
         name: this.newChannelName,
         description: this.newChannelDescription,
         users: this.users,
-        channelAuthor: currentUser.uid,
+        channelAuthor: this.currentUserUid,
       });
 
-      const channelDocRef = await addDoc(channelsRef, {
+      await addDoc(channelsRef, {
         name: newChannel.name,
         description: newChannel.description,
         users: newChannel.users,
-        channelAuthor: newChannel.channelAuthor,
+        channelAuthorId: newChannel.channelAuthor,
       });
 
       await updateDoc(userDocRef, {
-        channels: arrayUnion({
-          name: newChannel.name,
-          id: channelDocRef.id
-        })
+        channels: arrayUnion(newChannel.name)
       });
     } else {
       console.log('Keine User ausgewählt');

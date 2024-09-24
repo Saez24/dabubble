@@ -58,7 +58,7 @@ export class CreateNewChannelDialog implements OnInit {
     @Inject(MAT_DIALOG_DATA) public users: [],
   ) { }
   ngOnInit(): void {
-    console.log('User sind:', this.users);
+    // console.log('User sind:', this.users);
   }
 
   nameFormControl = new FormControl('', [Validators.required]);

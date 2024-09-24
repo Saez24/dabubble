@@ -11,6 +11,6 @@ export class Channel {
         this.name = obj ? obj.name : null;
         this.description = obj ? obj.description : null;
         this.users = obj ? obj.users : [];
-        this.channelAuthor = obj ? obj.channelAuthor : [];
+        this.channelAuthor = obj ? obj.channelAuthor : null;
     }
 }
