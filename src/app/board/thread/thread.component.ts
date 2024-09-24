@@ -30,7 +30,7 @@ export class ThreadComponent implements OnInit, OnChanges {
   showMessageEdit = false;
   showMessageEditArea = false;
   threadMessageArea = true;
-  threadMessage = 'Ja das stimmt.';
+  threadMessage = '';
   newThreadMessage = '';
   editingMessage = '';
   currentUser: User | null = null;
@@ -109,7 +109,6 @@ export class ThreadComponent implements OnInit, OnChanges {
           reaction: data['reaction'],
           formattedTimestamp: formattedDate,
           parentMessageId: data['parentMessageId'],
-          isOwnMessage: data['isOwnMessage'],
           answers: data['answers'] || []
         }, this.currentUserUid);
       });
@@ -160,25 +159,19 @@ export class ThreadComponent implements OnInit, OnChanges {
     this.editingMessage = message.message || ''; // Fallback auf leeren String
   }
 
+  async saveEditedMessage(message: Message) {
+    if (this.selectedMessage) {
+      const messageRef = doc(this.firestore, 'messages', this.selectedMessage.messageId);
 
-  async saveMessage(message: Message) {
-    console.log("Speichere Nachricht:", this.editingMessage);
-
-    if (this.editingMessage.trim() === '') {
-      console.error("Nachricht darf nicht leer sein!");
-      return;
+      await updateDoc(messageRef, {
+        answers: this.selectedMessage.answers.map((answer: any) =>
+          answer.messageId === message.messageId ? { ...answer, message: this.editingMessage } : answer
+        )
+      });
     }
-
-    const messageRef = doc(this.firestore, 'messages', message.messageId);
-    await updateDoc(messageRef, {
-      message: this.editingMessage
-    });
-
-    this.threadMessage = this.editingMessage;
     this.showMessageEditArea = false;
     this.threadMessageArea = true;
   }
-
 
   cancelMessageEdit() {
     this.showMessageEditArea = false;

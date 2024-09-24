@@ -31,7 +31,7 @@
         </div>
       </div>
       <div class="emoji-box">
-        <mat-icon class="message-icon">add_reaction</mat-icon>
+        <mat-icon (click)="showEmoji()" class="message-icon">add_reaction</mat-icon>
       </div>
     </div>
 
@@ -76,7 +76,7 @@
               2
             </div>
             <div>
-              <mat-icon>add_reaction</mat-icon>
+              <mat-icon (click)="showEmoji()">add_reaction</mat-icon>
             </div>
           </div>
         </div>
@@ -99,7 +99,7 @@
         />
         <div class="thread-message-details" *ngIf="threadMessageArea">
           <div class="emoji-box user-emoji-box">
-            <mat-icon class="message-icon">add_reaction</mat-icon>
+            <mat-icon class="message-icon" (click)="showEmoji()">add_reaction</mat-icon>
             <mat-icon class="message-icon" (click)="toggleEditBtn(message)"
               >more_vert</mat-icon
             >
@@ -152,7 +152,7 @@
             </div>
             <div class="thread-message-edit-action">
               <button (click)="cancelMessageEdit()">Abbrechen</button>
-              <button class="save-btn" (click)="saveMessage(message)">
+              <button class="save-btn" (click)="saveEditedMessage(message)">
                 Speichern
               </button>
             </div>
