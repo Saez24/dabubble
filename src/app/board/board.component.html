@@ -4,7 +4,7 @@
             <img src="./../../assets/images/main_logo.png" alt="DABubble Logo">
         </div>
         <div class="input-search-container">
-            <input name="searchText" type="text" placeholder="Devspace durchsuchen">
+            <input name="searchText" type="text" placeholder="Devspace durchsuchen" [(ngModel)]="searchInput">
             <img src="../../assets/images/icons/search.png" alt="search icon">
         </div>
         <div class="profile-menu-container" (click)="toggleProfileMenu()">
