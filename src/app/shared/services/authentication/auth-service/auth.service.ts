@@ -15,8 +15,11 @@ export class AuthService {
   auth = getAuth();
   router = inject(Router);
   userService = inject(UserService);
+  currentUser = this.auth.currentUser;
 
-  constructor() { }
+  constructor() { 
+    console.log(this.currentUser);
+  }
 
 
   async login(email: string, password: string): Promise<void> {
@@ -30,22 +33,6 @@ export class AuthService {
       throw err;
     }
   }
-
-  // async updateAuthUser() {
-  //   const auth = getAuth();
-  //   if (auth.currentUser) {
-  //     updateProfile(auth.currentUser, {
-  //       displayName: "Paul Scholz",
-  //       photoURL: "../../assets/images/avatars/avatar2.svg",
-  //     }).then(() => {
-  //       // Profile updated!
-  //       // ...
-  //     }).catch((error) => {
-  //       // An error occurred
-  //       // ...
-  //     });
-  //   }
-  // }
 
 
   async logout(): Promise<void> {

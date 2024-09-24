@@ -54,7 +54,7 @@ export class BoardComponent {
   userService = inject(UserService);
   searchInput: string = '';
   showThreadComponent: boolean = true;
-  currentUser = this.authService.auth.currentUser;
+  currentUser = this.authService.currentUser;
   workspaceOpen = true;
   messages: Message[] = [];
   currentUserUid: string | null = null;
@@ -69,7 +69,7 @@ export class BoardComponent {
   }
 
   getCurrentUser() {
-    const currentUser = this.auth.currentUser;
+    const currentUser = this.currentUser;
     if (currentUser) {
       this.currentUserUid = currentUser.uid;  // Speichere die aktuelle Benutzer-ID
     } else {
