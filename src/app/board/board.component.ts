@@ -72,9 +72,9 @@ export class BoardComponent {
   getCurrentUser() {
     const currentUser = this.currentUser;
     if (currentUser) {
-      this.currentUserUid = currentUser.uid;  // Speichere die aktuelle Benutzer-ID
+      this.currentUserUid = currentUser.id;  // Speichere die aktuelle Benutzer-ID
       console.log('User logged in: ', this.currentUserUid);
-      this.loadUserData(currentUser.uid!);
+      this.loadUserData(currentUser.id!);
     } else {
       console.log('Kein Benutzer angemeldet');
     }
