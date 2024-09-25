@@ -53,7 +53,7 @@ export class BoardComponent {
   authService = inject(AuthService);
   userService = inject(UserService);
   searchInput: string = '';
-  showThreadComponent: boolean = true;
+  showThreadComponent: boolean = false;
   currentUser: User | null = null;
   workspaceOpen = true;
   messages: Message[] = [];
