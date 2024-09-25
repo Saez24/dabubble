@@ -17,7 +17,7 @@
                         <div class="profil-menu-links" (click)="openUserProfile($event)">Profil</div>
                         <div class="profil-menu-links" (click)="authService.logout()">Log Out</div>
                     </div>
-                    <app-profile-dialog class="profil-details" [currentUser]="currentUser" *ngIf="this.userService.showProfile()"></app-profile-dialog>
+                    <app-profile-dialog class="profil-details" [currentUser]="this.authService.currentUser" *ngIf="this.userService.showProfile()"></app-profile-dialog>
                 </div>
             </div>
         </div>
