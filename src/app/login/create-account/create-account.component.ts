@@ -97,8 +97,8 @@ export class CreateAccountComponent {
             uid: user.uid,
             email: user.email,
             name: name,
-            avatarPath: this.selectedAvatar,
-            loginState: 'loggedOut',
+            avatarPath: '',
+            loginState: 'loggedOut', // Leerer loginState
             channels: []
           };
 
@@ -109,12 +109,10 @@ export class CreateAccountComponent {
               this.router.navigate(['select-avatar'], { queryParams: { name: name, email: email, password: password } });
             })
             .catch((error) => {
-              console.error('Error creating user in Firestore:', error.message);
+              this.emailFormControl.setErrors({ emailExists: true });
             });
         })
-        .catch((error) => {
-          this.emailFormControl.setErrors({ emailExists: true });
-        });
+
     }
   }
 
