@@ -128,11 +128,25 @@ export class BoardComponent {
 
   toggleProfileMenu() {
     this.showOverlay = !this.showOverlay;
+    console.log(this.userService.showProfile());
+    
   }
 
 
-  openUserProfile() {
-    this.userService.showProfile = true;
+  openUserProfile(event: Event) {
+    event.stopPropagation();
+    this.userService.showProfile.set(true);
+  }
+
+
+  closeAllDialogs() {
+    this.userService.showProfile.set(false);
+    // this.showOverlay = false;
+  }
+
+
+  stopPropagation(event: Event) {
+    event.stopPropagation();
   }
 
 }

@@ -11,13 +11,13 @@
             <span>{{ this.authService.currentUser?.displayName }}</span>
             <img src="{{ this.authService.currentUser?.photoURL }}" alt="Profil Icon">
             <mat-icon>keyboard_arrow_down</mat-icon>
-            <div class="overlay" *ngIf="showOverlay">
-                <div class="profile-menu" (click)="toggleProfileMenu()">
-                    <div class="profil-menu-link-container" *ngIf="!this.userService.showProfile">
-                        <div class="profil-menu-links" (click)="openUserProfile()">Profil</div>
+            <div class="overlay" *ngIf="showOverlay" (click)="closeAllDialogs()">
+                <div class="profile-menu" (click)="stopPropagation($event)">
+                    <div class="profil-menu-link-container" *ngIf="!this.userService.showProfile()">
+                        <div class="profil-menu-links" (click)="openUserProfile($event)">Profil</div>
                         <div class="profil-menu-links" (click)="authService.logout()">Log Out</div>
                     </div>
-                    <app-profile-dialog class="profil-details" *ngIf="this.userService.showProfile"></app-profile-dialog>
+                    <app-profile-dialog class="profil-details" [currentUser]="currentUser" *ngIf="this.userService.showProfile()"></app-profile-dialog>
                 </div>
             </div>
         </div>

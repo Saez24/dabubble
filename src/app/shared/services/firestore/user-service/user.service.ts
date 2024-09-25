@@ -1,6 +1,6 @@
 // Service for all Functions related to the User Object in Firestore
 
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { Firestore, collectionData, collection, where, query, doc, getDoc, updateDoc, setDoc } from '@angular/fire/firestore';
 import { Observable, Subscription, of } from 'rxjs';
 import { User } from '../../../models/user.class';
@@ -13,7 +13,7 @@ export class UserService {
   public user: User = new User();
   public user$!: Observable<User[]>;
   private subscription!: Subscription;
-  showProfile: boolean = false;
+  showProfile = signal<boolean>(false); /* Bearbeiten!!! */
 
   constructor(private firestore: Firestore) { }
 

@@ -2,7 +2,7 @@
 
 import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { getAuth, signInWithEmailAndPassword, signOut, updateProfile, createUserWithEmailAndPassword } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword, signOut, updateProfile } from "firebase/auth";
 import { UserCredential } from "firebase/auth";
 import { UserService } from '../../firestore/user-service/user.service';
 import { Auth } from '@angular/fire/auth';

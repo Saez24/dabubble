@@ -11,9 +11,7 @@ import { User } from '../../shared/models/user.class';
   styleUrl: './profile-dialog.component.scss'
 })
 export class ProfileDialogComponent {
-  @Input() currentUser!: WritableSignal<null | User | undefined>;
-  @Output() editorOpen = new EventEmitter<boolean>();
-  @Output() closeProfileDetail = new EventEmitter<boolean>();
+  @Input() currentUser: User | null = null;
 
   authService = inject(AuthService);
   userService = inject(UserService);
@@ -21,23 +19,12 @@ export class ProfileDialogComponent {
   readonly GUESTID = 'y7WnIAhufRhCn54XusoiYWlXl4S2';
 
 
-  // openEditor(event: Event) {
-  //   event.stopPropagation();
-  //   this.editorOpen.emit(true);
-  // }
-
-  // closeProfile(event: Event) {
-  //   event.stopPropagation();
-  //   this.closeProfileDetail.emit(false);
-  // }
-
   stopPropagation(event: Event) {
     event.stopPropagation();
   }
 
 
   closeUserProfile() {
-    this.userService.showProfile = false;
+    this.userService.showProfile.set(false);
   }
-  
 }
