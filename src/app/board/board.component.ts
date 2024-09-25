@@ -19,6 +19,7 @@ import { doc, Firestore, onSnapshot, orderBy, query } from '@angular/fire/firest
 import { Message } from '../shared/models/message.class';
 import { Auth } from '@angular/fire/auth';
 import { User } from '../shared/models/user.class';
+import { AddPeopleDialog } from "../dialogs/create-new-channel-dialog/add-people-dialog/add-people-dialog.component";
 
 @Component({
   selector: 'app-board',
@@ -40,8 +41,9 @@ import { User } from '../shared/models/user.class';
     MatInputModule,
     MatFormFieldModule,
     MatMenuModule,
-    ProfileDialogComponent
-  ],
+    ProfileDialogComponent,
+    AddPeopleDialog
+],
   templateUrl: './board.component.html',
   styleUrls: ['./board.component.scss', '../../styles.scss'],
   encapsulation: ViewEncapsulation.None

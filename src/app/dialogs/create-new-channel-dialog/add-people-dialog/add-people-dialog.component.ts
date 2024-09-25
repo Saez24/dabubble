@@ -54,7 +54,7 @@ export class AddPeopleDialog implements OnInit {
     private firestore: Firestore,
     private auth: Auth,
     @Inject(MAT_DIALOG_DATA) public data: any,
-  ) { 
+  ) {
   }
 
   ngOnInit(): void {
@@ -70,55 +70,55 @@ export class AddPeopleDialog implements OnInit {
   }
 
   checkDataFromDialog() {
-      this.newChannelName = this.data.name || '';
-      this.newChannelDescription = this.data.description || '';
-      this.users = this.data.users.users || [];
+    this.newChannelName = this.data.name || '';
+    this.newChannelDescription = this.data.description || '';
+    this.users = this.data.users.users || [];
   }
 
-async createNewChannel() {
- let currentUser = this.auth.currentUser;
+  async createNewChannel() {
+    let currentUser = this.auth.currentUser;
 
-  if (currentUser) {
-    let channelsRef = collection(this.firestore, 'channels');
-    let usersRef = collection(this.firestore, 'users');
-    let userDocRef = doc(usersRef, currentUser.uid);
+    if (currentUser) {
+      let channelsRef = collection(this.firestore, 'channels');
+      let usersRef = collection(this.firestore, 'users');
+      let userDocRef = doc(usersRef, currentUser.uid);
 
-    if (this.selectedValue == 'addAll') {
+      if (this.selectedValue == 'addAll') {
 
-      let memberUids = this.users.map(user => user.id);
+        let memberUids = this.users.map(user => user.id);
 
-      let newChannel: Channel = new Channel({
-        name: this.newChannelName,
-        description: this.newChannelDescription,
-        members: memberUids,
-        channelAuthor: this.currentUserUid,
-      });
+        let newChannel: Channel = new Channel({
+          name: this.newChannelName,
+          description: this.newChannelDescription,
+          members: memberUids,
+          channelAuthor: this.currentUserUid,
+        });
 
-      await addDoc(channelsRef, {
-        name: newChannel.name,
-        description: newChannel.description,
-        members: newChannel.members,
-        channelAuthorId: newChannel.channelAuthor,
-      });
+        await addDoc(channelsRef, {
+          name: newChannel.name,
+          description: newChannel.description,
+          members: newChannel.members,
+          channelAuthorId: newChannel.channelAuthor,
+        });
 
-      await updateDoc(userDocRef, {
-        channels: arrayUnion(newChannel.name)
-      });
-    } else {
-      console.log('Keine User ausgewählt');
+        await updateDoc(userDocRef, {
+          channels: arrayUnion(newChannel.name)
+        });
+      } else {
+        console.log('Keine User ausgewählt');
+      }
     }
   }
-}
 
-filterUsers() {
-  if (!this.searchTerm) {
-    this.filteredUsers = this.users; 
-  } else {
-    this.filteredUsers = this.users.filter(user =>
-      user.name?.toLowerCase().includes(this.searchTerm.toLowerCase()) 
-    );
+  filterUsers() {
+    if (!this.searchTerm) {
+      this.filteredUsers = this.users;
+    } else {
+      this.filteredUsers = this.users.filter(user =>
+        user.name?.toLowerCase().includes(this.searchTerm.toLowerCase())
+      );
+    }
   }
-}
 
   onSelectionChange(event: any) {
     this.selectedValue = event.value;
