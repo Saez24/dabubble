@@ -14,6 +14,7 @@ import { Channel } from '../../shared/models/channel.class';
 import { addDoc, collection, doc, Firestore, onSnapshot, orderBy, query, updateDoc } from '@angular/fire/firestore';
 import { Auth } from '@angular/fire/auth';
 import { UserService } from '../../shared/services/firestore/user-service/user.service';
+import { AuthService } from '../../shared/services/authentication/auth-service/auth.service';
 
 
 
@@ -36,16 +37,17 @@ export class ChatWindowComponent implements OnInit, AfterViewChecked {
   showMessageEditArea = false;
   chatMessage = '';
   messageArea = true;
-  message = 'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Facilis minus quae, natus asperiores, rem ipsa delectus dolorem iste soluta, repudiandae esse? Magnam facilis distinctio illo, fuga nisi suscipit perspiciatis iure.';
   editedMessage = '';
   currentUserUid: string | null = null;
   editingMessageId: string | null = null;
   channelId: string | null = null;
   selectedChannelId: string | null = null;
+  senderAvatar: string | null = null;
+  senderName: string | null = null;
 
 
   @ViewChild('chatWindow') private chatWindow!: ElementRef;
-  constructor(private firestore: Firestore, private auth: Auth, private userService: UserService, private cd: ChangeDetectorRef) { }
+  constructor(private firestore: Firestore, private auth: Auth, private userService: UserService, private cd: ChangeDetectorRef, private authService: AuthService) { }
 
   ngOnInit() {
     this.getCurrentUser();
@@ -53,12 +55,34 @@ export class ChatWindowComponent implements OnInit, AfterViewChecked {
     this.loadMessages();
   }
 
-  getCurrentUser() {
-    const currentUser = this.auth.currentUser;
-    if (currentUser) {
-      this.currentUserUid = currentUser.uid;
+  async getCurrentUser() {
+    const currentUser = this.authService.currentUser;
+    console.log('Aktueller Benutzer:', currentUser);
+
+    if (currentUser && currentUser.id != null && currentUser.id != undefined) {
+      this.currentUserUid = currentUser.id; // Speichere die aktuelle Benutzer-ID
+
+      // Benutzerdaten von Firestore abrufen
+      const userDoc = await this.userService.getUserById(currentUser.id);
+
+      // Überprüfe, ob userDoc existiert und einen avatarPath hat
+      if (userDoc) {
+        this.senderAvatar = userDoc.avatarPath || './assets/images/avatars/default-avatar.svg'; // Standard-Avatar, wenn avatarPath nicht vorhanden ist
+        this.senderName = userDoc.name; // Setze den Benutzernamen
+      } else {
+        console.warn('Benutzerdaten nicht gefunden für UID:', currentUser.id);
+        this.senderAvatar = './assets/images/avatars/default-avatar.svg'; // Setze einen Standard-Avatar
+      }
+
+      console.log('User logged in: ', this.currentUserUid);
+      console.log('Sender Avatar: ', this.senderAvatar);
+      console.log(this.senderName);
+
+    } else {
+      console.log('Kein Benutzer angemeldet');
     }
   }
+
 
   async loadChannels() {
     const channelsRef = collection(this.firestore, 'channels');
@@ -151,14 +175,14 @@ export class ChatWindowComponent implements OnInit, AfterViewChecked {
     }
 
     if (this.chatMessage.trim()) {
-      const currentUser = this.auth.currentUser;
+      const currentUser = this.authService.currentUser;
 
       if (currentUser) {
         const messagesRef = collection(this.firestore, 'messages');
 
         const newMessage: Message = new Message({
-          senderID: currentUser.uid,
-          senderName: currentUser.displayName,
+          senderID: currentUser.id,
+          senderName: this.senderName,
           message: this.chatMessage,
           channelId: this.selectedChannelId, // Verwende die gespeicherte channelId
           reaction: '',

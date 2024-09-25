@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, HostListener, ViewEncapsulation, EventEmitter, Output, OnInit, Input, SimpleChanges, OnChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, HostListener, ViewEncapsulation, EventEmitter, Output, OnInit, Input, SimpleChanges, OnChanges, inject } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -12,6 +12,7 @@ import { UserService } from '../../shared/services/firestore/user-service/user.s
 import { Auth } from '@angular/fire/auth';
 import { addDoc, arrayUnion, collection, doc, onSnapshot, updateDoc, } from 'firebase/firestore';
 import { Firestore } from '@angular/fire/firestore';
+import { AuthService } from '../../shared/services/authentication/auth-service/auth.service';
 
 
 @Component({
@@ -36,8 +37,13 @@ export class ThreadComponent implements OnInit, OnChanges {
   currentUser: User | null = null;
   currentUserUid: string | null = null;
   @Input() selectedMessage: Message | null = null;
+  authService = inject(AuthService);
+  userService = inject(UserService);
+  senderAvatar: string | null = null;
+  senderName: string | null = null;
 
-  constructor(private firestore: Firestore, private userService: UserService, private auth: Auth) { }
+
+  constructor(private firestore: Firestore, private auth: Auth) { }
   ngOnInit(): void {
     this.getCurrentUser();
     this.loadMessages();
@@ -49,13 +55,60 @@ export class ThreadComponent implements OnInit, OnChanges {
     }
   }
 
-  getCurrentUser() {
-    const currentUser = this.auth.currentUser;
-    if (currentUser) {
-      this.currentUserUid = currentUser.uid;
+  async getCurrentUser() {
+    const currentUser = this.authService.currentUser;
+    console.log('Aktueller Benutzer:', currentUser);
+
+    if (currentUser && currentUser.id != null && currentUser.id != undefined) {
+      this.currentUserUid = currentUser.id; // Speichere die aktuelle Benutzer-ID
+
+      // Benutzerdaten von Firestore abrufen
+      const userDoc = await this.userService.getUserById(currentUser.id);
+
+      // Überprüfe, ob userDoc existiert und einen avatarPath hat
+      if (userDoc) {
+        this.senderAvatar = userDoc.avatarPath || './assets/images/avatars/default-avatar.svg'; // Standard-Avatar, wenn avatarPath nicht vorhanden ist
+        this.senderName = userDoc.name; // Setze den Benutzernamen
+      } else {
+        console.warn('Benutzerdaten nicht gefunden für UID:', currentUser.id);
+        this.senderAvatar = './assets/images/avatars/default-avatar.svg'; // Setze einen Standard-Avatar
+      }
+
+      console.log('User logged in: ', this.currentUserUid);
+      console.log('Sender Avatar: ', this.senderAvatar);
+      console.log(this.senderName);
+
     } else {
       console.log('Kein Benutzer angemeldet');
     }
+  }
+
+  loadUserData(uid: string) {
+    if (!uid) {
+      console.log('Keine Benutzer-ID gefunden');
+      return;
+    }
+
+    const userDocRef = doc(this.firestore, `users/${uid}`);
+    onSnapshot(userDocRef, (doc) => {
+      if (doc.exists()) {
+        const data = doc.data() as {
+          name: string;
+          avatarPath: string;
+        };
+
+        // Update currentUser with Firestore data
+        this.currentUser = new User({
+          id: uid,
+          name: data.name,
+          avatarPath: data.avatarPath,
+          loginState: 'loggedIn', // Assuming the user is logged in
+          channels: [] // Load channels if necessary
+        });
+      } else {
+        console.log('Kein Benutzerdokument gefunden');
+      }
+    });
   }
 
   sendMessage() {
@@ -65,7 +118,7 @@ export class ThreadComponent implements OnInit, OnChanges {
 
         const message = new Message({
           senderID: currentUser.uid,
-          senderName: currentUser.displayName,
+          senderName: this.senderName,
           message: this.newThreadMessage,
           reaction: '',
           parentMessageId: this.selectedMessage ? this.selectedMessage.messageId : null

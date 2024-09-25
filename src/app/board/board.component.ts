@@ -70,8 +70,8 @@ export class BoardComponent {
   }
 
   getCurrentUser() {
-    const currentUser = this.currentUser;
-    if (currentUser) {
+    const currentUser = this.authService.currentUser;
+    if (currentUser && currentUser.id != null && currentUser.id != undefined) {
       this.currentUserUid = currentUser.id;  // Speichere die aktuelle Benutzer-ID
       console.log('User logged in: ', this.currentUserUid);
       this.loadUserData(currentUser.id!);
@@ -81,28 +81,27 @@ export class BoardComponent {
   }
 
   loadUserData(uid: string) {
-    if (uid === null || uid === undefined) {
+    if (!uid) {
       console.log('Keine Benutzer-ID gefunden');
       return;
     }
+
     const userDocRef = doc(this.firestore, `users/${uid}`);
     onSnapshot(userDocRef, (doc) => {
       if (doc.exists()) {
-        // Typprüfung und Zuweisung
         const data = doc.data() as {
           name: string;
           avatarPath: string;
-
         };
 
-        // Neuen User erstellen
+        // Update currentUser with Firestore data
         this.currentUser = new User({
+          id: uid,
           name: data.name,
           avatarPath: data.avatarPath,
-
+          loginState: 'loggedIn', // Assuming the user is logged in
+          channels: [] // Load channels if necessary
         });
-
-        console.log('Benutzerinformationen:', this.currentUser);
       } else {
         console.log('Kein Benutzerdokument gefunden');
       }
