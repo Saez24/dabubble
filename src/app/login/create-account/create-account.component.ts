@@ -97,7 +97,9 @@ export class CreateAccountComponent {
             uid: user.uid,
             email: user.email,
             name: name,
-            avatarPath: this.selectedAvatar
+            avatarPath: this.selectedAvatar,
+            loginState: 'loggedOut',
+            channels: []
           };
 
           // Speichert den Benutzer in Firestore

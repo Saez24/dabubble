@@ -57,7 +57,6 @@ export class ChatWindowComponent implements OnInit, AfterViewChecked {
 
   async getCurrentUser() {
     const currentUser = this.authService.currentUser;
-    console.log('Aktueller Benutzer:', currentUser);
 
     if (currentUser && currentUser.id != null && currentUser.id != undefined) {
       this.currentUserUid = currentUser.id; // Speichere die aktuelle Benutzer-ID
@@ -73,10 +72,6 @@ export class ChatWindowComponent implements OnInit, AfterViewChecked {
         console.warn('Benutzerdaten nicht gefunden für UID:', currentUser.id);
         this.senderAvatar = './assets/images/avatars/default-avatar.svg'; // Setze einen Standard-Avatar
       }
-
-      console.log('User logged in: ', this.currentUserUid);
-      console.log('Sender Avatar: ', this.senderAvatar);
-      console.log(this.senderName);
 
     } else {
       console.log('Kein Benutzer angemeldet');
