@@ -24,6 +24,11 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+.mat-mdc-card-content {
+    padding: 0;
+}
+
+
 .chat-header-button {
     border-radius: 100px !important;
     bottom: 10px;
@@ -458,7 +463,7 @@
         background-color: white !important;
         border: 1px solid rgba(173, 176, 217, 1) !important;
         border-radius: 30px;
-        height: 145px;
+        height: 135px;
         width: 100%;
         padding: 20px;
         box-sizing: border-box;
