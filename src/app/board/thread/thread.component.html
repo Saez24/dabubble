@@ -45,7 +45,7 @@
     <div *ngFor="let message of messages" style="width: 100%;">
       <div class="thread-message-container" *ngIf="!message.isOwnMessage">
         <img
-          src="/assets/images/logo_big.png"
+        [src]="message.senderAvatar"
           alt="Profile Image"
           class="avatar"
         />

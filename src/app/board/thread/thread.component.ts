@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, HostListener, ViewEncapsulation, EventEmitter, Output, OnInit, Input, SimpleChanges, OnChanges, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, HostListener, ViewEncapsulation, EventEmitter, Output, OnInit, Input, SimpleChanges, OnChanges, inject, ChangeDetectorRef } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -43,7 +43,7 @@ export class ThreadComponent implements OnInit, OnChanges {
   senderName: string | null = null;
 
 
-  constructor(private firestore: Firestore, private auth: Auth) { }
+  constructor(private firestore: Firestore, private auth: Auth, private cdr: ChangeDetectorRef) { }
   ngOnInit(): void {
     this.getCurrentUser();
     this.loadMessages();
@@ -140,7 +140,6 @@ export class ThreadComponent implements OnInit, OnChanges {
           senderName: message.senderName,
           message: message.message,
           timestamp: new Date(),
-          isOwnMessage: true,
           reaction: '',
         })
       });
@@ -172,6 +171,7 @@ export class ThreadComponent implements OnInit, OnChanges {
       } else {
         this.messages = [];
       }
+      this.cdr.detectChanges();
       // console.log('Nachrichten erfolgreich geladen:', this.messages);
     }, (error) => {
       // console.error('Fehler beim Laden der Nachrichten:', error);
