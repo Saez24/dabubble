@@ -44,10 +44,8 @@
     
     <div class="dialog-footer">
         <mat-dialog-actions>
-            <button 
-            mat-flat-button 
-            type="submit"
-            [disabled]="channelForm.invalid" 
+            <button mat-flat-button 
+            [disabled]="!isValid()" 
             (click)="openNextDialog()">
             Erstellen
         </button>

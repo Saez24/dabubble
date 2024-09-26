@@ -194,6 +194,7 @@ export class AddPeopleDialog implements OnInit {
         console.log('User is already selected:', user);
     }
     this.userSelected = !this.userSelected;
+    this.searchTerm = '';
 }
 
   onSelectionChange(event: any) {
