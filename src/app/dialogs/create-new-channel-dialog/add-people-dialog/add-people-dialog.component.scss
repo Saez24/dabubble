@@ -1,21 +1,31 @@
 @import '../../../../mixin.scss';
 
 .mdc-button {
-    height: 49px !important;
-    width: 125px !important;
-    border-radius: 25px !important;
-    background: $dark-purple !important;
+    height: 49px;
+    width: 125px;
+    border-radius: 25px;
+    background: $dark-purple;
+
+    &:disabled {
+        background-color: grey !important;
+    }
 
     &:hover {
         cursor: pointer;
-        background-color: $purple !important;
+        background-color: $purple;
     }
+}
+
+.dialog-content {
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
 .radio-group-container {
     display: flex;
     flex-direction: column;
     width: 630px;
+    gap: 15px;
 }
 
 .group-link {
@@ -33,5 +43,109 @@
         cursor: pointer;
     } 
 }
+
+.search-input {
+    width: 100%;
+    border-color: $purple;
+    border: 1px solid $purple;
+    padding: 18px 20px;
+    border-radius: 30px;
+    font-size: 18px;
+}
+
+.contacts-container {
+    border: 1px solid $purple;
+    border-radius: 0px 30px 30px 30px;
+    padding: 8px;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    background: white;
+    top: 249px;
+    left: 80px;
+    width: 320px;
+    gap: 15px;
+}
+
+.contact-container {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    z-index: 1000;
+    padding: 4px 20px 4px 20px;
+    border-radius: 35px;
+    img {
+        width: 50px;
+        height: 50px;
+    }
+    span {
+        font-size: 18px;
+        font-weight: 400;
+        white-space: nowrap;      
+        overflow: hidden;          
+        text-overflow: ellipsis; 
+        max-width: 168px; 
+    }
+    &:hover {
+        background-color: $light-purple;
+        cursor: pointer;
+    }
+}
+
+.selected-users {
+    display: flex;
+    gap: 15px;
+    overflow-x: scroll;
+    max-width: 400px;
+}
+
+.selected-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 2px 10px 2px 10px;
+    border-radius: 35px;
+    margin-left: -16px;
+    img {
+        width: 30px;
+        height: 30px;
+    }
+    span {
+        font-size: 14px;
+        font-weight: 400;
+        white-space: nowrap;      
+        overflow: hidden;          
+        text-overflow: ellipsis; 
+        max-width: 168px; 
+    }
+    button {
+        margin-left: -16px;
+        .mat-icon {
+            font-size: 18px;
+        }
+    }
+    &:hover {
+        background-color: $light-purple;
+        cursor: pointer;
+    }
+    background-color: $light-purple !important;
+}
+
+.mdc-text-field--no-label:not(.mdc-text-field--textarea) .mat-mdc-form-field-input-control.mdc-text-field__input, .mat-mdc-text-field-wrapper .mat-mdc-form-field-input-control{
+    flex: 1;
+}
+
+.mat-mdc-dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.mdc-text-field--outlined .mat-mdc-form-field-infix, .mdc-text-field--no-label .mat-mdc-form-field-infix {
+    max-height: 60px;
+}
+
+
+
 
 

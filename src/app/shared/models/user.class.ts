@@ -1,7 +1,7 @@
 type loginState = 'loggedIn' | 'loggedOut' | 'inactive';
 
 export class User {
-    id: string | null;
+    id: string;
     email: string | null;
     name: string | null;
     avatarPath: string | null;

@@ -17,7 +17,6 @@ import { IconsService } from '../../shared/services/icons/icons.service';
 import { ErrorStateMatcher } from '@angular/material/core';
 import { ChannelsService } from '../../shared/services/channels/channels.service';
 import { AddPeopleDialog } from './add-people-dialog/add-people-dialog.component';
-import { User } from '../../shared/models/user.class';
 
 export class MyErrorStateMatcher implements ErrorStateMatcher {
   isErrorState(control: FormControl | null): boolean {
