@@ -3,9 +3,9 @@
         <h3>Profil</h3>
         <img src="../../../assets/images/icons/close.png" alt="" (click)="closeUserProfile()">
     </div>
-    <img src="../../../assets/images/avatars/avatar3.svg" alt="" class="avatar-img">
+    <img src="{{ currentUser()?.avatarPath }}" alt="" class="avatar-img">
     <div class="name-container">
-            <h2>{{ currentUser?.displayName }}</h2>
+            <h2>{{ currentUser()?.name }}</h2>
             <span>Bearbeiten</span>
     </div>
     <div class="status-container">
@@ -29,7 +29,7 @@
         <img src="../../../assets/images/icons/mail.png" alt="">
         <div>
             <span>Email Adresse</span>
-            <span class="email-address">{{ currentUser?.email }}</span>
+            <span class="email-address">{{ currentUser()?.email }}</span>
         </div>
     </div>
 </div>

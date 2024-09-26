@@ -43,7 +43,7 @@ import { AddPeopleDialog } from "../dialogs/create-new-channel-dialog/add-people
     MatMenuModule,
     ProfileDialogComponent,
     AddPeopleDialog
-],
+  ],
   templateUrl: './board.component.html',
   styleUrls: ['./board.component.scss', '../../styles.scss'],
   encapsulation: ViewEncapsulation.None
@@ -56,7 +56,7 @@ export class BoardComponent {
   userService = inject(UserService);
   searchInput: string = '';
   showThreadComponent: boolean = false;
-  currentUser: User | null = null;
+  currentUser = this.authService.getUserSignal();
   workspaceOpen = true;
   messages: Message[] = [];
   currentUserUid: string | null = null;
@@ -72,17 +72,18 @@ export class BoardComponent {
   }
 
   getCurrentUser() {
-    const currentUser = this.authService.currentUser;
-    if (currentUser && currentUser.id != null && currentUser.id != undefined) {
-      this.currentUserUid = currentUser.id;  // Speichere die aktuelle Benutzer-ID
-      console.log('User logged in: ', this.currentUserUid);
-      this.loadUserData(currentUser.id!);
+    const userId = this.currentUser()?.id;
+    console.log('Current User Id: ', userId);
+    console.log('Current User Avatar: ', this.currentUser()?.avatarPath);
+    if (userId) {
+      this.currentUserUid = userId;  // Speichere die aktuelle Benutzer-ID
+      this.loadUserData(this.currentUserUid);
     } else {
       console.log('Kein Benutzer angemeldet');
     }
   }
 
-  loadUserData(uid: string) {
+  loadUserData(uid: string | null) {
     if (!uid) {
       console.log('Keine Benutzer-ID gefunden');
       return;
@@ -97,13 +98,13 @@ export class BoardComponent {
         };
 
         // Update currentUser with Firestore data
-        this.currentUser = new User({
-          id: uid,
-          name: data.name,
-          avatarPath: data.avatarPath,
-          loginState: 'loggedIn', // Assuming the user is logged in
-          channels: [] // Load channels if necessary
-        });
+        // this.currentUser = new User({
+        //   id: uid,
+        //   name: data.name,
+        //   avatarPath: data.avatarPath,
+        //   loginState: 'loggedIn', // Assuming the user is logged in
+        //   channels: [] // Load channels if necessary
+        // });
       } else {
         console.log('Kein Benutzerdokument gefunden');
       }
@@ -130,7 +131,7 @@ export class BoardComponent {
   toggleProfileMenu() {
     this.showOverlay = !this.showOverlay;
     console.log(this.userService.showProfile());
-    
+
   }
 
 

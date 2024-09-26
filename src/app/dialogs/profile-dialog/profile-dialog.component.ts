@@ -11,12 +11,16 @@ import { User } from '../../shared/models/user.class';
   styleUrl: './profile-dialog.component.scss'
 })
 export class ProfileDialogComponent {
-  @Input() currentUser: any | null = null;
+  @Input() currentUser!: WritableSignal<User | null | undefined>;
 
   authService = inject(AuthService);
   userService = inject(UserService);
 
   readonly GUESTID = 'y7WnIAhufRhCn54XusoiYWlXl4S2';
+
+
+  constructor() {
+  }
 
 
   stopPropagation(event: Event) {

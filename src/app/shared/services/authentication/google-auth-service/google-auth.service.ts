@@ -29,26 +29,24 @@ export class GoogleAuthService {
     try {
       const result = await signInWithPopup(this.auth, this.provider);
       if (result.user) {
-        const user = result.user;
-
         const firestoreUser = {
-          uid: user.uid,
-          email: user.email,
-          name: user.displayName || 'No Name',
-          avatarPath: user.photoURL || null,
+          uid: result.user.uid,
+          email: result.user.email,
+          name: result.user.displayName || 'No Name',
+          avatarPath: result.user.photoURL || null,
         };
 
-        this.userService.createFirestoreUser(firestoreUser)
+        await this.userService.createFirestoreUser(firestoreUser)
+        await this.userService.updateUserLoginState(result.user.uid, 'loggedIn')
           .then(() => {
-            console.log('User successfully created in Firestore');
+            console.log('User successfully created /logged in, in Firestore');
           })
           .catch((error) => {
             console.error('Error creating user in Firestore:', error.message);
           });
 
         this.router.navigateByUrl('board');
-        this.userService.updateUserLoginState(result.user.uid, 'loggedIn')
-        console.log('Logged in as:', user.displayName, user.email);
+        console.log('Logged in as:', result.user.displayName, result.user.email);
       }
     } catch (err: any) {
       console.error(err);
@@ -56,15 +54,16 @@ export class GoogleAuthService {
     }
   }
 
-  // async getRedirectIntel(): Promise<void> {
-  //   try {
-  //     let result = await getRedirectResult(this.auth);
-  //     if (result?.user) {
-  //       this.router.navigateByUrl('board');        
-  //     }
-  //   } catch (err: any) {
-  //     console.error(err);
-  //     throw err;
-  //   }
-  // }
+
+  async getRedirectIntel(): Promise<void> {
+    try {
+      const result = await getRedirectResult(this.auth);
+      if (result?.user) {
+        this.router.navigateByUrl('board');
+      }
+    } catch (err: any) {
+      console.error(err);
+      throw err;
+    }
+  }
 }

@@ -1,10 +1,11 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, OnDestroy, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { getAuth, signInWithEmailAndPassword, signOut, updateProfile } from "firebase/auth";
 import { UserCredential } from "firebase/auth";
 import { UserService } from '../../firestore/user-service/user.service';
-import { Auth } from '@angular/fire/auth';
+import { Auth, user, User as AuthUser } from '@angular/fire/auth';
 import { User } from '../../../models/user.class';
+import { Subscription } from 'rxjs';
 
 
 @Injectable({
@@ -12,52 +13,82 @@ import { User } from '../../../models/user.class';
 })
 export class AuthService {
 
-  auth = getAuth();
+  // auth = getAuth();
+  auth = inject(Auth);
   router = inject(Router);
   userService = inject(UserService);
+  private userSignal = signal<User | null | undefined>(undefined);
+  private authSubscription: Subscription | null = null;
+  errorCode: string | null = null
+
   currentUser: User | null = null; // Change to hold an instance of the User class
 
   constructor() {
-    console.log(this.currentUser);
+    this.initializeAuthState();
   }
+
+
+  getUserSignal() {
+    return this.userSignal;
+  }
+
+
+  setUser(user: User | null | undefined) {
+    this.userSignal.set(user);
+  }
+
+
+  ngOnDestroy(): void {
+    this.authSubscription?.unsubscribe();
+  }
+
+
+  initializeAuthState() {
+    this.authSubscription = user(this.auth).subscribe((authUser: AuthUser | null) => {
+      if (authUser) {
+        let currentUser = this.setCurrentUserObject(authUser);
+        this.setUser(currentUser);
+      } else {
+        this.setUser(null);
+      }
+    })
+  }
+
+
+  setCurrentUserObject(user: AuthUser): User {
+    return {
+      id: user.uid,
+      email: user.email,
+      name: user.displayName,
+      avatarPath: user.photoURL,
+      loginState: 'loggedIn',
+      channels: [] // Fetch channels from your userService if required
+    } as User
+  }
+
 
   async login(email: string, password: string): Promise<void> {
     try {
       let result: UserCredential = await signInWithEmailAndPassword(this.auth, email, password);
       await this.userService.updateUserLoginState(result.user.uid, 'loggedIn');
-
-      if (result.user) {
-        // Create an instance of the User class and populate it with data from Firebase
-        this.currentUser = new User({
-          id: result.user.uid,
-          email: result.user.email,
-          name: result.user.displayName,
-          avatarPath: '', // This would be populated from your storage if needed
-          loginState: 'loggedIn',
-          channels: [] // Fetch channels from your userService if required
-        });
-
-        console.log('Auth.service: logged in as: ', this.currentUser.id);
-        this.router.navigateByUrl('board');
-      }
-    } catch (err: any) {
+      this.router.navigateByUrl('board');
+    }
+    catch (err: any) {
       throw err;
     }
   }
 
+
   async logout(): Promise<void> {
     try {
-      const currentUser = this.auth.currentUser; // Still use Firebase's auth state for logging out
-
-      if (currentUser) {
-        await this.userService.updateUserLoginState(currentUser.uid, 'loggedOut');
+      if (this.auth.currentUser) {
+        await this.userService.updateUserLoginState(this.auth.currentUser.uid, 'loggedOut');
         await signOut(this.auth);
-        console.log(currentUser.uid);
-        this.currentUser = null; // Clear the currentUser upon logout
-      } else {
-        console.log('No user is currently logged in.');
+        window.open('sign-in', '_self');
       }
-      this.router.navigateByUrl('');
+      else {
+        console.log('No user is currently logged in');
+      }
     } catch (err: any) {
       console.error(err);
       throw err;
