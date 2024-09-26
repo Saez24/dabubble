@@ -620,6 +620,11 @@
     display: inline-block;
 }
 
+.image-preview {
+    height: 100px;
+    width: 100px;
+}
+
 .delete-upload {
     &:hover {
         background: #d1d3e7;

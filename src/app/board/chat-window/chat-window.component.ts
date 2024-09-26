@@ -326,4 +326,20 @@ export class ChatWindowComponent implements OnInit, AfterViewChecked {
     fileInput.click();
   }
 
+  isImageFile(fileURL: string | null): boolean {
+    if (!fileURL) return false;
+
+    // Extrahiere die Datei-Informationen aus der Firebase-URL und prüfe den Dateinamen
+    const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp'];
+    const url = new URL(fileURL);
+    const fileName = url.pathname.split('/').pop(); // Hole den Dateinamen aus dem Pfad
+
+    if (!fileName) return false;
+
+    // Prüfe, ob der Dateiname mit einem der Bildformate endet
+    const fileExtension = fileName.split('.').pop()?.toLowerCase();
+    return imageExtensions.includes(fileExtension || '');
+  }
+
+
 }

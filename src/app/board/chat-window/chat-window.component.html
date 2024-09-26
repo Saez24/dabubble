@@ -33,18 +33,22 @@
                     </span>
                     <span class="message-recieved">{{ message.message }}</span>
 
-                    <img *ngIf="message.fileURL?.startsWith('data:image/')" [src]="message.fileURL" alt="Bildvorschau"
-                        width="100%" />
+                    <!-- Bildvorschau für URLs, die Bilddateien sind -->
+                    <a *ngIf="isImageFile(message.fileURL)" [href]="message.fileURL" target="_blank">
+                        <img class="image-preview" [src]="message.fileURL" alt="Bildvorschau" width="100%" />
+                    </a>
 
-                    <!-- Link für andere Dateitypen, z.B. PDFs -->
+                    <!-- Link für PDFs -->
                     <a *ngIf="message.fileURL?.endsWith('.pdf')" [href]="message.fileURL" target="_blank">PDF
                         anzeigen</a>
 
-                    <!-- Optional: Vorschau für andere Dateitypen -->
-                    <span *ngIf="!message.fileURL?.endsWith('.pdf') && message.fileURL" class="file-link">
+                    <!-- Datei-Link für alle anderen Dateitypen -->
+                    <span *ngIf="message.fileURL && !isImageFile(message.fileURL) && !message.fileURL?.endsWith('.pdf')"
+                        class="file-link">
                         <a [href]="message.fileURL" target="_blank">Datei herunterladen</a>
-
                     </span>
+
+
                     <span (click)="showThread(message)" class="answers-block">{{ message?.answers?.length || 0 }}
                         Antworten
                         <span class="message-time">Letzte Antwort
@@ -78,18 +82,23 @@
                                 Uhr</span></span>
                         <span class="chat-message-sender">{{ message.message }} </span>
 
-                        <img *ngIf="message.fileURL?.startsWith('data:image/')" [src]="message.fileURL"
-                            alt="Bildvorschau" width="100%" />
+                        <!-- Bildvorschau für URLs, die Bilddateien sind -->
+                        <a *ngIf="isImageFile(message.fileURL)" [href]="message.fileURL" target="_blank">
+                            <img class="image-preview" [src]="message.fileURL" alt="Bildvorschau" width="100%" />
+                        </a>
 
-                        <!-- Link für andere Dateitypen, z.B. PDFs -->
+                        <!-- Link für PDFs -->
                         <a *ngIf="message.fileURL?.endsWith('.pdf')" [href]="message.fileURL" target="_blank">PDF
                             anzeigen</a>
 
-                        <!-- Optional: Vorschau für andere Dateitypen -->
-                        <span *ngIf="!message.fileURL?.endsWith('.pdf') && message.fileURL" class="file-link">
+                        <!-- Datei-Link für alle anderen Dateitypen -->
+                        <span
+                            *ngIf="message.fileURL && !isImageFile(message.fileURL) && !message.fileURL?.endsWith('.pdf')"
+                            class="file-link">
                             <a [href]="message.fileURL" target="_blank">Datei herunterladen</a>
-
                         </span>
+
+
                         <div class="show-reactions">
                             <div class="reaction-icon-button">
                                 <div class="reaction-name-popup">
