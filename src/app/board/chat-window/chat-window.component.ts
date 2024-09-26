@@ -31,7 +31,7 @@ import { SafeUrlPipe } from '../../shared/pipes/safe-url.pipe';
   encapsulation: ViewEncapsulation.None,
 })
 
-export class ChatWindowComponent implements OnInit, AfterViewChecked {
+export class ChatWindowComponent implements OnInit {
   messages: Message[] = [];
   users: User[] = [];
   channels: Channel[] = [];
@@ -59,6 +59,10 @@ export class ChatWindowComponent implements OnInit, AfterViewChecked {
     this.loadChannels();
     this.loadMessages();
   }
+
+  // ngAfterViewChecked() {
+  //   this.scrollToBottom(); // Stelle sicher, dass das Chat-Fenster nach jeder View-Änderung nach unten scrollt
+  // }
 
   async getCurrentUser() {
     const currentUser = this.authService.currentUser;
@@ -213,6 +217,7 @@ export class ChatWindowComponent implements OnInit, AfterViewChecked {
         this.chatMessage = ''; // Eingabefeld leeren
         this.selectedFile = null; // Reset selectedFile
         this.loadMessages();
+        this.scrollToBottom();
         this.deleteUpload();
       } else {
         console.error('Kein Benutzer angemeldet');
@@ -256,13 +261,9 @@ export class ChatWindowComponent implements OnInit, AfterViewChecked {
         message.formattedTimestamp = messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         return message;
       }));
-      this.scrollToBottom();
       this.cd.detectChanges();
+      this.scrollToBottom();
     });
-  }
-
-  ngAfterViewChecked() {
-    this.scrollToBottom(); // Stelle sicher, dass das Chat-Fenster nach jeder View-Änderung nach unten scrollt
   }
 
   scrollToBottom(): void {
@@ -339,6 +340,16 @@ export class ChatWindowComponent implements OnInit, AfterViewChecked {
     // Prüfe, ob der Dateiname mit einem der Bildformate endet
     const fileExtension = fileName.split('.').pop()?.toLowerCase();
     return imageExtensions.includes(fileExtension || '');
+  }
+
+  getFileNameFromURL(url: string | null): string {
+    if (!url) {
+      return 'Datei'; // Fallback, falls die URL null ist
+    }
+
+    const decodedUrl = decodeURIComponent(url);
+    const fileName = decodedUrl.split('?')[0].split('/').pop();
+    return fileName || 'Datei'; // Wenn kein Dateiname gefunden wird, 'Datei' als Fallback anzeigen
   }
 
 

@@ -31,23 +31,18 @@
                     <span class="sender-name">{{ message.senderName }}
                         <span class="message-time">{{ message.formattedTimestamp }}</span>
                     </span>
-                    <span class="message-recieved">{{ message.message }}</span>
+                    <span class="message-recieved">{{ message.message }}
+                        <!-- Bildvorschau für URLs, die Bilddateien sind -->
+                        <a *ngIf="isImageFile(message.fileURL)" [href]="message.fileURL" target="_blank">
+                            <img class="image-preview" [src]="message.fileURL" alt="Bildvorschau" width="100%" />
+                        </a>
+                        <!-- Datei-Link für alle anderen Dateitypen -->
+                        <a *ngIf="message.fileURL && !isImageFile(message.fileURL) && !message.fileURL?.endsWith('.pdf')"
+                            class="file-link" [href]="message.fileURL" target="_blank"> {{
+                            getFileNameFromURL(message.fileURL) }}</a>
 
-                    <!-- Bildvorschau für URLs, die Bilddateien sind -->
-                    <a *ngIf="isImageFile(message.fileURL)" [href]="message.fileURL" target="_blank">
-                        <img class="image-preview" [src]="message.fileURL" alt="Bildvorschau" width="100%" />
-                    </a>
 
-                    <!-- Link für PDFs -->
-                    <a *ngIf="message.fileURL?.endsWith('.pdf')" [href]="message.fileURL" target="_blank">PDF
-                        anzeigen</a>
-
-                    <!-- Datei-Link für alle anderen Dateitypen -->
-                    <span *ngIf="message.fileURL && !isImageFile(message.fileURL) && !message.fileURL?.endsWith('.pdf')"
-                        class="file-link">
-                        <a [href]="message.fileURL" target="_blank">Datei herunterladen</a>
                     </span>
-
 
                     <span (click)="showThread(message)" class="answers-block">{{ message?.answers?.length || 0 }}
                         Antworten
@@ -80,23 +75,19 @@
                         <span class="my-name">{{ message.senderName }} <span class="message-time">{{
                                 message.formattedTimestamp }}
                                 Uhr</span></span>
-                        <span class="chat-message-sender">{{ message.message }} </span>
+                        <span class="chat-message-sender">{{ message.message }}
+                            <!-- Bildvorschau für URLs, die Bilddateien sind -->
+                            <a *ngIf="isImageFile(message.fileURL)" [href]="message.fileURL" target="_blank">
+                                <img class="image-preview" [src]="message.fileURL" alt="Bildvorschau" width="100%" />
+                            </a>
+                            <!-- Datei-Link für alle anderen Dateitypen -->
+                            <a *ngIf="message.fileURL && !isImageFile(message.fileURL) && !message.fileURL?.endsWith('.pdf')"
+                                class="file-link" [href]="message.fileURL" target="_blank">{{
+                                getFileNameFromURL(message.fileURL)
+                                }}</a>
 
-                        <!-- Bildvorschau für URLs, die Bilddateien sind -->
-                        <a *ngIf="isImageFile(message.fileURL)" [href]="message.fileURL" target="_blank">
-                            <img class="image-preview" [src]="message.fileURL" alt="Bildvorschau" width="100%" />
-                        </a>
-
-                        <!-- Link für PDFs -->
-                        <a *ngIf="message.fileURL?.endsWith('.pdf')" [href]="message.fileURL" target="_blank">PDF
-                            anzeigen</a>
-
-                        <!-- Datei-Link für alle anderen Dateitypen -->
-                        <span
-                            *ngIf="message.fileURL && !isImageFile(message.fileURL) && !message.fileURL?.endsWith('.pdf')"
-                            class="file-link">
-                            <a [href]="message.fileURL" target="_blank">Datei herunterladen</a>
                         </span>
+
 
 
                         <div class="show-reactions">

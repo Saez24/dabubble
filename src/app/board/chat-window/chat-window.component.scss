@@ -136,7 +136,6 @@
     cursor: pointer;
     box-sizing: border-box;
 
-
     &:hover {
         background: rgba(236, 238, 254, 1);
 
@@ -163,9 +162,6 @@
     flex-direction: column;
     gap: 8px;
     box-sizing: border-box;
-    width: 100%;
-
-    ;
 
     >.sender-name {
         font-weight: 700;
@@ -191,6 +187,8 @@
         border-radius: 0px 30px 30px 30px;
         box-sizing: border-box;
         font-size: 18px;
+        display: flex;
+        flex-direction: column;
     }
 
     >.chat-message-sender {
@@ -201,6 +199,8 @@
         color: white;
         box-sizing: border-box;
         font-size: 18px;
+        display: flex;
+        flex-direction: column;
     }
 }
 
@@ -272,7 +272,7 @@
     transition: background 0.3s ease;
     cursor: pointer;
     box-sizing: border-box;
-    justify-content: space-between;
+
 
     &:hover {
         background: rgba(236, 238, 254, 1);
@@ -336,7 +336,6 @@
 
 .message-area-container {
     position: relative;
-    width: 100%;
 }
 
 .message-edit-container {
@@ -623,6 +622,27 @@
 .image-preview {
     height: 100px;
     width: 100px;
+    border-radius: 20px;
+    padding-left: 10px;
+}
+
+.file-link {
+    height: 20px;
+    border-radius: 20px;
+    border: 1px solid #ADB0D9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    background: #a2e2a2;
+    color: black;
+    text-decoration: none;
+
+    &:hover {
+        background: #d1d3e7;
+    }
+
+
 }
 
 .delete-upload {
