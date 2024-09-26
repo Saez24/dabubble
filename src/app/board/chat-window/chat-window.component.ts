@@ -15,6 +15,8 @@ import { addDoc, collection, doc, Firestore, onSnapshot, orderBy, query, updateD
 import { Auth } from '@angular/fire/auth';
 import { UserService } from '../../shared/services/firestore/user-service/user.service';
 import { AuthService } from '../../shared/services/authentication/auth-service/auth.service';
+import { UploadFileService } from '../../shared/services/firestore/storage-service/upload-file.service';
+import { SafeUrlPipe } from '../../shared/pipes/safe-url.pipe';
 
 
 
@@ -22,12 +24,13 @@ import { AuthService } from '../../shared/services/authentication/auth-service/a
   selector: 'app-chat-window',
   standalone: true,
   imports: [MatCardModule, MatButtonModule, MatIconModule, MatDividerModule, FormsModule,
-    MatFormFieldModule, MatInputModule, CommonModule, PickerComponent, NgIf, NgFor],
+    MatFormFieldModule, MatInputModule, CommonModule, PickerComponent, NgIf, NgFor, SafeUrlPipe],
   templateUrl: './chat-window.component.html',
   styleUrl: './chat-window.component.scss',
   changeDetection: ChangeDetectionStrategy.Default,
   encapsulation: ViewEncapsulation.None,
 })
+
 export class ChatWindowComponent implements OnInit, AfterViewChecked {
   messages: Message[] = [];
   users: User[] = [];
@@ -44,10 +47,12 @@ export class ChatWindowComponent implements OnInit, AfterViewChecked {
   selectedChannelId: string | null = null;
   senderAvatar: string | null = null;
   senderName: string | null = null;
+  selectedFile: File | null = null;// Service für den Datei-Upload
+  filePreviewUrl: string | null = null;
 
 
   @ViewChild('chatWindow') private chatWindow!: ElementRef;
-  constructor(private firestore: Firestore, private auth: Auth, private userService: UserService, private cd: ChangeDetectorRef, private authService: AuthService) { }
+  constructor(private firestore: Firestore, private auth: Auth, private userService: UserService, private cd: ChangeDetectorRef, private authService: AuthService, private uploadFileService: UploadFileService) { }
 
   ngOnInit() {
     this.getCurrentUser();
@@ -169,7 +174,7 @@ export class ChatWindowComponent implements OnInit, AfterViewChecked {
       return;
     }
 
-    if (this.chatMessage.trim()) {
+    if (this.chatMessage.trim() || this.selectedFile) {
       const currentUser = this.authService.currentUser;
 
       if (currentUser) {
@@ -182,9 +187,10 @@ export class ChatWindowComponent implements OnInit, AfterViewChecked {
           channelId: this.selectedChannelId, // Verwende die gespeicherte channelId
           reaction: '',
           answers: [],
+          fileURL: '',
         });
 
-        await addDoc(messagesRef, {
+        const messageDocRef = await addDoc(messagesRef, {
           senderID: newMessage.senderID,
           senderName: newMessage.senderName,
           message: newMessage.message,
@@ -194,8 +200,20 @@ export class ChatWindowComponent implements OnInit, AfterViewChecked {
           timestamp: new Date(),
         });
 
+        if (this.selectedFile && currentUser.id) {
+          try {
+            const fileURL = await this.uploadFileService.uploadFileWithIds(this.selectedFile, currentUser.id, messageDocRef.id); // Verwende die ID des neuen Dokuments
+            newMessage.fileURL = fileURL; // Setze die Download-URL in der Nachricht
+            await updateDoc(messageDocRef, { fileURL: newMessage.fileURL }); // Aktualisiere das Dokument mit der Datei-URL
+          } catch (error) {
+            console.error('Datei-Upload fehlgeschlagen:', error);
+          }
+        }
+
         this.chatMessage = ''; // Eingabefeld leeren
-        this.loadMessages(); // Nachrichten neu laden
+        this.selectedFile = null; // Reset selectedFile
+        this.loadMessages();
+        this.deleteUpload();
       } else {
         console.error('Kein Benutzer angemeldet');
       }
@@ -274,4 +292,38 @@ export class ChatWindowComponent implements OnInit, AfterViewChecked {
       return messageDate.toLocaleDateString('de-DE', { day: 'numeric', month: 'long' });
     }
   }
+
+  onFileSelected(event: Event) {
+    const fileInput = event.target as HTMLInputElement;
+    const file = fileInput.files?.[0];
+
+    if (file) {
+      this.selectedFile = file; // Speichere die ausgewählte Datei
+
+      // Datei als base64 speichern, um sie im localStorage zu speichern
+      const reader = new FileReader();
+      reader.onload = () => {
+        const fileData = reader.result as string;
+        this.filePreviewUrl = fileData; // Speichere die Vorschau-URL für die Datei
+        localStorage.setItem('selectedFile', JSON.stringify({ fileName: file.name, fileData }));
+        console.log('File saved to localStorage');
+      };
+      reader.readAsDataURL(file);
+    } else {
+      console.error('No file selected');
+    }
+  }
+
+  deleteUpload() {
+    this.selectedFile = null;
+    this.filePreviewUrl = null;
+    localStorage.removeItem('selectedFile');
+  }
+
+  // Trigger für verstecktes File-Input
+  triggerFileInput() {
+    const fileInput = document.getElementById('fileInput') as HTMLInputElement;
+    fileInput.click();
+  }
+
 }

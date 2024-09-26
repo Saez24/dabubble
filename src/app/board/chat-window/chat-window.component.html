@@ -32,6 +32,19 @@
                         <span class="message-time">{{ message.formattedTimestamp }}</span>
                     </span>
                     <span class="message-recieved">{{ message.message }}</span>
+
+                    <img *ngIf="message.fileURL?.startsWith('data:image/')" [src]="message.fileURL" alt="Bildvorschau"
+                        width="100%" />
+
+                    <!-- Link für andere Dateitypen, z.B. PDFs -->
+                    <a *ngIf="message.fileURL?.endsWith('.pdf')" [href]="message.fileURL" target="_blank">PDF
+                        anzeigen</a>
+
+                    <!-- Optional: Vorschau für andere Dateitypen -->
+                    <span *ngIf="!message.fileURL?.endsWith('.pdf') && message.fileURL" class="file-link">
+                        <a [href]="message.fileURL" target="_blank">Datei herunterladen</a>
+
+                    </span>
                     <span (click)="showThread(message)" class="answers-block">{{ message?.answers?.length || 0 }}
                         Antworten
                         <span class="message-time">Letzte Antwort
@@ -63,7 +76,20 @@
                         <span class="my-name">{{ message.senderName }} <span class="message-time">{{
                                 message.formattedTimestamp }}
                                 Uhr</span></span>
-                        <span class="chat-message-sender">{{ message.message }}</span>
+                        <span class="chat-message-sender">{{ message.message }} </span>
+
+                        <img *ngIf="message.fileURL?.startsWith('data:image/')" [src]="message.fileURL"
+                            alt="Bildvorschau" width="100%" />
+
+                        <!-- Link für andere Dateitypen, z.B. PDFs -->
+                        <a *ngIf="message.fileURL?.endsWith('.pdf')" [href]="message.fileURL" target="_blank">PDF
+                            anzeigen</a>
+
+                        <!-- Optional: Vorschau für andere Dateitypen -->
+                        <span *ngIf="!message.fileURL?.endsWith('.pdf') && message.fileURL" class="file-link">
+                            <a [href]="message.fileURL" target="_blank">Datei herunterladen</a>
+
+                        </span>
                         <div class="show-reactions">
                             <div class="reaction-icon-button">
                                 <div class="reaction-name-popup">
@@ -95,16 +121,35 @@
     </div>
     <div class="chat-message-input-container">
         <textarea class="message-input" id="chatMessage" [(ngModel)]="chatMessage" type="text"
-            placeholder="Schreiben Sie Ihre Nachricht">
-                        </textarea>
+            placeholder="Schreiben Sie Ihre Nachricht"></textarea>
+
+        <!-- Datei-Vorschau -->
+
+
+
         <div class="message-icon-container">
             <div class="left-icon-container">
-                <div class="message-icon"><mat-icon fontIcon="add"></mat-icon></div>
+                <input type="file" id="fileInput" (change)="onFileSelected($event)" hidden />
+                <div class="message-icon" (click)="triggerFileInput()">
+                    <mat-icon fontIcon="add"></mat-icon>
+                </div>
                 <div class="separator"></div>
                 <div (click)="showEmoji()" class="message-icon"><mat-icon fontIcon="sentiment_satisfied"></mat-icon>
                 </div>
                 <div class="message-icon"><mat-icon fontIcon="alternate_email"></mat-icon></div>
+
+                <div *ngIf="filePreviewUrl" class="file-preview">
+                    <img *ngIf="selectedFile && selectedFile.type.startsWith('image/')" [src]="filePreviewUrl"
+                        alt="Dateivorschau" />
+                    <a *ngIf="selectedFile && selectedFile.type === 'application/pdf'" [href]="filePreviewUrl"
+                        target="_blank">PDF
+                        anzeigen</a>
+                    <mat-icon class="delete-upload" fontIcon="close" (click)="deleteUpload()"></mat-icon>
+                </div>
+
             </div>
+
+
             <div class="right-icon-container">
                 <div (click)="sendMessage()" class="message-icon send"><mat-icon fontIcon="send"></mat-icon></div>
             </div>
