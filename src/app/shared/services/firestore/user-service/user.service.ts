@@ -50,6 +50,8 @@ export class UserService {
       email: user.email,
       name: user.name,
       avatarPath: user.avatarPath,
+      loginState: 'loggedOut', // Leerer loginState
+      channels: [],
     });
   }
 
