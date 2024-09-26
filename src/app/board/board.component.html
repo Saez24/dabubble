@@ -8,8 +8,8 @@
             <img src="../../assets/images/icons/search.png" alt="search icon">
         </div>
         <div class="profile-menu-container" (click)="toggleProfileMenu()">
-            <span>{{ this.authService.currentUser?.displayName }}</span>
-            <img src="{{ this.authService.currentUser?.photoURL }}" alt="Profil Icon">
+            <span>{{ currentUser?.name }}</span>
+            <img src="{{ currentUser?.avatarPath }}" alt="Profil Icon">
             <mat-icon>keyboard_arrow_down</mat-icon>
             <div class="overlay" *ngIf="showOverlay" (click)="closeAllDialogs()">
                 <div class="profile-menu" (click)="stopPropagation($event)">
