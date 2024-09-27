@@ -55,32 +55,9 @@ export class ThreadComponent implements OnInit, OnChanges {
     }
   }
 
-  async getCurrentUser() {
-    const currentUser = this.authService.currentUser;
-    console.log('Aktueller Benutzer:', currentUser);
+  getCurrentUser() {
+    this.authService.currentUser();
 
-    if (currentUser && currentUser.id != null && currentUser.id != undefined) {
-      this.currentUserUid = currentUser.id; // Speichere die aktuelle Benutzer-ID
-
-      // Benutzerdaten von Firestore abrufen
-      const userDoc = await this.userService.getUserById(currentUser.id);
-
-      // Überprüfe, ob userDoc existiert und einen avatarPath hat
-      if (userDoc) {
-        this.senderAvatar = userDoc.avatarPath || './assets/images/avatars/default-avatar.svg'; // Standard-Avatar, wenn avatarPath nicht vorhanden ist
-        this.senderName = userDoc.name; // Setze den Benutzernamen
-      } else {
-        console.warn('Benutzerdaten nicht gefunden für UID:', currentUser.id);
-        this.senderAvatar = './assets/images/avatars/default-avatar.svg'; // Setze einen Standard-Avatar
-      }
-
-      console.log('User logged in: ', this.currentUserUid);
-      console.log('Sender Avatar: ', this.senderAvatar);
-      console.log(this.senderName);
-
-    } else {
-      console.log('Kein Benutzer angemeldet');
-    }
   }
 
   loadUserData(uid: string) {

@@ -6,6 +6,7 @@ import { UserService } from '../../firestore/user-service/user.service';
 import { Auth, user, User as AuthUser } from '@angular/fire/auth';
 import { User } from '../../../models/user.class';
 import { Subscription } from 'rxjs';
+import { doc, Firestore, onSnapshot } from '@angular/fire/firestore';
 
 
 @Injectable({
@@ -20,13 +21,52 @@ export class AuthService {
   private userSignal = signal<User | null | undefined>(undefined);
   private authSubscription: Subscription | null = null;
   errorCode: string | null = null
+  currentUserUid: string | null = null;
+  currentUser = this.getUserSignal(); // Change to hold an instance of the User class
 
-  currentUser: User | null = null; // Change to hold an instance of the User class
-
-  constructor() {
+  constructor(private firestore: Firestore) {
     this.initializeAuthState();
   }
 
+  getCurrentUser() {
+    const userId = this.currentUser()?.id;
+    console.log('Current User Id: ', userId);
+    console.log('Current User Avatar: ', this.currentUser()?.avatarPath);
+    if (userId) {
+      this.currentUserUid = userId;  // Speichere die aktuelle Benutzer-ID
+      this.loadUserData(this.currentUserUid);
+    } else {
+      console.log('Kein Benutzer angemeldet');
+    }
+  }
+
+  loadUserData(uid: string | null) {
+    if (!uid) {
+      console.log('Keine Benutzer-ID gefunden');
+      return;
+    }
+
+    const userDocRef = doc(this.firestore, `users/${uid}`);
+    onSnapshot(userDocRef, (doc) => {
+      if (doc.exists()) {
+        const data = doc.data() as {
+          name: string;
+          avatarPath: string;
+        };
+
+        // Update currentUser with Firestore data
+        // this.currentUser = new User({
+        //   id: uid,
+        //   name: data.name,
+        //   avatarPath: data.avatarPath,
+        //   loginState: 'loggedIn', // Assuming the user is logged in
+        //   channels: [] // Load channels if necessary
+        // });
+      } else {
+        console.log('Kein Benutzerdokument gefunden');
+      }
+    });
+  }
 
   getUserSignal() {
     return this.userSignal;

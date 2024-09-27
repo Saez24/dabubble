@@ -45,7 +45,7 @@ export class ChatWindowComponent implements OnInit {
   currentUserUid: string | null = null;
   editingMessageId: string | null = null;
   channelId: string | null = null;
-  selectedChannelId: string | null = null;
+  selectedChannelId: string | null = 'hJHD4P2xWfH9J45vaZPS';
   senderAvatar: string | null = null;
   senderName: string | null = null;
   selectedFile: File | null = null;// Service für den Datei-Upload
@@ -53,12 +53,18 @@ export class ChatWindowComponent implements OnInit {
 
 
   @ViewChild('chatWindow') private chatWindow!: ElementRef;
-  constructor(private firestore: Firestore, private auth: Auth, private userService: UserService, private cd: ChangeDetectorRef, private authService: AuthService, private uploadFileService: UploadFileService) { }
+  constructor(private firestore: Firestore, private auth: Auth,
+    private userService: UserService, private cd: ChangeDetectorRef,
+    private authService: AuthService, private uploadFileService: UploadFileService) { }
 
   ngOnInit() {
     this.getCurrentUser();
     this.loadChannels();
-    this.loadMessages();
+
+    // Überprüfe, ob selectedChannelId bereits gesetzt ist
+    if (this.selectedChannelId) {
+      this.loadMessages(this.selectedChannelId);
+    }
   }
 
   // ngAfterViewChecked() {
@@ -89,43 +95,13 @@ export class ChatWindowComponent implements OnInit {
   // }
 
   getCurrentUser() {
-    const userId = this.currentUser()?.id;
-    console.log('Current User Id: ', userId);
-    console.log('Current User Avatar: ', this.currentUser()?.avatarPath);
-    if (userId) {
-      this.currentUserUid = userId;  // Speichere die aktuelle Benutzer-ID
-      this.loadUserData(this.currentUserUid);
-    } else {
-      console.log('Kein Benutzer angemeldet');
-    }
+    this.authService.getCurrentUser();
+    console.log(this.currentUser());
+
   }
 
   loadUserData(uid: string | null) {
-    if (!uid) {
-      console.log('Keine Benutzer-ID gefunden');
-      return;
-    }
-
-    const userDocRef = doc(this.firestore, `users/${uid}`);
-    onSnapshot(userDocRef, (doc) => {
-      if (doc.exists()) {
-        const data = doc.data() as {
-          name: string;
-          avatarPath: string;
-        };
-
-        // Update currentUser with Firestore data
-        // this.currentUser = new User({
-        //   id: uid,
-        //   name: data.name,
-        //   avatarPath: data.avatarPath,
-        //   loginState: 'loggedIn', // Assuming the user is logged in
-        //   channels: [] // Load channels if necessary
-        // });
-      } else {
-        console.log('Kein Benutzerdokument gefunden');
-      }
-    });
+    this.authService.loadUserData(uid);
   }
 
   async loadChannels() {
@@ -135,6 +111,8 @@ export class ChatWindowComponent implements OnInit {
     onSnapshot(channelsQuery, (snapshot) => {
       this.channels = snapshot.docs.map(doc => {
         const channelData = doc.data() as Channel;
+        console.log(channelData);
+
         return { ...channelData, id: doc.id }; // ID nach channelData hinzufügen
       });
     });
@@ -221,11 +199,11 @@ export class ChatWindowComponent implements OnInit {
     if (this.chatMessage.trim() || this.selectedFile) {
       const currentUser = this.authService.currentUser;
 
-      if (currentUser) {
+      if (currentUser()) {
         const messagesRef = collection(this.firestore, 'messages');
 
         const newMessage: Message = new Message({
-          senderID: currentUser.id,
+          senderID: this.currentUserUid,
           senderName: this.senderName,
           message: this.chatMessage,
           channelId: this.selectedChannelId, // Verwende die gespeicherte channelId
@@ -244,9 +222,9 @@ export class ChatWindowComponent implements OnInit {
           timestamp: new Date(),
         });
 
-        if (this.selectedFile && currentUser.id) {
+        if (this.selectedFile && this.currentUserUid) {
           try {
-            const fileURL = await this.uploadFileService.uploadFileWithIds(this.selectedFile, currentUser.id, messageDocRef.id); // Verwende die ID des neuen Dokuments
+            const fileURL = await this.uploadFileService.uploadFileWithIds(this.selectedFile, this.currentUserUid, messageDocRef.id); // Verwende die ID des neuen Dokuments
             newMessage.fileURL = fileURL; // Setze die Download-URL in der Nachricht
             await updateDoc(messageDocRef, { fileURL: newMessage.fileURL }); // Aktualisiere das Dokument mit der Datei-URL
           } catch (error) {
@@ -256,7 +234,7 @@ export class ChatWindowComponent implements OnInit {
 
         this.chatMessage = ''; // Eingabefeld leeren
         this.selectedFile = null; // Reset selectedFile
-        this.loadMessages();
+        this.loadMessages(this.selectedChannelId); // Übergebe die channelId
         this.scrollToBottom();
         this.deleteUpload();
       } else {
@@ -265,7 +243,8 @@ export class ChatWindowComponent implements OnInit {
     }
   }
 
-  async loadMessages() {
+
+  async loadMessages(selectedChannelId: string) {
     const messagesRef = collection(this.firestore, 'messages');
     const messagesQuery = query(messagesRef, orderBy('timestamp'));
 

@@ -5,6 +5,8 @@ import { UserService } from '../firestore/user-service/user.service';
 import { Message } from '../../models/message.class';
 import { PickerComponent } from '@ctrl/ngx-emoji-mart';
 import { BehaviorSubject } from 'rxjs';
+import { UploadFileService } from '../firestore/storage-service/upload-file.service';
+import { AuthService } from '../authentication/auth-service/auth.service';
 // Importiere deinen UserService
 
 @Injectable({
@@ -20,9 +22,21 @@ export class MessagesService {
     private showEmojiPicker: boolean = false;
     private messages: Message[] = [];
     private currentUserUid: string | null = null; // Setze den aktuellen Benutzer-UID
+
+
+
+    messageArea = true;
+    editedMessage = '';
+
+    channelId: string | null = null;
+    selectedChannelId: string | null = 'hJHD4P2xWfH9J45vaZPS';
+    senderAvatar: string | null = null;
+    senderName: string | null = null;
+    selectedFile: File | null = null;// Service für den Datei-Upload
+    filePreviewUrl: string | null = null;
     @Output() showThreadEvent = new EventEmitter<void>();
 
-    constructor(private firestore: Firestore, private auth: Auth, private userService: UserService) { }
+    constructor(private firestore: Firestore, private auth: Auth, private userService: UserService, private uploadFileService: UploadFileService, private authService: AuthService) { }
 
 
     toggleEmojiPicker() {
@@ -71,103 +85,89 @@ export class MessagesService {
         this.showThreadEvent.emit();
     }
 
-    async saveMessage(message: Message) {
-        if (message.messageId) {
-            const messageRef = doc(this.firestore, `messages/${message.messageId}`);
-            try {
-                await updateDoc(messageRef, { message: message.message });
-                this.editingMessageId = null;
-                this.showMessageEditArea = false;
-            } catch (error) {
-                console.error("Fehler beim Speichern der Nachricht: ", error);
-            }
-        }
-    }
+    // async saveMessage(message: Message) {
+    //     if (message.messageId) {
+    //         const messageRef = doc(this.firestore, `messages/${message.messageId}`);
+    //         try {
+    //             await updateDoc(messageRef, { message: message.message });
+    //             this.editingMessageId = null;
+    //             this.showMessageEditArea = false;
+    //         } catch (error) {
+    //             console.error("Fehler beim Speichern der Nachricht: ", error);
+    //         }
+    //     }
+    // }
 
-    async sendMessage() {
-        if (this.chatMessage.trim()) {
-            const currentUser = this.auth.currentUser;
+    // showError() {
+    //     console.error("Kein Kanal ausgewählt.");
+    // }
 
-            if (currentUser) {
-                const messagesRef = collection(this.firestore, 'messages');
-                const newMessageRef = doc(messagesRef);
+    // async sendMessage() {
+    //     if (!this.selectedChannelId) {
+    //         this.showError(); // Fehler, wenn kein Kanal ausgewählt ist
+    //         return;
+    //     }
 
-                const newMessage: Message = new Message({
-                    messageId: newMessageRef.id,
-                    senderID: currentUser.uid,
-                    senderName: currentUser.displayName,
-                    message: this.chatMessage,
-                    reaction: '',
-                    answers: [],
-                });
+    //     if (this.chatMessage.trim() || this.selectedFile) {
+    //         const currentUser = this.authService.currentUser;
 
-                await addDoc(messagesRef, {
-                    messageId: newMessage.messageId,
-                    senderID: newMessage.senderID,
-                    senderName: newMessage.senderName,
-                    message: newMessage.message,
-                    reaction: newMessage.reaction,
-                    answers: newMessage.answers,
-                    timestamp: new Date(),
-                });
+    //         if (currentUser()) {
+    //             const messagesRef = collection(this.firestore, 'messages');
 
-                console.log("Nachricht gesendet, lade Nachrichten neu.");
-                this.chatMessage = ''; // Leere das Eingabefeld
-            } else {
-                console.error('Kein Benutzer angemeldet');
-            }
-        }
-    }
+    //             const newMessage: Message = new Message({
+    //                 senderID: this.currentUserUid,
+    //                 senderName: this.senderName,
+    //                 message: this.chatMessage,
+    //                 channelId: this.selectedChannelId, // Verwende die gespeicherte channelId
+    //                 reaction: '',
+    //                 answers: [],
+    //                 fileURL: '',
+    //             });
 
-    async loadMessages(p0: (messages: any) => void) {
-        const messagesRef = collection(this.firestore, 'messages');
-        const messagesQuery = query(messagesRef, orderBy('timestamp'));
+    //             const messageDocRef = await addDoc(messagesRef, {
+    //                 senderID: newMessage.senderID,
+    //                 senderName: newMessage.senderName,
+    //                 message: newMessage.message,
+    //                 channelId: newMessage.channelId,
+    //                 reaction: newMessage.reaction,
+    //                 answers: newMessage.answers,
+    //                 timestamp: new Date(),
+    //             });
 
-        onSnapshot(messagesQuery, async (snapshot) => {
-            let lastDisplayedDate: string | null = null;
+    //             if (this.selectedFile && this.currentUserUid) {
+    //                 try {
+    //                     const fileURL = await this.uploadFileService.uploadFileWithIds(this.selectedFile, this.currentUserUid, messageDocRef.id); // Verwende die ID des neuen Dokuments
+    //                     newMessage.fileURL = fileURL; // Setze die Download-URL in der Nachricht
+    //                     await updateDoc(messageDocRef, { fileURL: newMessage.fileURL }); // Aktualisiere das Dokument mit der Datei-URL
+    //                 } catch (error) {
+    //                     console.error('Datei-Upload fehlgeschlagen:', error);
+    //                 }
+    //             }
 
-            const messages = await Promise.all(snapshot.docs.map(async (doc) => {
-                const messageData = doc.data();
-                const message = new Message(messageData, this.currentUserUid);
 
-                if (message.senderID) {
-                    const senderUser = await this.userService.getUserById(message.senderID);
-                    message.senderAvatar = senderUser?.avatarPath || './assets/images/avatars/avatar5.svg';
-                } else {
-                    message.senderAvatar = './assets/images/avatars/avatar5.svg';
-                }
+    //         } else {
+    //             console.error('Kein Benutzer angemeldet');
+    //         }
+    //     }
+    // }
 
-                const messageTimestamp = messageData['timestamp'];
-                const messageDate = new Date(messageTimestamp.seconds * 1000);
-                const formattedDate = this.formatTimestamp(messageDate);
 
-                if (formattedDate !== lastDisplayedDate) {
-                    message.displayDate = formattedDate;
-                    lastDisplayedDate = formattedDate;
-                } else {
-                    message.displayDate = null;
-                }
 
-                message.formattedTimestamp = messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    // formatTimestamp(messageDate: Date): string {
+    //     const today = new Date();
+    //     const yesterday = new Date();
+    //     yesterday.setDate(today.getDate() - 1);
 
-                return message;
-            }));
-        });
-    }
+    //     if (messageDate.toDateString() === today.toDateString()) {
+    //         return 'Heute';
+    //     } else if (messageDate.toDateString() === yesterday.toDateString()) {
+    //         return 'Gestern';
+    //     } else {
+    //         return messageDate.toLocaleDateString('de-DE', { day: 'numeric', month: 'long' });
+    //     }
+    // }
 
-    formatTimestamp(messageDate: Date): string {
-        const today = new Date();
-        const yesterday = new Date();
-        yesterday.setDate(today.getDate() - 1);
 
-        if (messageDate.toDateString() === today.toDateString()) {
-            return 'Heute';
-        } else if (messageDate.toDateString() === yesterday.toDateString()) {
-            return 'Gestern';
-        } else {
-            return messageDate.toLocaleDateString('de-DE', { day: 'numeric', month: 'long' });
-        }
-    }
 }
 
 
