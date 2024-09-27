@@ -248,9 +248,16 @@ export class ThreadComponent implements OnInit, OnChanges {
   @HostListener('document:click', ['$event'])
   clickOutside(event: Event) {
     const target = event.target as HTMLElement;
+    console.log('Clicked element:', target);
 
-    if (this.showEmojiPicker && !target.closest('emoji-mart') && !target.closest('.thread-message-icon')) {
-      this.showEmojiPicker = false;
+    if (this.showEmojiPicker) {
+      if (!target.closest('.emoji-box') && !target.closest('.message-icon')) {
+        console.log('Closing emoji picker');
+        this.showEmojiPicker = false;
+      } else {
+        console.log('Clicked inside emoji box or icon');
+      }
     }
   }
+
 }
