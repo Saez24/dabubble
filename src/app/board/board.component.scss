@@ -75,15 +75,33 @@ header {
         line-height: 43.65px;
     }
 
+    &:hover {
+        cursor: pointer;
+        color: #535AF1;
+    }
+}
+
+.avatar-container {
+    display: flex;
+    align-items: center;
+    justify-items: center;
+    position: relative;
+
+
     >img {
         width: 70px;
         height: 70px;
         border-radius: 50%;
     }
 
-    &:hover {
-        cursor: pointer;
-        color: #535AF1;
+    >.state-icon {
+        right: 0;
+        bottom: 0;
+        position: absolute;
+        width: 16px;
+        height: 16px;
+        padding: 2px;
+        background-color: #eceefe;
     }
 }
 
@@ -139,7 +157,7 @@ header {
 }
 
 .profil-details {
-padding: 45px 40px;
+    padding: 45px 40px;
 }
 
 .logo-container {

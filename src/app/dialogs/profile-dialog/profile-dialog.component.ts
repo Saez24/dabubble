@@ -31,4 +31,11 @@ export class ProfileDialogComponent {
   closeUserProfile() {
     this.userService.showProfile.set(false);
   }
+
+
+  openUserEditor(event: Event) {
+    event.stopPropagation();
+    this.userService.showProfile.set(false);
+    this.userService.showProfileEditor.set(true);
+  }
 }

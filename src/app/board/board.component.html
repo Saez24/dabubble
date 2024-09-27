@@ -9,7 +9,14 @@
         </div>
         <div class="profile-menu-container" (click)="toggleProfileMenu()">
             <span>{{ currentUser()?.name }}</span>
-            <img src="{{ currentUser()?.avatarPath }}" alt="Profil Icon">
+            <div class="avatar-container">
+                <img src="{{ currentUser()?.avatarPath }}" alt="Profil Icon">
+                @if (currentUser()?.loginState == 'inactive') {
+                <img src="../../assets/images/icons/inactive.png" alt="" class="state-icon">
+                } @else {
+                <img src="../../assets/images/icons/online.png" alt="" class="state-icon">
+                }
+            </div>
             <mat-icon>keyboard_arrow_down</mat-icon>
             <div class="overlay" *ngIf="showOverlay" (click)="closeAllDialogs()">
                 <div class="profile-menu" (click)="stopPropagation($event)">
@@ -18,6 +25,7 @@
                         <div class="profil-menu-links" (click)="authService.logout()">Log Out</div>
                     </div>
                     <app-profile-dialog class="profil-details" [currentUser]="this.currentUser" *ngIf="this.userService.showProfile()"></app-profile-dialog>
+                    <app-profile-editor-dialog class="profil-editor" [currentUser]="this.currentUser" *ngIf="this.userService.showProfileEditor()"></app-profile-editor-dialog>
                 </div>
             </div>
         </div>

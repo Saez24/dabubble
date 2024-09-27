@@ -5,7 +5,7 @@ export class User {
     email: string | null;
     name: string;
     avatarPath: string | null;
-    loginState: loginState | null;
+    loginState: loginState;
     channels: string[] = [];
 
     constructor(obj?: any) {

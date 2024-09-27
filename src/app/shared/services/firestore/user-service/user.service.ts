@@ -13,7 +13,8 @@ export class UserService {
   public user: User = new User();
   public user$!: Observable<User[]>;
   private subscription!: Subscription;
-  showProfile = signal<boolean>(false); /* Bearbeiten!!! */
+  showProfile = signal<boolean>(false);
+  showProfileEditor = signal<boolean>(false);
 
   constructor(private firestore: Firestore) { }
 

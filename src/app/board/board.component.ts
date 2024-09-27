@@ -20,6 +20,7 @@ import { Message } from '../shared/models/message.class';
 import { Auth } from '@angular/fire/auth';
 import { User } from '../shared/models/user.class';
 import { AddPeopleDialog } from "../dialogs/create-new-channel-dialog/add-people-dialog/add-people-dialog.component";
+import { ProfileEditorDialogComponent } from "../dialogs/profile-editor-dialog/profile-editor-dialog.component";
 
 @Component({
   selector: 'app-board',
@@ -42,8 +43,9 @@ import { AddPeopleDialog } from "../dialogs/create-new-channel-dialog/add-people
     MatFormFieldModule,
     MatMenuModule,
     ProfileDialogComponent,
-    AddPeopleDialog
-  ],
+    AddPeopleDialog,
+    ProfileEditorDialogComponent
+],
   templateUrl: './board.component.html',
   styleUrls: ['./board.component.scss', '../../styles.scss'],
   encapsulation: ViewEncapsulation.None
@@ -75,6 +77,7 @@ export class BoardComponent {
     const userId = this.currentUser()?.id;
     console.log('Current User Id: ', userId);
     console.log('Current User Avatar: ', this.currentUser()?.avatarPath);
+    console.log('Current User Login state: ', this.currentUser()?.loginState);
     if (userId) {
       this.currentUserUid = userId;  // Speichere die aktuelle Benutzer-ID
       this.loadUserData(this.currentUserUid);
@@ -130,8 +133,6 @@ export class BoardComponent {
 
   toggleProfileMenu() {
     this.showOverlay = !this.showOverlay;
-    console.log(this.userService.showProfile());
-
   }
 
 

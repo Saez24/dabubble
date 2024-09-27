@@ -6,24 +6,22 @@
     <img src="{{ currentUser()?.avatarPath }}" alt="" class="avatar-img">
     <div class="name-container">
             <h2>{{ currentUser()?.name }}</h2>
-            <span>Bearbeiten</span>
+            <span (click)="openUserEditor($event)">Bearbeiten</span>
     </div>
     <div class="status-container">
-        <!-- @if (currentUser()?.loginState == 'loggedIn') {
+        @if (currentUser()?.loginState == 'loggedIn') {
             <span class="status">
-                <img src="/img/status_online.png" alt="" class="state-icon"> Online
+                <img src="../../assets/images/icons/online.png" alt="" class="state-icon"> Online
             </span>
-            } @else if (currentUser()?.loginState == 'idle') {
+            } @else if (currentUser()?.loginState == 'inactive') {
             <span class="status">
-                <img src="/icons/user_idle.png" alt="" class="state-icon"> Abwesend
+                <img src="../../assets/images/icons/inactive.png" alt="" class="state-icon"> Abwesend
             </span>
             } @else if (currentUser()?.loginState == 'loggedOut') {
             <span class="status">
-                <img src="/icons/user_offline.png" alt="" class="state-icon"> Offline
+                <img src="../../assets/images/icons/offline.png" alt="" class="state-icon"> Offline
             </span>
-            } -->
-            <img src="../../../assets/images/icons/Online.png" alt="" class="state-icon">
-            <span>Aktive</span>
+            }
     </div>
     <div class="email-container">
         <img src="../../../assets/images/icons/mail.png" alt="">
