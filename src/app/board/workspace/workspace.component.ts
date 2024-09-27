@@ -43,47 +43,28 @@ export class WorkspaceComponent {
   constructor(
     public dialog: MatDialog,
     private iconsService: IconsService,
-    private channelsService: ChannelsService,
+    public channelsService: ChannelsService,
     private firestore: Firestore,
     private auth: Auth
   ) { }
 
   ngOnInit() {
     this.loadData();
+    this.fillArraysWithBoolean();
   }
 
   loadData() {
-    this.auth.onAuthStateChanged((user) => {
+    this.auth.onAuthStateChanged(async (user) => {
       if (user) {
         this.currentUserUid = user.uid;
         this.loadUsers();
-        this.loadChannels(this.currentUserUid);
+        this.channelsService.loadChannels(this.currentUserUid);
       } else {
         console.log('Kein Benutzer angemeldet');
       }
     });
   }
 
-  async loadChannels(currentUserUid: string) {
-    let channelsRef = collection(this.firestore, 'channels');
-    let channelsQuery = query(channelsRef, orderBy('name'));
-
-    onSnapshot(channelsQuery, async (snapshot) => {
-      this.channels = await Promise.all(snapshot.docs.map(async (doc) => {
-        let channelData = doc.data() as Channel;
-        return { ...channelData, id: doc.id };
-      }));
-
-      if (currentUserUid) {
-        let userChannels = this.channels.filter(channel => {
-          return channel.members && channel.members.includes(currentUserUid);
-        });
-        this.currentUserChannels = userChannels;
-      } else {
-        this.currentUserChannels = [];
-      }
-    });
-  }
 
   async loadUsers() {
     let usersRef = collection(this.firestore, 'users');
@@ -94,8 +75,11 @@ export class WorkspaceComponent {
         let userData = doc.data() as User;
         return { ...userData, id: doc.id };
       }));
-      // console.log('Geladene User:', this.users);
     });
+  }
+
+  fillArraysWithBoolean() {
+    this.channelsService.initializeArrays(this.currentUserChannels.length, this.users.length);
   }
 
   // method to rotate arrow icon
@@ -104,27 +88,11 @@ export class WorkspaceComponent {
   }
 
   // method to change background color for channel or user container
-  clickContainer(i: number, type: 'channel' | 'user') {
-    if (type === 'channel') {
-      this.clickChannelContainer(i);
-    } else if (type === 'user') {
-      this.clickUserContainer(i)
-    }
+  clickContainer(name: string, i: number, type: 'channel' | 'user') {
+    this.channelsService.clickContainer(name, i, type);
   }
 
   // helper method to toggle the clickContainer method
-  clickChannelContainer(i: number) {
-    this.clickedChannels.fill(false);
-    this.clickedUsers.fill(false);
-    this.clickedChannels[i] = true;
-  }
-
-  // helper method to toggle the clickContainer method
-  clickUserContainer(i: number) {
-    this.clickedUsers.fill(false);
-    this.clickedChannels.fill(false);
-    this.clickedUsers[i] = true;
-  }
 
   openDialog() {
     this.dialog.open(CreateNewChannelDialog, {
@@ -153,14 +121,26 @@ export class WorkspaceComponent {
 // }
 
 
-// getCurrentUser() {
-//   const currentUser = this.auth.currentUser;
-//   if (currentUser) {
-//     this.currentUserUid = currentUser.uid;
-//   } else {
-//     console.log('Kein Benutzer angemeldet');
-//   }
-// }
+  // async loadChannels(currentUserUid: string) {
+  //   let channelsRef = collection(this.firestore, 'channels');
+  //   let channelsQuery = query(channelsRef, orderBy('name'));
+
+  //   onSnapshot(channelsQuery, async (snapshot) => {
+  //     this.channels = await Promise.all(snapshot.docs.map(async (doc) => {
+  //       let channelData = doc.data() as Channel;
+  //       return { ...channelData, id: doc.id };
+  //     }));
+
+  //     if (currentUserUid) {
+  //       let userChannels = this.channels.filter(channel => {
+  //         return channel.members && channel.members.includes(currentUserUid);
+  //       });
+  //       this.currentUserChannels = userChannels;
+  //     } else {
+  //       this.currentUserChannels = [];
+  //     }
+  //   });
+  // }
 
 
 

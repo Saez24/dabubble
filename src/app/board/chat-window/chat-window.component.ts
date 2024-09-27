@@ -17,6 +17,7 @@ import { UserService } from '../../shared/services/firestore/user-service/user.s
 import { AuthService } from '../../shared/services/authentication/auth-service/auth.service';
 import { UploadFileService } from '../../shared/services/firestore/storage-service/upload-file.service';
 import { SafeUrlPipe } from '../../shared/pipes/safe-url.pipe';
+import { ChannelsService } from '../../shared/services/channels/channels.service';
 
 
 
@@ -55,7 +56,7 @@ export class ChatWindowComponent implements OnInit {
   @ViewChild('chatWindow') private chatWindow!: ElementRef;
   constructor(private firestore: Firestore, private auth: Auth,
     private userService: UserService, private cd: ChangeDetectorRef,
-    private authService: AuthService, private uploadFileService: UploadFileService) { }
+    private authService: AuthService, private uploadFileService: UploadFileService, public channelsService: ChannelsService,) { }
 
   ngOnInit() {
     this.getCurrentUser();

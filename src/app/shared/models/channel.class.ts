@@ -1,6 +1,6 @@
 export class Channel {
     id: string;
-    name: string | null;
+    name: string;
     description: string | null;
     members: string[];
     newChannelName: any;

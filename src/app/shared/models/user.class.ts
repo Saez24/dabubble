@@ -3,7 +3,7 @@ type loginState = 'loggedIn' | 'loggedOut' | 'inactive';
 export class User {
     id: string;
     email: string | null;
-    name: string | null;
+    name: string;
     avatarPath: string | null;
     loginState: loginState | null;
     channels: string[] = [];

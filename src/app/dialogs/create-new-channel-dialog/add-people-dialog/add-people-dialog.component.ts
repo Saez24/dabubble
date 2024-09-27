@@ -187,7 +187,7 @@ export class AddPeopleDialog implements OnInit {
 
   selectUser(user: User): void {
     this.userSelected! = this.userSelected;
-    if (!this.selectedUsers.some(selectedUser => selectedUser.id === user.id)) {
+    if (!this.selectedUsers.find(selectedUser => selectedUser.id === user.id)) {
         this.selectedUsers.push(user);
         console.log('User added:', user);
     } else {
