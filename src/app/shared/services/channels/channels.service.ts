@@ -11,10 +11,10 @@ export class ChannelsService {
   clickedChannels: boolean[] = [];
   clickedUsers: boolean[] = [];
   channelName: string = '';
+  userName: string = '';
   public channels: Channel[] = [];
   public currentUserChannels: Channel[] = [];
-  userName: string = '';
-
+  
   constructor(private firestore: Firestore) { }
 
   loadChannels(currentUserId: string) {
@@ -29,7 +29,7 @@ export class ChannelsService {
   
       if (currentUserId) {
         let userChannels = this.channels.filter(channel => {
-          return channel.members && channel.members.includes(currentUserId);
+          return channel.memberUids && channel.memberUids.includes(currentUserId);
         });
         this.currentUserChannels = userChannels;
       } else {

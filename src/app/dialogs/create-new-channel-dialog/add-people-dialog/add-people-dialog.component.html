@@ -27,7 +27,6 @@
                         </div>
                     </div>
                     <input matInput required
-                        color="primary"
                         appearance="outline"
                         class="search-input"
                         type="search" 
@@ -37,8 +36,11 @@
                         placeholder="Suche nach Benutzern"
                         [ngModelOptions]="{standalone: true}"
                         #searchInput="ngModel">
-                        <mat-error *ngIf="searchInput.invalid && (searchInput.dirty || channelForm.submitted)">
+                        <!-- <mat-error *ngIf="searchInput.invalid && (searchInput.dirty || channelForm.submitted)">
                             Bitte gib einen Suchbegriff ein.
+                        </mat-error> -->
+                        <mat-error *ngIf="ownUserError">
+                            Du kannst deinen eigenen Benutzer nicht als Mitglied hinzufügen.
                         </mat-error>
                 </mat-form-field>
             </div>

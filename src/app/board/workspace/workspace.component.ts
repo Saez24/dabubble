@@ -97,7 +97,6 @@ export class WorkspaceComponent {
   }
 
   // helper method to toggle the clickContainer method
-
   openDialog() {
     this.dialog.open(CreateNewChannelDialog, {
       data: {

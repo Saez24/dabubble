@@ -2,7 +2,7 @@ export class Channel {
     id: string;
     name: string;
     description: string | null;
-    members: string[];
+    memberUids: string[];
     newChannelName: any;
     channelAuthor: string | null;
 
@@ -10,7 +10,7 @@ export class Channel {
         this.id = obj ? obj.id : null;
         this.name = obj ? obj.name : null;
         this.description = obj ? obj.description : null;
-        this.members = Array.isArray(obj?.members) ? obj.members : []; 
+        this.memberUids = Array.isArray(obj?.members) ? obj.members : []; 
         this.channelAuthor = obj ? obj.channelAuthor : null;
     }
 }

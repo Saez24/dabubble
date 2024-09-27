@@ -57,15 +57,13 @@ export class AddPeopleDialog implements OnInit {
   filteredUsers: User[] = [];
   userSelected: boolean = false;
   selectedUsers: User[] = [];
+  ownUserError: boolean = false;
 
   @Input()
   color: ThemePalette
   dialogRef: any;
   
-  
-
-  constructor(
-    // private channelsService: ChannelsService, 
+  constructor( 
     private firestore: Firestore,
     private auth: Auth,
     @Inject(MAT_DIALOG_DATA) public data: any,
@@ -106,53 +104,62 @@ export class AddPeopleDialog implements OnInit {
     let currentUser = this.auth.currentUser;
 
     if (currentUser) {
-      let channelsRef = collection(this.firestore, 'channels');
-      let usersRef = collection(this.firestore, 'users');
-      let userDocRef = doc(usersRef, currentUser.uid);
+        let memberUids = this.getMemberUids();
+        let newChannel = await this.createChannel(memberUids);
 
-      if (this.selectedValue == 'addAll') {
-
-        let memberUids = this.users.map(user => user.id);
-        let newChannel: Channel = new Channel({
-          name: this.newChannelName,
-          description: this.newChannelDescription,
-          members: memberUids,
-          channelAuthor: this.currentUserUid,
-        });
-
-        await addDoc(channelsRef, {
-          name: newChannel.name,
-          description: newChannel.description,
-          members: newChannel.members,
-          channelAuthorId: newChannel.channelAuthor,
-        });
-
-        await updateDoc(userDocRef, {
-          channels: arrayUnion(newChannel.name)
-        });
-      } else if (this.selectedValue == 'specific') {
-
-        let memberUids = this.selectedUsers.map(selectedUser => selectedUser.id);
-        let newChannel: Channel = new Channel({
-          name: this.newChannelName,
-          description: this.newChannelDescription,
-          members: memberUids,
-          channelAuthor: this.currentUserUid,
-        });
-
-        await addDoc(channelsRef, {
-          name: newChannel.name,
-          description: newChannel.description,
-          members: newChannel.members,
-          channelAuthorId: newChannel.channelAuthor,
-        });
-
-        await updateDoc(userDocRef, {
-          channels: arrayUnion(newChannel.name)
-        });
-      }
+        if (newChannel) {
+            await this.updateUserChannels(currentUser.uid, newChannel.name);
+        }
     }
+}
+
+async createChannel(memberUids: string[]): Promise<Channel | null> {
+    let channelsRef = collection(this.firestore, 'channels');
+    let newChannel: Channel = new Channel({
+        name: this.newChannelName,
+        description: this.newChannelDescription,
+        members: memberUids,
+        channelAuthor: this.currentUserUid,
+    });
+
+    await addDoc(channelsRef, {
+        name: newChannel.name,
+        description: newChannel.description,
+        memberUids: newChannel.memberUids,
+        channelAuthorId: newChannel.channelAuthor,
+    });
+
+    return newChannel;
+}
+
+async updateUserChannels(userId: string, channelName: string) {
+    let usersRef = collection(this.firestore, 'users');
+    let userDocRef = doc(usersRef, userId);
+
+    await updateDoc(userDocRef, {
+        channels: arrayUnion(channelName),
+    });
+}
+
+// Only the id of the users is pushed to the firestore
+getMemberUids(): string[] {
+  let memberUids: string[];
+
+  if (this.selectedValue === 'addAll') {
+      memberUids = this.users.map(user => user.id);
+  } else if (this.selectedValue === 'specific') {
+      memberUids = this.selectedUsers.map(selectedUser => selectedUser.id);
+      // channelAuthor must be pushed into channel as well
+      if (this.currentUserUid) {                     
+        memberUids.push(this.currentUserUid);
+    }
+  } else {
+      memberUids = [];
   }
+
+  return memberUids;
+}
+
 
   filterUsers() {
     if (!this.searchTerm) {
@@ -185,17 +192,24 @@ export class AddPeopleDialog implements OnInit {
   }
 }
 
-  selectUser(user: User): void {
-    this.userSelected! = this.userSelected;
-    if (!this.selectedUsers.find(selectedUser => selectedUser.id === user.id)) {
-        this.selectedUsers.push(user);
-        console.log('User added:', user);
-    } else {
-        console.log('User is already selected:', user);
-    }
-    this.userSelected = !this.userSelected;
-    this.searchTerm = '';
+selectUser(user: User): void {
+  this.userSelected! = this.userSelected;
+
+  if (this.currentUserUid === user.id) {
+      this.ownUserError = true; 
+  } else {
+      if (!this.selectedUsers.find(selectedUser => selectedUser.id === user.id)) {
+          this.selectedUsers.push(user);
+          this.ownUserError = false; 
+      } else {
+          this.ownUserError = false;
+      }
+  }
+
+  this.searchTerm = '';
 }
+
+
 
   onSelectionChange(event: any) {
     this.selectedValue = event.value;
