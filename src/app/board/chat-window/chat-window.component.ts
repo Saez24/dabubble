@@ -1,4 +1,4 @@
-import { AfterViewChecked, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
+import { AfterViewChecked, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, inject, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -35,6 +35,7 @@ export class ChatWindowComponent implements OnInit {
   messages: Message[] = [];
   users: User[] = [];
   channels: Channel[] = [];
+  currentUser = this.authService.getUserSignal();
   showEmojiPicker = false;
   showMessageEdit = false;
   showMessageEditArea = false;
@@ -64,29 +65,68 @@ export class ChatWindowComponent implements OnInit {
   //   this.scrollToBottom(); // Stelle sicher, dass das Chat-Fenster nach jeder View-Änderung nach unten scrollt
   // }
 
-  async getCurrentUser() {
-    const currentUser = this.authService.currentUser;
+  // async getCurrentUser() {
+  //   const currentUser = this.authService.currentUser;
 
-    if (currentUser && currentUser.id != null && currentUser.id != undefined) {
-      this.currentUserUid = currentUser.id; // Speichere die aktuelle Benutzer-ID
+  //   if (currentUser && currentUser.id != null && currentUser.id != undefined) {
+  //     this.currentUserUid = currentUser.id; // Speichere die aktuelle Benutzer-ID
 
-      // Benutzerdaten von Firestore abrufen
-      const userDoc = await this.userService.getUserById(currentUser.id);
+  //     // Benutzerdaten von Firestore abrufen
+  //     const userDoc = await this.userService.getUserById(currentUser.id);
 
-      // Überprüfe, ob userDoc existiert und einen avatarPath hat
-      if (userDoc) {
-        this.senderAvatar = userDoc.avatarPath || './assets/images/avatars/default-avatar.svg'; // Standard-Avatar, wenn avatarPath nicht vorhanden ist
-        this.senderName = userDoc.name; // Setze den Benutzernamen
-      } else {
-        console.warn('Benutzerdaten nicht gefunden für UID:', currentUser.id);
-        this.senderAvatar = './assets/images/avatars/default-avatar.svg'; // Setze einen Standard-Avatar
-      }
+  //     // Überprüfe, ob userDoc existiert und einen avatarPath hat
+  //     if (userDoc) {
+  //       this.senderAvatar = userDoc.avatarPath || './assets/images/avatars/default-avatar.svg'; // Standard-Avatar, wenn avatarPath nicht vorhanden ist
+  //       this.senderName = userDoc.name; // Setze den Benutzernamen
+  //     } else {
+  //       console.warn('Benutzerdaten nicht gefunden für UID:', currentUser.id);
+  //       this.senderAvatar = './assets/images/avatars/default-avatar.svg'; // Setze einen Standard-Avatar
+  //     }
 
+  //   } else {
+  //     console.log('Kein Benutzer angemeldet');
+  //   }
+  // }
+
+  getCurrentUser() {
+    const userId = this.currentUser()?.id;
+    console.log('Current User Id: ', userId);
+    console.log('Current User Avatar: ', this.currentUser()?.avatarPath);
+    if (userId) {
+      this.currentUserUid = userId;  // Speichere die aktuelle Benutzer-ID
+      this.loadUserData(this.currentUserUid);
     } else {
       console.log('Kein Benutzer angemeldet');
     }
   }
 
+  loadUserData(uid: string | null) {
+    if (!uid) {
+      console.log('Keine Benutzer-ID gefunden');
+      return;
+    }
+
+    const userDocRef = doc(this.firestore, `users/${uid}`);
+    onSnapshot(userDocRef, (doc) => {
+      if (doc.exists()) {
+        const data = doc.data() as {
+          name: string;
+          avatarPath: string;
+        };
+
+        // Update currentUser with Firestore data
+        // this.currentUser = new User({
+        //   id: uid,
+        //   name: data.name,
+        //   avatarPath: data.avatarPath,
+        //   loginState: 'loggedIn', // Assuming the user is logged in
+        //   channels: [] // Load channels if necessary
+        // });
+      } else {
+        console.log('Kein Benutzerdokument gefunden');
+      }
+    });
+  }
 
   async loadChannels() {
     const channelsRef = collection(this.firestore, 'channels');

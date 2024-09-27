@@ -4,7 +4,7 @@ export class Message {
         throw new Error('Method not implemented.');
     }
     messageId: string;
-    channelId: string;
+    channelId: string | null;
     senderID: string | null;
     senderName: string | null;
     message: string | null;
