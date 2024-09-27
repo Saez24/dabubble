@@ -34,7 +34,7 @@
                         </mat-expansion-panel-header>
                         <div class="panel-container-open">
                             <div *ngFor="let channel of channelsService.currentUserChannels; let i = index"
-                                (click)="clickContainer(channel.name, i, 'channel')" [ngClass]="channelsService.clickedChannels[i] ? 'clicked' : ''">
+                                (click)="clickChannelContainer(channel, i)" [ngClass]="channelsService.clickedChannels[i] ? 'clicked' : ''">
                                 <mat-icon [ngClass]="channelsService.clickedChannels[i] ? 'hashtag-black' : ''" class="icon"
                                     svgIcon="hashtag" aria-hidden="false" aria-label="Hashtag icon"></mat-icon>
                                 <span>{{channel.name }}</span>
@@ -64,7 +64,7 @@
                             </a>
                         </mat-expansion-panel-header>
                         <div class="chat-container-open">
-                            <div *ngFor="let user of users; let i = index" (click)="clickContainer(user.name, i, 'user')"
+                            <div *ngFor="let user of users; let i = index" (click)="clickUserContainer(user, i)"
                                 [ngClass]="channelsService.clickedUsers[i] ? 'clicked' : ''">
                                 <div>
                                     <img [src]="user.avatarPath" alt="Avatar Image">

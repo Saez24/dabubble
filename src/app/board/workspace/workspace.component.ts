@@ -88,8 +88,12 @@ export class WorkspaceComponent {
   }
 
   // method to change background color for channel or user container
-  clickContainer(name: string, i: number, type: 'channel' | 'user') {
-    this.channelsService.clickContainer(name, i, type);
+  clickChannelContainer(channel: Channel, i: number) {
+    this.channelsService.clickChannelContainer(channel, i);
+  }
+
+  clickUserContainer(user: User, i: number) {
+    this.channelsService.clickUserContainer(user, i);
   }
 
   // helper method to toggle the clickContainer method

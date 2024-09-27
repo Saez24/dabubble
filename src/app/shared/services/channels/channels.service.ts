@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Firestore, doc, onSnapshot, collection, query, orderBy } from '@angular/fire/firestore';
-import { Auth, User } from '@angular/fire/auth';
 import { Channel } from '../../models/channel.class';
+import { User } from '../../models/user.class';
 
 @Injectable({
   providedIn: 'root',
@@ -10,11 +10,12 @@ export class ChannelsService {
   
   clickedChannels: boolean[] = [];
   clickedUsers: boolean[] = [];
-  name: string | null = null;
+  channelName: string = '';
   public channels: Channel[] = [];
   public currentUserChannels: Channel[] = [];
+  userName: string = '';
 
-  constructor(private firestore: Firestore, private auth: Auth) { }
+  constructor(private firestore: Firestore) { }
 
   loadChannels(currentUserId: string) {
     let channelsRef = collection(this.firestore, 'channels');
@@ -37,30 +38,28 @@ export class ChannelsService {
     });
   }
 
-  showChannelName(name: string) {
-    this.name = name;
-    console.log(this.name);
+  getChannelName(channel: Channel) {
+    this.channelName = channel.name;
+    console.log(this.channelName);
   }
 
-  clickChannelContainer(i: number) {
-    this.clickedChannels.fill(false);
-    this.clickedUsers.fill(false);
-    this.clickedChannels[i] = true;
+  getUserName(user: User) {
+    this.userName = user.name;
+    console.log(this.userName);
   }
 
-  clickUserContainer(i: number) {
+  clickUserContainer(user: User, i: number) {
     this.clickedUsers.fill(false);
     this.clickedChannels.fill(false);
     this.clickedUsers[i] = true;
+    this.getUserName(user);
   }
 
-  clickContainer(name: string, i: number, type: 'channel' | 'user') {
-    if (type === 'channel') {
-      this.clickChannelContainer(i);
-      this.showChannelName(name);
-    } else if (type === 'user') {
-      this.clickUserContainer(i);
-    }
+  clickChannelContainer(channel: Channel, i: number) {
+    this.clickedChannels.fill(false);
+    this.clickedUsers.fill(false);
+    this.clickedChannels[i] = true;
+    this.getChannelName(channel);
   }
 
   initializeArrays(channelCount: number, userCount: number) {
