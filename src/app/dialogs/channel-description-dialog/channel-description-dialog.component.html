@@ -1,0 +1,81 @@
+<div class="dialog-content">
+    <header>
+        <h1 mat-dialog-title>{{ channelsService.currentChannelName }}</h1>
+        <a class="close-btn" mat-dialog-close mat-icon-button><mat-icon class="icon">close</mat-icon></a>
+    </header>
+    <mat-dialog-content>
+    
+        <form #channelForm="ngForm">
+            <div class="channel-name">
+
+                <div>
+                    <h2>Channel-Name</h2>
+                    <a>Bearbeiten</a>
+                </div>
+                
+                <div>
+                    <mat-icon 
+                        svgIcon="hashtag" 
+                        aria-hidden="false" 
+                        aria-label="Hashtag icon">
+                    </mat-icon>
+                    <span>
+                        {{ channelsService.currentChannelName }}
+                    </span>
+                </div>
+
+            </div>
+
+             <!-- <mat-form-field appearance="outline">
+                    <mat-icon class="icon" svgIcon="hashtag" aria-hidden="false" aria-label="Workspace icon"></mat-icon>
+                    <input matInput required
+                           placeholder="z.B. Kooperationsobjekte"
+                           name="channelName"
+                           [(ngModel)]="currentChannelName"
+                           [ngModelOptions]="{standalone: true}"
+                           maxlength="20"
+                           >
+                           @if (nameFormControl.hasError('required')) {
+                            <mat-error>Bitte geben Sie einen Namen ein.</mat-error>
+                            }
+                </mat-form-field> -->
+
+            <div class="channel-description">
+
+                <div>
+                    <div>
+                        <h2>Beschreibung</h2>
+                        <a href="">Bearbeiten</a>
+                    </div>
+                    
+                    <span>{{ channelsService.currentChannelDescription }}</span>
+                    <div class="line"></div>
+                    <div>
+                        <span>Erstellt von</span>
+                        <a href="">{{ currentUser?.name }}</a>
+                    </div>
+                </div>
+                <!-- <mat-form-field appearance="outline">
+                    <input matInput 
+                           placeholder="Dein Text hier"
+                           name="channelDescription"
+                           [(ngModel)]="currentChannelDescription"
+                           maxlength="200"
+                           >
+                </mat-form-field> -->
+            </div>
+        </form>
+        
+    </mat-dialog-content>
+    
+    <div class="dialog-footer">
+        <mat-dialog-actions>
+            <button mat-flat-button mat-dialog-close>
+                Channel verlassen
+            </button>
+        </mat-dialog-actions>
+    </div>
+    
+</div>
+
+

@@ -18,6 +18,8 @@ import { AuthService } from '../../shared/services/authentication/auth-service/a
 import { UploadFileService } from '../../shared/services/firestore/storage-service/upload-file.service';
 import { SafeUrlPipe } from '../../shared/pipes/safe-url.pipe';
 import { ChannelsService } from '../../shared/services/channels/channels.service';
+import { ChannelDescriptionDialogComponent } from '../../dialogs/channel-description-dialog/channel-description-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
 
 
 
@@ -56,7 +58,8 @@ export class ChatWindowComponent implements OnInit {
   @ViewChild('chatWindow') private chatWindow!: ElementRef;
   constructor(private firestore: Firestore, private auth: Auth,
     private userService: UserService, private cd: ChangeDetectorRef,
-    private authService: AuthService, private uploadFileService: UploadFileService, public channelsService: ChannelsService,) { }
+    private authService: AuthService, private uploadFileService: UploadFileService, 
+    public channelsService: ChannelsService, public dialog: MatDialog,) { }
 
   ngOnInit() {
     this.getCurrentUser();
@@ -99,6 +102,10 @@ export class ChatWindowComponent implements OnInit {
     this.authService.getCurrentUser();
     console.log(this.currentUser());
 
+  }
+
+  openDialog() {
+    this.dialog.open(ChannelDescriptionDialogComponent)
   }
 
   loadUserData(uid: string | null) {

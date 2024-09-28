@@ -15,6 +15,7 @@ import { Auth } from '@angular/fire/auth';
 import { User } from '../../../shared/models/user.class';
 import { NgFor, NgIf, NgStyle } from '@angular/common';
 import { MatInputModule } from '@angular/material/input';
+import { AuthService } from '../../../shared/services/authentication/auth-service/auth.service';
 
 
 export class MyErrorStateMatcher implements ErrorStateMatcher {
@@ -66,6 +67,7 @@ export class AddPeopleDialog implements OnInit {
   constructor( 
     private firestore: Firestore,
     private auth: Auth,
+    private authService: AuthService,
     @Inject(MAT_DIALOG_DATA) public data: any,
   ) {
   }
@@ -76,14 +78,6 @@ export class AddPeopleDialog implements OnInit {
 
   ngOnInit(): void {
     this.checkDataFromDialog();
-    this.getCurrentUser();
-  }
-
-  getCurrentUser() {
-    const currentUser = this.auth.currentUser;
-    if (currentUser) {
-      this.currentUserUid = currentUser.uid;
-    }
   }
 
   onSubmit(form: NgForm) {
@@ -126,7 +120,7 @@ async createChannel(memberUids: string[]): Promise<Channel | null> {
         name: newChannel.name,
         description: newChannel.description,
         memberUids: newChannel.memberUids,
-        channelAuthorId: newChannel.channelAuthor,
+        channelAuthorId: newChannel.channelAuthorId,
     });
 
     return newChannel;

@@ -35,9 +35,13 @@
                         <div class="panel-container-open">
                             <div *ngFor="let channel of channelsService.currentUserChannels; let i = index"
                                 (click)="clickChannelContainer(channel, i)" [ngClass]="channelsService.clickedChannels[i] ? 'clicked' : ''">
-                                <mat-icon [ngClass]="channelsService.clickedChannels[i] ? 'hashtag-black' : ''" class="icon"
-                                    svgIcon="hashtag" aria-hidden="false" aria-label="Hashtag icon"></mat-icon>
-                                <span>{{channel.name }}</span>
+                                <mat-icon 
+                                [ngClass]="channelsService.clickedChannels[i] ? 'hashtag-black' : ''" class="icon"
+                                svgIcon="hashtag" 
+                                aria-hidden="false" 
+                                aria-label="Hashtag icon">
+                                </mat-icon>
+                                <span>{{ channel.name }}</span>
                             </div>
                         </div>
                         <a (click)="openDialog()" class="add-channel-container">
@@ -60,7 +64,7 @@
                                 </mat-icon>
                                 <mat-icon class="icon" svgIcon="chat" aria-hidden="false"
                                     aria-label="Workspace icon"></mat-icon>
-                                <span>Direktnachrichten</span>
+                                <span (click)="loadUsers()">Direktnachrichten</span>
                             </a>
                         </mat-expansion-panel-header>
                         <div class="chat-container-open">

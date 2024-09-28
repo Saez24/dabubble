@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnInit } from '@angular/core';
 import { Firestore, doc, onSnapshot, collection, query, orderBy } from '@angular/fire/firestore';
 import { Channel } from '../../models/channel.class';
 import { User } from '../../models/user.class';
@@ -6,16 +6,28 @@ import { User } from '../../models/user.class';
 @Injectable({
   providedIn: 'root',
 })
-export class ChannelsService {
+export class ChannelsService implements OnInit {
   
   clickedChannels: boolean[] = [];
   clickedUsers: boolean[] = [];
-  channelName: string = 'Kein Kanal ausgewählt';
+  currentChannelName: string = 'Kein Kanal ausgewählt';
+  currentChannelDescription: string = 'Kein Kanal ausgewählt';
+  currentChannelAuthor: string = '';
+  currentChannelId: string = '';
+  currentChannelMemberUids: string[] = [];
   userName: string = '';
+  channel: Channel | [] = [];
   public channels: Channel[] = [];
+  private users: User[] = [];
   public currentUserChannels: Channel[] = [];
   
-  constructor(private firestore: Firestore) { }
+  constructor(private firestore: Firestore) { 
+
+  }
+
+  ngOnInit(): void {
+    //  this.loadUsers();
+  }
 
   loadChannels(currentUserId: string) {
     let channelsRef = collection(this.firestore, 'channels');
@@ -38,10 +50,29 @@ export class ChannelsService {
     });
   }
 
-  getChannelName(channel: Channel) {
-    this.channelName = channel.name;
-    console.log(this.channelName);
+  getChannelData(channel: Channel) {
+    this.currentChannelName = channel.name;
+    this.currentChannelDescription = channel.description;
+    this.currentChannelAuthor = channel.channelAuthorId;
+    this.currentChannelId = channel.id;
+    this.currentChannelMemberUids = channel.memberUids;
+    this.channel = channel;
+    console.log(this.channel);
   }
+
+  clickChannelContainer(channel: Channel, i: number) {
+    this.clickedChannels.fill(false);
+    this.clickedUsers.fill(false);
+    this.clickedChannels[i] = true;
+    this.getChannelData(channel);
+  }
+
+  initializeArrays(channelCount: number, userCount: number) {
+    this.clickedChannels = new Array(channelCount).fill(false);
+    this.clickedUsers = new Array(userCount).fill(false);
+  }
+
+  // needs to be moved to workspace
 
   getUserName(user: User) {
     this.userName = user.name;
@@ -55,17 +86,22 @@ export class ChannelsService {
     this.getUserName(user);
   }
 
-  clickChannelContainer(channel: Channel, i: number) {
-    this.clickedChannels.fill(false);
-    this.clickedUsers.fill(false);
-    this.clickedChannels[i] = true;
-    this.getChannelName(channel);
-  }
+  //
 
-  initializeArrays(channelCount: number, userCount: number) {
-    this.clickedChannels = new Array(channelCount).fill(false);
-    this.clickedUsers = new Array(userCount).fill(false);
-  }
+
+
+  // async loadUsers() {
+  //   let usersRef = collection(this.firestore, 'users');
+  //   let usersQuery = query(usersRef, orderBy('name'));
+
+  //   onSnapshot(usersQuery, async (snapshot) => {
+  //     this.users = await Promise.all(snapshot.docs.map(async (doc) => {
+  //       let userData = doc.data() as User;
+  //       return { ...userData, id: doc.id };
+  //     }));
+  //   });
+  //   console.log(this.users);
+  // }
 
 
 

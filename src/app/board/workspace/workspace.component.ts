@@ -39,6 +39,7 @@ export class WorkspaceComponent {
   arrowRotated: boolean[] = [false, false];
   currentUserUid: string | null = null;
   currentUserChannels: Channel[] = [];
+  currentUser: User | undefined;
 
   constructor(
     public dialog: MatDialog,
@@ -46,7 +47,8 @@ export class WorkspaceComponent {
     public channelsService: ChannelsService,
     private firestore: Firestore,
     private auth: Auth
-  ) { }
+  ) {
+   }
 
   ngOnInit() {
     this.loadData();
@@ -65,17 +67,27 @@ export class WorkspaceComponent {
     });
   }
 
-
   async loadUsers() {
     let usersRef = collection(this.firestore, 'users');
     let usersQuery = query(usersRef, orderBy('name'));
 
     onSnapshot(usersQuery, async (snapshot) => {
-      this.users = await Promise.all(snapshot.docs.map(async (doc) => {
-        let userData = doc.data() as User;
-        return { ...userData, id: doc.id };
-      }));
-    });
+        this.users = await Promise.all(snapshot.docs.map(async (doc) => {
+            let userData = doc.data() as User;
+            return { ...userData, id: doc.id };
+        }));
+
+        let currentUser = this.auth.currentUser;
+        if (currentUser) {
+            this.currentUser = this.findUserById(currentUser.uid);
+            } else {
+                console.log('Logged-in user not found in the users list.');
+            }
+        });
+  }
+
+  findUserById(userId: string): User | undefined {
+      return this.users.find(user => user.id === userId);
   }
 
   fillArraysWithBoolean() {
