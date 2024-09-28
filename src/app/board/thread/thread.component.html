@@ -13,21 +13,22 @@
       <mat-icon>close</mat-icon>
     </button>
   </div>
+
   <div class="thread-content">
     <!-- Originalnachricht -->
-    <div class="thread-message-container">
+    <div class="thread-message-container" *ngIf="selectedMessage">
       <img
-      [src]="selectedMessage?.senderAvatar"
+        [src]="selectedMessage.senderAvatar"
         alt="Profile Image"
         class="avatar"
       />
       <div class="thread-message-details">
         <div class="thread-message-info">
-          <span class="thread-message-sender">{{ selectedMessage?.senderName }}</span>
-          <span class="thread-message-time">{{ selectedMessage?.formattedTimestamp }}</span>
+          <span class="thread-message-sender">{{ selectedMessage.senderName }}</span>
+          <span class="thread-message-time">{{ selectedMessage.formattedTimestamp }}</span>
         </div>
         <div class="thread-message-bubble">
-          <p>{{ selectedMessage?.message }}</p>
+          <p>{{ selectedMessage.message }}</p>
         </div>
       </div>
       <div class="emoji-box">
@@ -37,42 +38,38 @@
 
     <!-- Anzahl der Antworten -->
     <div class="answers">
-      <span>{{selectedMessage?.answers?.length}} Antworten</span>
+      <span>{{ selectedMessage?.answers?.length }} Antworten</span>
       <div class="line"></div>
     </div>
 
-    <!-- Kommentar -->
+    <!-- Kommentare -->
     <div *ngFor="let message of messages" style="width: 100%;">
       <div class="thread-message-container" *ngIf="!message.isOwnMessage">
         <img
-        [src]="message.senderAvatar"
+          [src]="message.senderAvatar"
           alt="Profile Image"
           class="avatar"
         />
         <div class="thread-message-details">
+          <div class="emoji-box">
+            <mat-icon class="message-icon" (click)="showEmoji()">add_reaction</mat-icon>
+           
+          </div>
           <div class="thread-message-info">
             <span class="thread-message-sender">{{ message.senderName }}</span>
             <span class="thread-message-time">{{ message.formattedTimestamp }}</span>
           </div>
           <div class="thread-message-bubble">
-            <p class="thread-message-text">
-              {{ message.message }}
-            </p>
+            <p class="thread-message-text">{{ message.message }}</p>
           </div>
           <div class="thread-show-reactions">
             <div class="thread-reaction-icon-button">
               <div class="thread-reaction-name-popup">
-                <img
-                  src="./assets/images/reaction/check_mark.png"
-                  alt="Reaction Icon"
-                />
-                <h3>Sofia Müller</h3>
+                <img src="./assets/images/reaction/check_mark.png" alt="Reaction Icon" />
+                <h3>{{ message.senderName }}</h3>
                 <span>Hat reagiert</span>
               </div>
-              <img
-                src="./assets/images/reaction/check_mark.png"
-                alt="Reaction Icon"
-              />
+              <img src="./assets/images/reaction/check_mark.png" alt="Reaction Icon" />
               2
             </div>
             <div>
@@ -80,71 +77,52 @@
             </div>
           </div>
         </div>
-        <div class="emoji-box">
-          <mat-icon (click)="showEmoji()" class="message-icon">add_reaction</mat-icon>
-        </div>
       </div>
     </div>
 
-    <!-- Eigene Nachricht -->
+    <!-- Eigene Nachrichten -->
     <div *ngFor="let message of messages" style="width: 100%;">
-      <div
-        class="thread-message-container user-message-container"
-        *ngIf="message.isOwnMessage"
-      >
+      <div class="thread-message-container user-message-container" *ngIf="message.isOwnMessage">
         <img
-        [src]="message.senderAvatar"
+          [src]="message.senderAvatar"
           alt="Profile Image"
           class="avatar"
         />
-        <div class="thread-message-details" *ngIf="threadMessageArea">
+        <div class="thread-message-details" *ngIf="!isEditing(message.messageId)">
           <div class="emoji-box user-emoji-box">
             <mat-icon class="message-icon" (click)="showEmoji()">add_reaction</mat-icon>
-            <mat-icon class="message-icon" (click)="toggleEditBtn(message)"
-              >more_vert</mat-icon
-            >
+            <mat-icon class="message-icon" (click)="showMessageEditToggle()">more_vert</mat-icon>
             <div *ngIf="showMessageEdit" class="thread-edit-message">
-              <span (click)="editMessage(message)">Nachricht bearbeiten</span>
+              <span (click)="editMessage(message.messageId)">Nachricht bearbeiten</span>
             </div>
           </div>
           <div class="user-message-info">
             <span class="thread-message-sender">{{ message.senderName }}</span>
-            <span class="thread-message-time">{{
-              message.formattedTimestamp
-            }}</span>
+            <span class="thread-message-time">{{ message.formattedTimestamp }}</span>
           </div>
           <div class="user-message-bubble">
             <p>{{ message.message }}</p>
-            <!-- threadMessage -->
           </div>
           <div class="thread-show-reactions" style="justify-content: flex-end">
             <div class="thread-reaction-icon-button">
               <div class="thread-reaction-name-popup">
-                <img
-                  src="./assets/images/reaction/rocket.png"
-                  alt="Reaction Icon"
-                />
-                <h3>Sofia Müller</h3>
+                <img src="./assets/images/reaction/rocket.png" alt="Reaction Icon" />
+                <h3>{{ message.senderName }}</h3>
                 <span>Hat reagiert</span>
               </div>
-              <img
-                src="./assets/images/reaction/check_mark.png"
-                alt="Reaction Icon"
-              />
+              <img src="./assets/images/reaction/check_mark.png" alt="Reaction Icon" />
               1
             </div>
             <div>
-              <mat-icon fontIcon="add_reaction"></mat-icon>
+              <mat-icon>add_reaction</mat-icon>
             </div>
           </div>
         </div>
 
-        <div *ngIf="showMessageEditArea" class="thread-message-edit-container">
+        <div *ngIf="isEditing(message.messageId)" class="thread-message-edit-container">
           <textarea
             class="thread-edit-textarea"
-            id="thread-edit-message"
-            type="text"
-            [(ngModel)]="editingMessage"
+            [(ngModel)]="message.message"
           ></textarea>
           <div class="thread-message-edit-buttons">
             <div (click)="showEmoji()" class="thread-message-icon">
@@ -152,26 +130,26 @@
             </div>
             <div class="thread-message-edit-action">
               <button (click)="cancelMessageEdit()">Abbrechen</button>
-              <button class="save-btn" (click)="saveEditedMessage(message)">
-                Speichern
-              </button>
+              <button class="save-btn" (click)="saveMessage(message)">Speichern</button>
             </div>
           </div>
         </div>
       </div>
     </div>
   </div>
+
   <!-- Nachrichteneingabebereich -->
   <div class="thread-message-input-container">
     <textarea
       class="message-input"
-      id="threadMessage"
       placeholder="Schreiben Sie Ihre Nachricht"
-      [(ngModel)]="newThreadMessage"
+      [(ngModel)]="threadMessage"
+      type="text"
     ></textarea>
     <div class="message-icon-container">
       <div class="left-icon-container">
-        <div class="message-icon"><mat-icon fontIcon="add"></mat-icon></div>
+        <input type="file" id="fileInput" (change)="onFileSelected($event)" hidden />
+        <div class="message-icon" (click)="triggerFileInput()"><mat-icon fontIcon="add"></mat-icon></div>
         <div class="separator"></div>
         <div (click)="showEmoji()" class="thread-message-icon">
           <mat-icon fontIcon="sentiment_satisfied"></mat-icon>
@@ -179,6 +157,14 @@
         <div class="message-icon">
           <mat-icon fontIcon="alternate_email"></mat-icon>
         </div>
+        <div *ngIf="filePreviewUrl" class="file-preview">
+          <img *ngIf="selectedFile && selectedFile.type.startsWith('image/')" [src]="filePreviewUrl"
+              alt="Dateivorschau" />
+          <a *ngIf="selectedFile && selectedFile.type === 'application/pdf'" [href]="filePreviewUrl"
+              target="_blank">PDF
+              anzeigen</a>
+          <mat-icon class="delete-upload" fontIcon="close" (click)="deleteUpload()"></mat-icon>
+      </div>
       </div>
       <div class="right-icon-container">
         <div class="message-icon send" (click)="sendMessage()">

@@ -9,7 +9,7 @@ export class Message {
     senderName: string | null;
     message: string | null;
     reaction: string | null;
-    answers: [];
+    answers: Message[];
     formattedTimestamp: string;
     isOwnMessage: boolean = false;
     displayDate: string | null;
@@ -25,7 +25,7 @@ export class Message {
         this.senderName = obj ? obj.senderName : null;
         this.message = obj ? obj.message : null;
         this.reaction = obj ? obj.reaction : null;
-        this.answers = obj ? obj.answers : [];
+        this.answers = obj && obj.answers ? obj.answers.map((answer: any) => new Message(answer)) : [];
         this.formattedTimestamp = '';
         this.displayDate = null;
         this.parentMessageId = obj ? obj.parentMessageId : null; //Um ThreadNachricht dem ausgewaehlten Kommentar zuzuweisen!
