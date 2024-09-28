@@ -10,7 +10,7 @@ export class ChannelsService {
   
   clickedChannels: boolean[] = [];
   clickedUsers: boolean[] = [];
-  channelName: string = '';
+  channelName: string = 'Kein Kanal ausgewählt';
   userName: string = '';
   public channels: Channel[] = [];
   public currentUserChannels: Channel[] = [];

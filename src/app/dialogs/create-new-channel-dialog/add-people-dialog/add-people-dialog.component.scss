@@ -95,21 +95,24 @@
 
 .selected-users {
     display: flex;
-    gap: 15px;
+    flex-wrap: wrap;
+    gap: 10px;
+    max-width: 320px;
+    max-height: 50px;
     overflow-x: scroll;
-    max-width: 400px;
+    overflow-y: scroll;
 }
 
 .selected-user {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 2px 10px 2px 10px;
     border-radius: 35px;
-    margin-left: -16px;
+    max-width: 150px;
     img {
         width: 30px;
         height: 30px;
+        margin-left: 15px;
     }
     span {
         font-size: 14px;
@@ -132,6 +135,11 @@
     background-color: $light-purple !important;
 }
 
+.mat-mdc-text-field-wrapper {
+    display: flex !important;
+    align-items: center !important;
+}
+
 .mdc-text-field--no-label:not(.mdc-text-field--textarea) .mat-mdc-form-field-input-control.mdc-text-field__input, .mat-mdc-text-field-wrapper .mat-mdc-form-field-input-control{
     flex: 1;
 }
@@ -142,36 +150,12 @@
 }
 
 .mdc-text-field--outlined .mat-mdc-form-field-infix, .mdc-text-field--no-label .mat-mdc-form-field-infix {
-    max-height: 60px;
+    padding: 0px !important;
 }
 
-.mat-mdc-text-field-wrapper, .mat-mdc-text-field-wrapper, .mdc-text-field--filled, .mdc-text-field, .mdc-text-field--filled:not(.mdc-text-field--disabled) {
-    background-color: white !important;
-    border-radius: 30px;
-    border: 1px solid $purple;
-
-    &:focus-visible {
-        outline: none !important;
-    }
-   
+.mdc-text-field--outlined .mat-mdc-form-field-infix, .mdc-text-field--no-label .mat-mdc-form-field-infix {
+    max-height: 120px;
 }
-
-// .mat-mdc-text-field-wrapper:focus, .mat-mdc-text-field-wrapper:focus, .mdc-text-field--filled:focus, .mdc-text-field:focus, .mdc-text-field--filled:not(.mdc-text-field--disabled):focus {
-//     background-color: white !important;
-//         caret-color: white !important;
-
-//         &:focus-visible {
-//             outline: none !important;
-//         }
-// }
-
-// .mat-mdc-form-field-focus-overlay {
-//     background-color: white;
-//     &:focus-visible {
-//         outline: none !important;
-//     }
-// }
-
 
 
 

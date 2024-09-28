@@ -16,9 +16,10 @@
             <mat-error *ngIf="channelForm.submitted && !selectedValue">Bitte wähle eine Option aus.</mat-error>
 
             <div *ngIf="selectedValue === 'specific'">
-                <mat-form-field>
-                    <div  [ngStyle]="{ 'padding-left': selectedUsers.length >=1 ? '32px' : '0px' }" class="selected-users">
-                        <div *ngFor="let user of selectedUsers" class="selected-user">
+            
+                <mat-form-field appearance="outline">
+                    <div class="selected-users">
+                        <div *ngFor="let user of selectedUsers.slice().reverse()" class="selected-user">
                             <img [src]="user.avatarPath" alt="{{ user.name }}" class="contact-avatar">
                             <span class="contact-name">{{ user.name }}</span>
                             <button (click)="deleteUser(user.id)" mat-icon-button>
@@ -27,7 +28,6 @@
                         </div>
                     </div>
                     <input matInput required
-                        appearance="outline"
                         class="search-input"
                         type="search" 
                         [(ngModel)]="searchTerm" 
@@ -35,12 +35,14 @@
                         (click)="showUsers()" 
                         placeholder="Suche nach Benutzern"
                         [ngModelOptions]="{standalone: true}"
-                        #searchInput="ngModel">
+                        #searchInput="ngModel"
+                        [ngStyle]="{ 'margin-left': selectedUsers.length >=3 ? '-10px' : '0' }"
+                        >
                         <!-- <mat-error *ngIf="searchInput.invalid && (searchInput.dirty || channelForm.submitted)">
                             Bitte gib einen Suchbegriff ein.
                         </mat-error> -->
                         <mat-error *ngIf="ownUserError">
-                            Du kannst deinen eigenen Benutzer nicht als Mitglied hinzufügen.
+                            Du bist bereits Mitglied.
                         </mat-error>
                 </mat-form-field>
             </div>
