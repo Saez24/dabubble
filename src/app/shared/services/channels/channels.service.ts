@@ -15,10 +15,10 @@ export class ChannelsService implements OnInit {
   currentChannelAuthor: string = '';
   currentChannelId: string = '';
   currentChannelMemberUids: string[] = [];
+  currentChannelMembers: string[] | any;
   userName: string = '';
   channel: Channel | [] = [];
   public channels: Channel[] = [];
-  private users: User[] = [];
   public currentUserChannels: Channel[] = [];
   
   constructor(private firestore: Firestore) { 
@@ -26,7 +26,6 @@ export class ChannelsService implements OnInit {
   }
 
   ngOnInit(): void {
-    //  this.loadUsers();
   }
 
   loadChannels(currentUserId: string) {
@@ -53,11 +52,12 @@ export class ChannelsService implements OnInit {
   getChannelData(channel: Channel) {
     this.currentChannelName = channel.name;
     this.currentChannelDescription = channel.description;
-    this.currentChannelAuthor = channel.channelAuthorId;
+    this.currentChannelAuthor = channel.channelAuthor;
     this.currentChannelId = channel.id;
     this.currentChannelMemberUids = channel.memberUids;
+    this.currentChannelMembers = channel.members;
     this.channel = channel;
-    console.log(this.channel);
+    console.log(this.currentChannelMembers);
   }
 
   clickChannelContainer(channel: Channel, i: number) {

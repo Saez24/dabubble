@@ -4,12 +4,11 @@
             <mat-icon fontIcon="keyboard_arrow_down"></mat-icon>
         </div>
         <div class="members-container">
-            <div class="members-list">
-                <img src="./assets/images/avatars/avatar1.svg" alt="">
-                <img src="./assets/images/avatars/avatar2.svg" alt="">
-                <img src="./assets/images/avatars/avatar3.svg" alt="">
-                <span>3</span>
+            <div class="members-list" *ngFor="let member of channelsService.currentChannelMembers">
+                <img [src]="member.avatarPath" alt="user-avatar">
             </div>
+            <span *ngIf="channelsService.currentChannelMembers.length <= 3">{{ channelsService.currentChannelMembers.length }}</span>
+            <span *ngIf="channelsService.currentChannelMembers.length >= 4"> 3+ </span>
             <mat-icon class="add-member-button" fontIcon="person_add"></mat-icon>
         </div>
     </div>

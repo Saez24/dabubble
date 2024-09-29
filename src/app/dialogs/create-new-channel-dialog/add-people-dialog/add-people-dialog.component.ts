@@ -59,6 +59,7 @@ export class AddPeopleDialog implements OnInit {
   userSelected: boolean = false;
   selectedUsers: User[] = [];
   ownUserError: boolean = false;
+  currentUser: User | any;
 
   @Input()
   color: ThemePalette
@@ -78,6 +79,7 @@ export class AddPeopleDialog implements OnInit {
 
   ngOnInit(): void {
     this.checkDataFromDialog();
+    this.loadData();
   }
 
   onSubmit(form: NgForm) {
@@ -88,21 +90,48 @@ export class AddPeopleDialog implements OnInit {
     }
   }
 
+  async loadData() {
+    this.auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        this.currentUserUid = user.uid;
+        this.loadUsers(this.currentUserUid);
+      } else {
+        console.log('Kein Benutzer angemeldet');
+      }
+    });
+  }
+
+  async loadUsers(currentUserId: string) {
+    let usersRef = collection(this.firestore, 'users');
+    let usersQuery = query(usersRef, orderBy('name'));
+
+    onSnapshot(usersQuery, async (snapshot) => {
+        this.users = await Promise.all(snapshot.docs.map(async (doc) => {
+            let userData = doc.data() as User;
+            return { ...userData, id: doc.id };
+        }));
+        this.loadCurrentUser(currentUserId);
+      });
+  }
+
+  loadCurrentUser(currentUserId: string) {
+    this.currentUser = this.users.find(user => user.id === currentUserId);
+  }
+
   checkDataFromDialog() {
     this.newChannelName = this.data.name || '';
     this.newChannelDescription = this.data.description || '';
-    this.users = this.data.users.users || [];
   }
 
   async createNewChannel() {
-    let currentUser = this.auth.currentUser;
-
-    if (currentUser) {
+        
+        if (this.currentUser) {
+        this.selectedUsers.push(this.currentUser);
         let memberUids = this.getMemberUids();
         let newChannel = await this.createChannel(memberUids);
 
         if (newChannel) {
-            await this.updateUserChannels(currentUser.uid, newChannel.name);
+            await this.updateUserChannels(this.currentUser.id, newChannel.name);
         }
     }
 }
@@ -112,15 +141,17 @@ async createChannel(memberUids: string[]): Promise<Channel | null> {
     let newChannel: Channel = new Channel({
         name: this.newChannelName,
         description: this.newChannelDescription,
-        members: memberUids,
-        channelAuthor: this.currentUserUid,
+        memberUids: memberUids,
+        members: this.selectedUsers,
+        channelAuthor: this.currentUser.name,
     });
 
     await addDoc(channelsRef, {
         name: newChannel.name,
         description: newChannel.description,
         memberUids: newChannel.memberUids,
-        channelAuthorId: newChannel.channelAuthorId,
+        members: newChannel.members,
+        channelAuthor: newChannel.channelAuthor,
     });
 
     return newChannel;
@@ -143,10 +174,6 @@ getMemberUids(): string[] {
       memberUids = this.users.map(user => user.id);
   } else if (this.selectedValue === 'specific') {
       memberUids = this.selectedUsers.map(selectedUser => selectedUser.id);
-      // channelAuthor must be pushed into channel as well
-      if (this.currentUserUid) {                     
-        memberUids.push(this.currentUserUid);
-    }
   } else {
       memberUids = [];
   }
@@ -170,7 +197,6 @@ getMemberUids(): string[] {
 
   showUsers() {
     this.userSelected = !this.userSelected;
-    console.log(this.userSelected)
   }
 
   deleteUser(userId: string) {

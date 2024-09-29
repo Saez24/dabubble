@@ -17,6 +17,7 @@ import { IconsService } from '../../shared/services/icons/icons.service';
 import { ErrorStateMatcher } from '@angular/material/core';
 import { ChannelsService } from '../../shared/services/channels/channels.service';
 import { AddPeopleDialog } from './add-people-dialog/add-people-dialog.component';
+import { User } from '../../shared/models/user.class';
 
 export class MyErrorStateMatcher implements ErrorStateMatcher {
   isErrorState(control: FormControl | null): boolean {
@@ -55,6 +56,7 @@ export class CreateNewChannelDialog implements OnInit {
     private dialogRef: MatDialogRef<CreateNewChannelDialog>,
     private dialog: MatDialog,
     @Inject(MAT_DIALOG_DATA) public users: [],
+    @Inject(MAT_DIALOG_DATA) public currentUser: User,
   ) { }
   ngOnInit(): void {
     // console.log('User sind:', this.users);
@@ -72,7 +74,6 @@ export class CreateNewChannelDialog implements OnInit {
       data: {
         name: this.newChannelName,
         description: this.newChannelDescription,
-        users: this.users,
       }
     });
 

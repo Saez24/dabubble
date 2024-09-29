@@ -39,7 +39,7 @@ export class WorkspaceComponent {
   arrowRotated: boolean[] = [false, false];
   currentUserUid: string | null = null;
   currentUserChannels: Channel[] = [];
-  currentUser: User | undefined;
+  currentUser: User | any;
 
   constructor(
     public dialog: MatDialog,
@@ -55,11 +55,11 @@ export class WorkspaceComponent {
     this.fillArraysWithBoolean();
   }
 
-  loadData() {
+  async loadData() {
     this.auth.onAuthStateChanged(async (user) => {
       if (user) {
         this.currentUserUid = user.uid;
-        this.loadUsers();
+        this.loadUsers(this.currentUserUid);
         this.channelsService.loadChannels(this.currentUserUid);
       } else {
         console.log('Kein Benutzer angemeldet');
@@ -67,7 +67,7 @@ export class WorkspaceComponent {
     });
   }
 
-  async loadUsers() {
+  async loadUsers(currentUserId: string) {
     let usersRef = collection(this.firestore, 'users');
     let usersQuery = query(usersRef, orderBy('name'));
 
@@ -76,18 +76,12 @@ export class WorkspaceComponent {
             let userData = doc.data() as User;
             return { ...userData, id: doc.id };
         }));
-
-        let currentUser = this.auth.currentUser;
-        if (currentUser) {
-            this.currentUser = this.findUserById(currentUser.uid);
-            } else {
-                console.log('Logged-in user not found in the users list.');
-            }
-        });
+        this.loadCurrentUser(currentUserId);
+      });
   }
-
-  findUserById(userId: string): User | undefined {
-      return this.users.find(user => user.id === userId);
+  loadCurrentUser(currentUserId: string) {
+    this.currentUser = this.users.find(user => user.id === currentUserId);
+    console.log(this.currentUser)
   }
 
   fillArraysWithBoolean() {
@@ -110,11 +104,7 @@ export class WorkspaceComponent {
 
   // helper method to toggle the clickContainer method
   openDialog() {
-    this.dialog.open(CreateNewChannelDialog, {
-      data: {
-        users: this.users,
-      }
-    });
+    this.dialog.open(CreateNewChannelDialog)
   }
 }
 
