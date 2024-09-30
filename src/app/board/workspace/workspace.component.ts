@@ -79,6 +79,7 @@ export class WorkspaceComponent {
         this.loadCurrentUser(currentUserId);
       });
   }
+  
   loadCurrentUser(currentUserId: string) {
     this.currentUser = this.users.find(user => user.id === currentUserId);
     console.log(this.currentUser)
@@ -94,7 +95,7 @@ export class WorkspaceComponent {
   }
 
   // method to change background color for channel or user container
-  clickChannelContainer(channel: Channel, i: number) {
+  openChannel(channel: Channel, i: number) {
     this.channelsService.clickChannelContainer(channel, i);
   }
 

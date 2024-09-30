@@ -57,7 +57,7 @@ export class ChannelsService implements OnInit {
     this.currentChannelMemberUids = channel.memberUids;
     this.currentChannelMembers = channel.members;
     this.channel = channel;
-    console.log(this.currentChannelMembers);
+    console.log(this.channel);
   }
 
   clickChannelContainer(channel: Channel, i: number) {

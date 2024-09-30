@@ -84,12 +84,19 @@ span {
         > div:nth-child(1) {
             @include dFlex($jc: space-between);
             width: 100%;
-            a {
-                color: $dark-purple;
-                font-size: 18px;
+            > a {
+                @include dFlex();
+                height: 24px;
+                width: 100px;
+                padding: 1px 2px;
                 &:hover {
                     cursor: pointer;
                     font-weight: bolder;
+                }
+
+                span {
+                    color: $dark-purple;
+                    font-size: 18px;  
                 }
             }
         }
@@ -127,12 +134,19 @@ span {
         > div:nth-child(1) {
             width: 100%;
             @include dFlex($jc: space-between, $g: 20px);
-            a {
-                color: $dark-purple;
-                font-size: 18px;
+            > a {
+                @include dFlex();
+                height: 24px;
+                width: 100px;
+                padding: 1px 2px;
                 &:hover {
                     cursor: pointer;
                     font-weight: bolder;
+                }
+
+                span {
+                    color: $dark-purple;
+                    font-size: 18px;  
                 }
             }
         }

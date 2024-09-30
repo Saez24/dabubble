@@ -34,7 +34,7 @@
                         </mat-expansion-panel-header>
                         <div class="panel-container-open">
                             <div *ngFor="let channel of channelsService.currentUserChannels; let i = index"
-                                (click)="clickChannelContainer(channel, i)" [ngClass]="channelsService.clickedChannels[i] ? 'clicked' : ''">
+                                (click)="openChannel(channel, i)" [ngClass]="channelsService.clickedChannels[i] ? 'clicked' : ''">
                                 <mat-icon 
                                 [ngClass]="channelsService.clickedChannels[i] ? 'hashtag-black' : ''" class="icon"
                                 svgIcon="hashtag" 

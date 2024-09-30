@@ -58,6 +58,7 @@ export class ChannelDescriptionDialogComponent {
   ngOnInit(): void {
     this.channel = this.channelsService.channel;
     this.loadUsers();
+    console.log(this.channel);
   }
 
   async loadUsers() {
@@ -82,6 +83,10 @@ export class ChannelDescriptionDialogComponent {
   findUserById(userId: string): User | undefined {
     return this.users.find(user => user.id === userId);
 }
+
+  editChannel() {
+
+  }
 
 }
 

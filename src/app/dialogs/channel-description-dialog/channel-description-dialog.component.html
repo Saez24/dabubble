@@ -19,7 +19,7 @@
 
                 <div>
                     <h2>Channel-Name</h2>
-                    <a>Bearbeiten</a>
+                    <a (click)="editChannel()"><span>Bearbeiten</span></a>
                 </div>
                 
                 <div>
@@ -54,7 +54,7 @@
                 <div>
                     <div>
                         <h2>Beschreibung</h2>
-                        <a>Bearbeiten</a>
+                        <a (click)="editChannel()"><span>Bearbeiten</span></a>
                     </div>
                     
                     <span>{{ channelsService.currentChannelDescription }}</span>

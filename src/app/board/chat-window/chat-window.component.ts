@@ -48,7 +48,7 @@ export class ChatWindowComponent implements OnInit {
   currentUserUid: string | null = null;
   editingMessageId: string | null = null;
   channelId: string | null = null;
-  selectedChannelId: string | null = 'hJHD4P2xWfH9J45vaZPS';
+  selectedChannelId = this.channelsService.currentChannelId;
   senderAvatar: string | null = null;
   senderName: string | null = null;
   selectedFile: File | null = null;// Service für den Datei-Upload
@@ -126,17 +126,17 @@ export class ChatWindowComponent implements OnInit {
     });
   }
 
-  getChannelName(channelId: string | null) {
-    const channel = this.channels.find(c => c.id === channelId);
+  // getChannelName(channelId: string | null) {
+  //   const channel = this.channels.find(c => c.id === channelId);
 
-    if (channel) {
-      this.selectedChannelId = channel.id; // Setze die selectedChannelId
-      return channel.name;
-    } else {
-      this.selectedChannelId = null; // Setze die selectedChannelId auf null, wenn kein Kanal gefunden wird
-      return 'Unbekannter Kanal';
-    }
-  }
+  //   if (channel) {
+  //     this.selectedChannelId = channel.id; // Setze die selectedChannelId
+  //     return channel.name;
+  //   } else {
+  //     this.selectedChannelId = null; // Setze die selectedChannelId auf null, wenn kein Kanal gefunden wird
+  //     return 'Unbekannter Kanal';
+  //   }
+  // }
 
   showEmoji() {
     this.showEmojiPicker = !this.showEmojiPicker;
