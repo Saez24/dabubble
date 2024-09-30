@@ -15,6 +15,7 @@ export class UserService {
   private subscription!: Subscription;
   showProfile = signal<boolean>(false);
   showProfileEditor = signal<boolean>(false);
+  showOverlay = signal<boolean>(false);
 
   constructor(private firestore: Firestore) { }
 
@@ -30,6 +31,16 @@ export class UserService {
       await updateDoc(userRef, { loginState: loginState });
     } catch (error) {
       console.error('Error updating user', error);
+    }
+  }
+
+
+  async updateUserDoc(userId:string, newUser: User) {
+    try {
+      let userRef = this.getUserDocReference(userId);
+      await updateDoc(userRef, {...newUser});
+    } catch (error) {
+      
     }
   }
 

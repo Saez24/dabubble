@@ -18,9 +18,9 @@
                 }
             </div>
             <mat-icon>keyboard_arrow_down</mat-icon>
-            <div class="overlay" *ngIf="showOverlay" (click)="closeAllDialogs()">
+            <div class="overlay" *ngIf="this.userService.showOverlay()" (click)="closeAllDialogs()">
                 <div class="profile-menu" (click)="stopPropagation($event)">
-                    <div class="profil-menu-link-container" *ngIf="!this.userService.showProfile()">
+                    <div class="profil-menu-link-container" *ngIf="!this.userService.showProfile() && !this.userService.showProfileEditor()">
                         <div class="profil-menu-links" (click)="openUserProfile($event)">Profil</div>
                         <div class="profil-menu-links" (click)="authService.logout()">Log Out</div>
                     </div>

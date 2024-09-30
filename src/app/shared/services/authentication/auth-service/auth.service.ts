@@ -1,6 +1,6 @@
 import { inject, Injectable, OnDestroy, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { getAuth, signInWithEmailAndPassword, signOut, updateProfile } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword, signOut, updateEmail, updateProfile, verifyBeforeUpdateEmail } from "firebase/auth";
 import { UserCredential } from "firebase/auth";
 import { UserService } from '../../firestore/user-service/user.service';
 import { Auth, user, User as AuthUser } from '@angular/fire/auth';
@@ -147,5 +147,37 @@ export class AuthService {
 
   async sendPasswordResetMail() {
 
+  }
+
+
+  async updateUserProfile(changes: {}): Promise<void> {
+    try {
+      if (this.auth.currentUser) {
+        await updateProfile(this.auth.currentUser, changes);
+      }
+    } catch (err: any) {
+
+      this.errorCode = err.code;
+      console.error('Error while updating auth user profile', err.code);
+      throw err;
+    }
+  }
+
+  async updateEmail(email: string): Promise<void> {
+    try {
+      const currentUser = this.auth.currentUser;
+      if (currentUser) {
+        await verifyBeforeUpdateEmail(currentUser, email);
+        console.log('Email to confirm your new Email is send. This could take some Minutes');
+        
+      }
+    } catch (err: any) {
+      if (err.code == 'auth/requires-recent-login') {
+        this.errorCode = err.code;
+      } else {
+        console.error('Error while updating auth user email', err.code);
+        throw err;
+      }
+    }
   }
 }

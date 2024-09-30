@@ -63,7 +63,6 @@ export class BoardComponent {
   messages: Message[] = [];
   currentUserUid: string | null = null;
   selectedMessage: Message | null = null;
-  showOverlay: boolean = false;
 
 
   constructor(private iconsService: IconsService, private firestore: Firestore, private auth: Auth,) { }
@@ -132,7 +131,7 @@ export class BoardComponent {
 
 
   toggleProfileMenu() {
-    this.showOverlay = !this.showOverlay;
+    this.userService.showOverlay.set(!this.userService.showOverlay());
   }
 
 
@@ -144,7 +143,6 @@ export class BoardComponent {
 
   closeAllDialogs() {
     this.userService.showProfile.set(false);
-    // this.showOverlay = false;
   }
 
 
