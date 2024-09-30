@@ -1,6 +1,13 @@
 <div class="chat-container max-width">
     <div class="chat-header">
-        <div *ngIf="channelsService.currentUserChannels" class="chat-header-button" (click)="openDialog()"><span># {{ channelsService.currentChannelName }}</span>
+        <div *ngIf="channelsService.currentUserChannels" class="chat-header-button" (click)="openDialog()">
+            <mat-icon 
+            class="icon"
+            svgIcon="hashtag" 
+            aria-hidden="false" 
+            aria-label="Hashtag icon">
+            </mat-icon>
+            <span> {{ channelsService.currentChannelName }}</span>
             <mat-icon fontIcon="keyboard_arrow_down"></mat-icon>
         </div>
         <div class="members-container">
