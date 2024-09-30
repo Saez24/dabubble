@@ -11,7 +11,7 @@ export class ChannelsService implements OnInit {
   clickedChannels: boolean[] = [];
   clickedUsers: boolean[] = [];
   currentChannelName: string = 'Kein Kanal ausgewählt';
-  currentChannelDescription: string = 'Kein Kanal ausgewählt';
+  currentChannelDescription: string = 'Keine Kanalbeschreibung vorhanden';
   currentChannelAuthor: string = '';
   currentChannelId: string = '';
   currentChannelMemberUids: string[] = [];

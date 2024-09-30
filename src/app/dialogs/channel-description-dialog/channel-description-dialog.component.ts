@@ -31,7 +31,7 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
     MatButtonModule
   ],
   templateUrl: './channel-description-dialog.component.html',
-  styleUrls: ['./channel-description-dialog.component.scss', '../create-new-channel-dialog/create-new-channel-dialog.component.scss'],
+  styleUrls: ['./channel-description-dialog.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
 
