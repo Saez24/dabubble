@@ -209,23 +209,15 @@ span {
     flex-direction: column;
     gap: 20px;
     width: 100%;
+
     .channel-description-bottom {
         width: 100%;
+        border-top: 1px solid $purple-grey;
+        padding-top: 20px;
         display: flex;
         flex-direction: column;
         gap: 20px;
-        // .line {
-        //     height: 1px;
-        //     width: 100%;
-        //     background-color: $purple-grey;
-        // }
     }
-}
-
-.line {
-    height: 1px;
-    width: 100%;
-    background-color: $purple-grey;
 }
 
 .dialog-footer {

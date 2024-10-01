@@ -24,7 +24,7 @@
                 <div>
                     <h2>Channel-Name</h2>
                     <a *ngIf="!editChannelName" (click)="editName()"><span>Bearbeiten</span></a>
-                    <a *ngIf="editChannelName" (click)="editName()"><span>Speichern</span></a>
+                    <a *ngIf="editChannelName" (click)="updateCurrentChannel('name')"><span>Speichern</span></a>
                 </div>
                 
                 <div *ngIf="!editChannelName">
@@ -34,7 +34,7 @@
                         aria-label="Hashtag icon">
                     </mat-icon>
                     <span>
-                        {{ channelsService.currentChannelName }}
+                        {{ currentChannelName }}
                     </span>
                 </div>
 
@@ -43,12 +43,13 @@
              <mat-form-field *ngIf="editChannelName" appearance="outline">
                     <mat-icon class="icon" svgIcon="hashtag" aria-hidden="false" aria-label="Workspace icon"></mat-icon>
                     <input matInput required
-                           placeholder=""
+                            [placeholder]="!editName ? currentChannelName : ''" 
                            name="channelName"
                            [(ngModel)]="currentChannelName"
                            [ngModelOptions]="{standalone: true}"
                            maxlength="20"
-                           (click)="emptyInput()"
+                           (click)="emptyInput('name')"
+                           (blur)="onBlur('name')"
                            >
                            @if (nameFormControl.hasError('required')) {
                             <mat-error>Bitte geben Sie einen Namen ein.</mat-error>
@@ -62,13 +63,14 @@
                 }">
            
                <div>
+
                    <div>
                        <h2>Beschreibung</h2>
                        <a *ngIf="!editChannelDescription" (click)="editDescription()"><span>Bearbeiten</span></a>
-                       <a *ngIf="editChannelDescription" (click)="editDescription()"><span>Speichern</span></a>
+                       <a *ngIf="editChannelDescription" (click)="updateCurrentChannel('description')"><span>Speichern</span></a>
                    </div>
            
-                   <span *ngIf="!editChannelDescription">{{ channelsService.currentChannelDescription }}</span>
+                   <span *ngIf="!editChannelDescription"> {{ currentChannelDescription || 'Keine Beschreibung vorhanden' }}</span>
            
                    <div class="edit-channel-description">
                        <mat-form-field *ngIf="editChannelDescription" appearance="outline">
@@ -76,22 +78,22 @@
                                   placeholder="Dein Text hier"
                                   name="channelDescription"
                                   [(ngModel)]="currentChannelDescription"
-                                  
+                                  (click)="emptyInput('description')"
+                                  (blur)="onBlur('description')"
                                   maxlength="200">
                        </mat-form-field>
            
                        <div class="channel-description-bottom">
-                           <div>
-                               <div class="line"></div>
-                           </div>
-           
                            <div class="creator-container">
                                <p>Erstellt von</p>
                                <p class="creator">{{ currentUser?.name }}</p>
                            </div>
                        </div>
+
                    </div>
+
                </div>
+
            </div>
            
             
@@ -101,7 +103,7 @@
     
     <div class="dialog-footer">
         <mat-dialog-actions>
-            <button mat-flat-button mat-dialog-close>
+            <button (click)="quitChannel()" mat-flat-button mat-dialog-close>
                 Channel verlassen
             </button>
         </mat-dialog-actions>

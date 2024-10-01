@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, Input, Output, signal, WritableSignal } from '@angular/core';
+import { Component, inject, Input, signal, WritableSignal } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { AuthService } from '../../shared/services/authentication/auth-service/auth.service';
 import { UserService } from '../../shared/services/firestore/user-service/user.service';
@@ -26,6 +26,17 @@ export class ProfileEditorDialogComponent {
   constructor() {
   }
 
+  ngOnInit() {
+    if (this.currentUser()) {
+      this.fullname = this.currentUser()?.name;
+      this.mail = this.currentUser()?.email;
+    }
+    console.log(this.mail);
+    console.log(this.fullname);
+  }
+    
+    
+
 
   async onSubmit(ngForm: NgForm): Promise<void> {
     if (ngForm.submitted && ngForm.form.valid) {
@@ -38,6 +49,9 @@ export class ProfileEditorDialogComponent {
         await this.userService.updateUserDoc(updatedUser!.id!, updatedUser!)
         this.currentUser.set(updatedUser)
         this.changesSuccessful.set(true);
+
+        console.log(this.mail);
+        console.log(this.fullname);
       }
     }
   }

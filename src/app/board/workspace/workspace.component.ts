@@ -59,8 +59,8 @@ export class WorkspaceComponent {
     this.auth.onAuthStateChanged(async (user) => {
       if (user) {
         this.currentUserUid = user.uid;
-        this.loadUsers(this.currentUserUid);
-        this.channelsService.loadChannels(this.currentUserUid);
+        await this.loadUsers(this.currentUserUid);
+        await this.channelsService.loadChannels(this.currentUserUid);
       } else {
         console.log('Kein Benutzer angemeldet');
       }

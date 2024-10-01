@@ -7,7 +7,7 @@ import { User } from '../../models/user.class';
   providedIn: 'root',
 })
 export class ChannelsService implements OnInit {
-  
+
   clickedChannels: boolean[] = [];
   clickedUsers: boolean[] = [];
   currentChannelName: string = 'Kein Kanal ausgewählt';
@@ -20,24 +20,24 @@ export class ChannelsService implements OnInit {
   channel: Channel | [] = [];
   public channels: Channel[] = [];
   public currentUserChannels: Channel[] = [];
-  
-  constructor(private firestore: Firestore) { 
+
+  constructor(private firestore: Firestore) {
 
   }
 
   ngOnInit(): void {
   }
 
-  loadChannels(currentUserId: string) {
+  async loadChannels(currentUserId: string) {
     let channelsRef = collection(this.firestore, 'channels');
     let channelsQuery = query(channelsRef, orderBy('name'));
-  
+
     onSnapshot(channelsQuery, async (snapshot) => {
       this.channels = await Promise.all(snapshot.docs.map(async (doc) => {
         let channelData = doc.data() as Channel;
         return { ...channelData, id: doc.id };
       }));
-  
+
       if (currentUserId) {
         let userChannels = this.channels.filter(channel => {
           return channel.memberUids && channel.memberUids.includes(currentUserId);
@@ -155,20 +155,20 @@ export class ChannelsService implements OnInit {
   //   });
   // }
 
-//   async loadUsers(): Promise<User[]> {
-//     const usersRef = collection(this.firestore, 'users');
-//     const usersQuery = query(usersRef, orderBy('name'));
+  //   async loadUsers(): Promise<User[]> {
+  //     const usersRef = collection(this.firestore, 'users');
+  //     const usersQuery = query(usersRef, orderBy('name'));
 
-//     return new Promise((resolve) => {
-//       onSnapshot(usersQuery, (snapshot) => {
-//         const users = snapshot.docs.map((doc) => {
-//           const userData = doc.data() as User;
-//           return { ...userData, id: doc.id };
-//         });
-//         resolve(users);
-//       });
-//     });
-//   }
+  //     return new Promise((resolve) => {
+  //       onSnapshot(usersQuery, (snapshot) => {
+  //         const users = snapshot.docs.map((doc) => {
+  //           const userData = doc.data() as User;
+  //           return { ...userData, id: doc.id };
+  //         });
+  //         resolve(users);
+  //       });
+  //     });
+  //   }
 }
 
 
