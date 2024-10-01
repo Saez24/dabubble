@@ -22,7 +22,7 @@ export class MessagesService {
     private showMessageEdit = false;
     private showEmojiPicker: boolean = false;
     messages: Message[] = [];
-    private currentUserUid: string | null = null; // Setze den aktuellen Benutzer-UID
+    currentUserUid = this.authService.currentUserUid; // Setze den aktuellen Benutzer-UID
 
 
 
@@ -86,10 +86,9 @@ export class MessagesService {
         this.showThreadEvent.emit();
     }
 
-    async loadMessages(channelId: string) {
+    async loadMessages(currentUserUid: string, channelId: string) {
         const messagesRef = collection(this.firestore, 'messages');
         console.log(channelId);
-
 
         // Filtere die Nachrichten nach der übergebenen channelId
         const messagesQuery = query(
@@ -103,8 +102,13 @@ export class MessagesService {
 
             this.messages = await Promise.all(snapshot.docs.map(async (doc) => {
                 const messageData = doc.data();
-                const message = new Message(messageData, this.currentUserUid);
+                const message = new Message(messageData, currentUserUid);
+
                 message.messageId = doc.id;
+                message.isOwnMessage = message.senderID === currentUserUid;
+                console.log('isOwnMessage: ', message.isOwnMessage);
+                // console.log(message.senderID);
+                // console.log(this.currentUserUid);
 
                 // Überprüfen, ob senderID nicht null ist
                 if (message.senderID) {
@@ -130,8 +134,6 @@ export class MessagesService {
             }));
         });
     }
-
-
 
     formatTimestamp(messageDate: Date): string {
         const today = new Date();

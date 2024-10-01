@@ -99,7 +99,7 @@ export class WorkspaceComponent {
   // method to change background color for channel or user container
   openChannel(channel: Channel, i: number) {
     this.channelsService.clickChannelContainer(channel, i);
-    this.messageService.loadMessages(channel.id);
+    this.messageService.loadMessages(this.currentUser, channel.id);
   }
 
   clickUserContainer(user: User, i: number) {

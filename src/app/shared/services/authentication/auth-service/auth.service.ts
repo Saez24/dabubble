@@ -170,7 +170,7 @@ export class AuthService {
         await verifyBeforeUpdateEmail(currentUser, email);
         alert('Email to confirm your new Email is send. This could take some Minutes');
         await this.logout();
-        
+
       }
     } catch (err: any) {
       if (err.code == 'auth/requires-recent-login') {
