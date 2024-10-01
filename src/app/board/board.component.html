@@ -11,10 +11,10 @@
             <span>{{ currentUser()?.name }}</span>
             <div class="avatar-container">
                 <img src="{{ currentUser()?.avatarPath }}" alt="Profil Icon">
-                @if (currentUser()?.loginState == 'inactive') {
-                <img src="../../assets/images/icons/inactive.png" alt="" class="state-icon">
+                @if (currentUser()?.loginState == 'loggedIn') {
+                <img src="../../assets/images/icons//online.png" alt="" class="state-icon">
                 } @else {
-                <img src="../../assets/images/icons/online.png" alt="" class="state-icon">
+                <img src="../../assets/images/icons/inactive.png" alt="" class="state-icon">
                 }
             </div>
             <mat-icon>keyboard_arrow_down</mat-icon>

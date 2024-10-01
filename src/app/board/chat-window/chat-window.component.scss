@@ -171,6 +171,7 @@
     flex-direction: column;
     gap: 8px;
     box-sizing: border-box;
+    width: max-content;
 
     >.sender-name {
         font-weight: 700;
@@ -345,10 +346,14 @@
 
 .message-area-container {
     position: relative;
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
 }
 
 .message-edit-container {
     height: 145px;
+    width: 100%;
 }
 
 .edit-message {

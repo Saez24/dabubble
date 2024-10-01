@@ -11,7 +11,7 @@ import { PickerComponent } from '@ctrl/ngx-emoji-mart';
 import { Message } from '../../shared/models/message.class';
 import { User } from '../../shared/models/user.class';
 import { Channel } from '../../shared/models/channel.class';
-import { addDoc, collection, doc, Firestore, onSnapshot, orderBy, query, updateDoc } from '@angular/fire/firestore';
+import { addDoc, collection, doc, Firestore, onSnapshot, orderBy, query, updateDoc, where } from '@angular/fire/firestore';
 import { Auth } from '@angular/fire/auth';
 import { UserService } from '../../shared/services/firestore/user-service/user.service';
 import { AuthService } from '../../shared/services/authentication/auth-service/auth.service';
@@ -39,7 +39,8 @@ export class ChatWindowComponent implements OnInit {
   messages: Message[] = [];
   users: User[] = [];
   channels: Channel[] = [];
-  currentUser = this.authService.getUserSignal();
+  // currentUser = this.authService.getUserSignal();
+  currentUser: User | any;
   showEmojiPicker = false;
   showMessageEdit = false;
   showMessageEditArea = false;
@@ -59,50 +60,50 @@ export class ChatWindowComponent implements OnInit {
   @ViewChild('chatWindow') private chatWindow!: ElementRef;
   constructor(private firestore: Firestore, private auth: Auth,
     private userService: UserService, private cd: ChangeDetectorRef,
-    private authService: AuthService, private uploadFileService: UploadFileService, 
+    private authService: AuthService, private uploadFileService: UploadFileService,
     public channelsService: ChannelsService, public dialog: MatDialog,) { }
 
   ngOnInit() {
-    this.getCurrentUser();
-    this.loadChannels();
+    this.loadData();
+    this.loadUserData(this.currentUserUid);
+    this.authService.getCurrentUser();
 
     // Überprüfe, ob selectedChannelId bereits gesetzt ist
-    if (this.selectedChannelId) {
-      this.loadMessages(this.selectedChannelId);
+    const currentChannelId = this.channelsService.currentChannelId;
+
+    // Überprüfe, ob currentChannelId gesetzt ist
+    if (currentChannelId) {
+      this.loadMessages(currentChannelId);
     }
   }
 
-  // ngAfterViewChecked() {
-  //   this.scrollToBottom(); // Stelle sicher, dass das Chat-Fenster nach jeder View-Änderung nach unten scrollt
-  // }
+  async loadData() {
+    this.auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        this.currentUserUid = user.uid;
+        this.loadUsers(this.currentUserUid);
+        this.channelsService.loadChannels(this.currentUserUid);
+      } else {
+        console.log('Kein Benutzer angemeldet');
+      }
+    });
+  }
 
-  // async getCurrentUser() {
-  //   const currentUser = this.authService.currentUser;
+  async loadUsers(currentUserId: string) {
+    let usersRef = collection(this.firestore, 'users');
+    let usersQuery = query(usersRef, orderBy('name'));
 
-  //   if (currentUser && currentUser.id != null && currentUser.id != undefined) {
-  //     this.currentUserUid = currentUser.id; // Speichere die aktuelle Benutzer-ID
+    onSnapshot(usersQuery, async (snapshot) => {
+      this.users = await Promise.all(snapshot.docs.map(async (doc) => {
+        let userData = doc.data() as User;
+        return { ...userData, id: doc.id };
+      }));
+      this.loadCurrentUser(currentUserId);
+    });
+  }
 
-  //     // Benutzerdaten von Firestore abrufen
-  //     const userDoc = await this.userService.getUserById(currentUser.id);
-
-  //     // Überprüfe, ob userDoc existiert und einen avatarPath hat
-  //     if (userDoc) {
-  //       this.senderAvatar = userDoc.avatarPath || './assets/images/avatars/default-avatar.svg'; // Standard-Avatar, wenn avatarPath nicht vorhanden ist
-  //       this.senderName = userDoc.name; // Setze den Benutzernamen
-  //     } else {
-  //       console.warn('Benutzerdaten nicht gefunden für UID:', currentUser.id);
-  //       this.senderAvatar = './assets/images/avatars/default-avatar.svg'; // Setze einen Standard-Avatar
-  //     }
-
-  //   } else {
-  //     console.log('Kein Benutzer angemeldet');
-  //   }
-  // }
-
-  getCurrentUser() {
-    this.authService.getCurrentUser();
-    console.log(this.currentUser());
-
+  loadCurrentUser(currentUserId: string) {
+    this.currentUser = this.users.find(user => user.id === currentUserId);
   }
 
   openChannelDescriptionDialog() {
@@ -217,7 +218,7 @@ export class ChatWindowComponent implements OnInit {
 
         const newMessage: Message = new Message({
           senderID: this.currentUserUid,
-          senderName: this.senderName,
+          senderName: this.currentUser.name,
           message: this.chatMessage,
           channelId: this.selectedChannelId, // Verwende die gespeicherte channelId
           reaction: '',
@@ -257,9 +258,15 @@ export class ChatWindowComponent implements OnInit {
   }
 
 
-  async loadMessages(selectedChannelId: string) {
+  async loadMessages(channelId: string) {
     const messagesRef = collection(this.firestore, 'messages');
-    const messagesQuery = query(messagesRef, orderBy('timestamp'));
+
+    // Filtere die Nachrichten nach der übergebenen channelId
+    const messagesQuery = query(
+      messagesRef,
+      where('channelId', '==', channelId), // Hier filtern wir nach channelId
+      orderBy('timestamp')
+    );
 
     onSnapshot(messagesQuery, async (snapshot) => {
       let lastDisplayedDate: string | null = null;
@@ -272,10 +279,8 @@ export class ChatWindowComponent implements OnInit {
         // Überprüfen, ob senderID nicht null ist
         if (message.senderID) {
           const senderUser = await this.userService.getUserById(message.senderID);
-          // Setze den Avatar für die Nachricht oder einen Standard-Avatar, wenn kein Avatar verfügbar ist
           message.senderAvatar = senderUser?.avatarPath || './assets/images/avatars/avatar5.svg';
         } else {
-          // Setze Standard-Avatar, wenn senderID null ist
           message.senderAvatar = './assets/images/avatars/avatar5.svg';
         }
 
@@ -293,10 +298,13 @@ export class ChatWindowComponent implements OnInit {
         message.formattedTimestamp = messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         return message;
       }));
+
       this.cd.detectChanges();
       this.scrollToBottom();
     });
   }
+
+
 
   scrollToBottom(): void {
     if (this.chatWindow) {
@@ -384,5 +392,55 @@ export class ChatWindowComponent implements OnInit {
     return fileName || 'Datei'; // Wenn kein Dateiname gefunden wird, 'Datei' als Fallback anzeigen
   }
 
+  // ngAfterViewChecked() {
+  //   this.scrollToBottom(); // Stelle sicher, dass das Chat-Fenster nach jeder View-Änderung nach unten scrollt
+  // }
+
+  // async getCurrentUser() {
+  //   const currentUser = this.authService.currentUser;
+
+  //   if (currentUser && currentUser.id != null && currentUser.id != undefined) {
+  //     this.currentUserUid = currentUser.id; // Speichere die aktuelle Benutzer-ID
+
+  //     // Benutzerdaten von Firestore abrufen
+  //     const userDoc = await this.userService.getUserById(currentUser.id);
+
+  //     // Überprüfe, ob userDoc existiert und einen avatarPath hat
+  //     if (userDoc) {
+  //       this.senderAvatar = userDoc.avatarPath || './assets/images/avatars/default-avatar.svg'; // Standard-Avatar, wenn avatarPath nicht vorhanden ist
+  //       this.senderName = userDoc.name; // Setze den Benutzernamen
+  //     } else {
+  //       console.warn('Benutzerdaten nicht gefunden für UID:', currentUser.id);
+  //       this.senderAvatar = './assets/images/avatars/default-avatar.svg'; // Setze einen Standard-Avatar
+  //     }
+
+  //   } else {
+  //     console.log('Kein Benutzer angemeldet');
+  //   }
+  // }
+
+  // async loadChannels() {
+  //   const channelsRef = collection(this.firestore, 'channels');
+  //   const channelsQuery = query(channelsRef);
+
+  //   onSnapshot(channelsQuery, (snapshot) => {
+  //     this.channels = snapshot.docs.map(doc => {
+  //       const channelData = doc.data() as Channel;
+  //       return { ...channelData, id: doc.id }; // ID nach channelData hinzufügen
+  //     });
+  //   });
+  // }
+
+  // getChannelName(channelId: string | null) {
+  //   const channel = this.channels.find(c => c.id === channelId);
+
+  //   if (channel) {
+  //     this.selectedChannelId = channel.id; // Setze die selectedChannelId
+  //     return channel.name;
+  //   } else {
+  //     this.selectedChannelId = null; // Setze die selectedChannelId auf null, wenn kein Kanal gefunden wird
+  //     return 'Unbekannter Kanal';
+  //   }
+  // }
 
 }
