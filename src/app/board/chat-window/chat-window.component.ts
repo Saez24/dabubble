@@ -37,7 +37,7 @@ import { AddMemberDialogComponent } from '../../dialogs/add-member-dialog/add-me
 })
 
 export class ChatWindowComponent implements OnInit {
-  messages: Message[] = [];
+  messages = this.messageService.messages;
   users: User[] = [];
   channels: Channel[] = [];
   // currentUser = this.authService.getUserSignal();
@@ -50,8 +50,6 @@ export class ChatWindowComponent implements OnInit {
   editedMessage = '';
   currentUserUid: string | null = null;
   editingMessageId: string | null = null;
-  channelId: string | null = null;
-  selectedChannelId = this.channelsService.currentChannelId;
   senderAvatar: string | null = null;
   senderName: string | null = null;
   selectedFile: File | null = null;// Service für den Datei-Upload
@@ -62,21 +60,20 @@ export class ChatWindowComponent implements OnInit {
   constructor(private firestore: Firestore, private auth: Auth,
     private userService: UserService, private cd: ChangeDetectorRef,
     private authService: AuthService, private uploadFileService: UploadFileService,
-    public channelsService: ChannelsService, public dialog: MatDialog, private messageService: MessagesService) { }
+    public channelsService: ChannelsService, public dialog: MatDialog, public messageService: MessagesService) { }
 
   ngOnInit() {
+    // // Überprüfe, ob currentChannelId gesetzt ist
+    // if (this.channelsService.currentChannelId) {
+    //   this.messages = this.messageService.messages;
+    //   this.messageService.loadMessages(this.channelsService.currentChannelId);
+    //   this.scrollToBottom();
+    //   this.cd.detectChanges();
+    // }
+
+    this.authService.getCurrentUser();
     this.loadData();
-
-    // Überprüfe, ob selectedChannelId bereits gesetzt ist
-
-    console.log(this.selectedChannelId);
-
-    // Überprüfe, ob currentChannelId gesetzt ist
-    if (this.selectedChannelId) {
-      this.messageService.loadMessages(this.selectedChannelId);
-      this.scrollToBottom();
-      this.cd.detectChanges();
-    }
+    this.loadUserData(this.currentUserUid);
   }
 
   async loadData() {
@@ -181,7 +178,7 @@ export class ChatWindowComponent implements OnInit {
   }
 
   async sendMessage() {
-    if (!this.selectedChannelId) {
+    if (!this.channelsService.currentChannelId) {
       this.showError(); // Fehler, wenn kein Kanal ausgewählt ist
       return;
     }
@@ -193,10 +190,10 @@ export class ChatWindowComponent implements OnInit {
         const messagesRef = collection(this.firestore, 'messages');
 
         const newMessage: Message = new Message({
-          senderID: this.currentUserUid,
+          senderID: this.currentUser.uid,
           senderName: this.currentUser.name,
           message: this.chatMessage,
-          channelId: this.selectedChannelId, // Verwende die gespeicherte channelId
+          channelId: this.channelsService.currentChannelId, // Verwende die gespeicherte channelId
           reaction: '',
           answers: [],
           fileURL: '',
@@ -224,7 +221,7 @@ export class ChatWindowComponent implements OnInit {
 
         this.chatMessage = ''; // Eingabefeld leeren
         this.selectedFile = null; // Reset selectedFile
-        this.messageService.loadMessages(this.selectedChannelId); // Übergebe die channelId
+        this.messageService.loadMessages(this.channelsService.currentChannelId); // Übergebe die channelId
         this.scrollToBottom();
         this.deleteUpload();
       } else {

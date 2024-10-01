@@ -7,6 +7,7 @@ import { PickerComponent } from '@ctrl/ngx-emoji-mart';
 import { BehaviorSubject } from 'rxjs';
 import { UploadFileService } from '../firestore/storage-service/upload-file.service';
 import { AuthService } from '../authentication/auth-service/auth.service';
+import { ChannelsService } from '../channels/channels.service';
 // Importiere deinen UserService
 
 @Injectable({
@@ -20,7 +21,7 @@ export class MessagesService {
     private showMessageEditArea: boolean = false;
     private showMessageEdit = false;
     private showEmojiPicker: boolean = false;
-    private messages: Message[] = [];
+    messages: Message[] = [];
     private currentUserUid: string | null = null; // Setze den aktuellen Benutzer-UID
 
 
@@ -28,8 +29,7 @@ export class MessagesService {
     messageArea = true;
     editedMessage = '';
 
-    channelId: string | null = null;
-    selectedChannelId: string | null = null;
+    channelId = this.channelsService.currentChannelId;
     senderAvatar: string | null = null;
     senderName: string | null = null;
     selectedFile: File | null = null;// Service für den Datei-Upload
@@ -37,7 +37,7 @@ export class MessagesService {
     @Output() showThreadEvent = new EventEmitter<void>();
 
     constructor(private firestore: Firestore, private auth: Auth, private userService: UserService,
-        private uploadFileService: UploadFileService, private authService: AuthService) { }
+        private uploadFileService: UploadFileService, private authService: AuthService, public channelsService: ChannelsService,) { }
 
 
     toggleEmojiPicker() {
@@ -89,6 +89,8 @@ export class MessagesService {
     async loadMessages(channelId: string) {
         const messagesRef = collection(this.firestore, 'messages');
         console.log(channelId);
+
+
         // Filtere die Nachrichten nach der übergebenen channelId
         const messagesQuery = query(
             messagesRef,
@@ -148,6 +150,7 @@ export class MessagesService {
             return messageDate.toLocaleDateString('de-DE', { day: 'numeric', month: 'long' });
         }
     }
+
 
     // async saveMessage(message: Message) {
     //     if (message.messageId) {
