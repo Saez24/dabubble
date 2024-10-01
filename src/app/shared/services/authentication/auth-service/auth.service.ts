@@ -168,7 +168,8 @@ export class AuthService {
       const currentUser = this.auth.currentUser;
       if (currentUser) {
         await verifyBeforeUpdateEmail(currentUser, email);
-        console.log('Email to confirm your new Email is send. This could take some Minutes');
+        alert('Email to confirm your new Email is send. This could take some Minutes');
+        await this.logout();
         
       }
     } catch (err: any) {
