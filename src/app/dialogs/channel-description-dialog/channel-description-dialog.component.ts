@@ -12,6 +12,7 @@ import { Channel } from '../../shared/models/channel.class';
 import { collection, Firestore, onSnapshot, orderBy, query } from '@angular/fire/firestore';
 import { User } from '../../shared/models/user.class';
 import { Auth } from '@angular/fire/auth';
+import { NgIf, NgStyle } from '@angular/common';
 
 export class MyErrorStateMatcher implements ErrorStateMatcher {
   isErrorState(control: FormControl | null): boolean {
@@ -28,7 +29,9 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
     MatIconModule,
     FormsModule,
     MatInputModule,
-    MatButtonModule
+    MatButtonModule,
+    NgIf,
+    NgStyle
   ],
   templateUrl: './channel-description-dialog.component.html',
   styleUrls: ['./channel-description-dialog.component.scss'],
@@ -45,6 +48,8 @@ export class ChannelDescriptionDialogComponent {
   currentUser: User | undefined;
   currentChannelName: string = '';
   currentChannelDescription: string = '';
+  editChannelName: boolean = false;
+  editChannelDescription: boolean = false;
 
   constructor(
     public channelsService: ChannelsService,
@@ -57,6 +62,8 @@ export class ChannelDescriptionDialogComponent {
 
   ngOnInit(): void {
     this.channel = this.channelsService.channel;
+    this.currentChannelName = this.channelsService.currentChannelName;
+    this.currentChannelDescription = this.channelsService.currentChannelDescription;
     this.loadUsers();
     console.log(this.channel);
   }
@@ -84,8 +91,16 @@ export class ChannelDescriptionDialogComponent {
     return this.users.find(user => user.id === userId);
 }
 
-  editChannel() {
+  editDescription() {
+    this.editChannelDescription = !this.editChannelDescription;
+  }
 
+  editName() {
+    this.editChannelName = !this.editChannelName;
+  }
+
+  emptyInput() {
+    this.currentChannelName = '';
   }
 
 }

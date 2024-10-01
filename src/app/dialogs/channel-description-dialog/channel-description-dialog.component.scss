@@ -80,6 +80,7 @@ span {
     padding: 20px;
     border: 1px solid $purple-grey;
     border-radius: 20px;
+    // transition: border 0.3s linear, padding 0.3s linear;
 
         > div:nth-child(1) {
             @include dFlex($jc: space-between);
@@ -153,12 +154,27 @@ span {
 
         > div:nth-child(3) {
             width: 100%;
-            @include dFlex($jc: center);
-            .line {
+            display: flex;
+            justify-content: flex-start;
+            align-items: flex-start;
+            flex-direction: column;
+            gap: 20px;
+            > div {
                 width: 100%;
-                height: 1px;
-                background-color: $purple-grey;
+                gap: 20px;
+                display: flex;
+                flex-direction: column;
+                // .line {
+                //     width: 100%;
+                //     height: 1px;
+                //     background-color: $purple-grey;
+                // }
+                .creator {
+                    color: $dark-purple;
+                    font-size: 24px; 
+                }
             }
+            
         }
 
         > div:nth-child(4) {
@@ -171,6 +187,45 @@ span {
             }
         }
     }
+}
+
+.creator-container {
+    width: 100%;
+    gap: 20px;
+    display: flex;
+    flex-direction: column;
+    p {
+        font-size: 18px;
+        margin: 0 !important;
+    }
+    .creator {
+        color: $dark-purple;
+        font-size: 24px; 
+    }
+}
+
+.edit-channel-description {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+    .channel-description-bottom {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        // .line {
+        //     height: 1px;
+        //     width: 100%;
+        //     background-color: $purple-grey;
+        // }
+    }
+}
+
+.line {
+    height: 1px;
+    width: 100%;
+    background-color: $purple-grey;
 }
 
 .dialog-footer {
@@ -211,6 +266,7 @@ span {
 
 .mat-mdc-form-field {
     width: 100%;
+    margin-bottom: -20px;
 }
 
 .mat-mdc-dialog-content .mdc-dialog__content .mat-mdc-dialog-container-with-actions {
@@ -229,3 +285,31 @@ span {
     height: 40px;
     padding: 0;
 }
+
+.mdc-text-field--outlined {
+    @include dFlex();
+    --mdc-outlined-text-field-container-shape: 40px !important;
+    min-height: 60px;
+}
+
+.mdc-text-field--outlined .mat-mdc-form-field-infix, .mdc-text-field--no-label .mat-mdc-form-field-infix {
+    display: flex;
+    align-items: center;
+    height: 60px;
+    gap: 20px;
+    .mat-icon {
+        width: 15.79px !important;
+        height: 15.33px !important;
+    }
+}
+
+.mdc-text-field--no-label:not(.mdc-text-field--textarea) .mat-mdc-form-field-input-control.mdc-text-field__input, .mat-mdc-text-field-wrapper .mat-mdc-form-field-input-control {
+    font-size: 18px;
+    color: grey;
+}
+
+.mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-notched-outline__leading,
+.mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-notched-outline__notch,
+.mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-notched-outline__trailing {
+  border-color: $purple !important;
+} 

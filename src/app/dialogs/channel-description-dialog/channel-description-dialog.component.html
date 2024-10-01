@@ -15,14 +15,19 @@
     <section class="content">
     
         <form #channelForm="ngForm" class="form-content">
-            <div class="channel-name">
+            <div class="channel-name" 
+            [ngStyle]="{
+                'border': editChannelName ? 'none' : '1px solid #ADB0D9',
+                'padding': editChannelName ? '0px' : '20px'
+            }">
 
                 <div>
                     <h2>Channel-Name</h2>
-                    <a (click)="editChannel()"><span>Bearbeiten</span></a>
+                    <a *ngIf="!editChannelName" (click)="editName()"><span>Bearbeiten</span></a>
+                    <a *ngIf="editChannelName" (click)="editName()"><span>Speichern</span></a>
                 </div>
                 
-                <div>
+                <div *ngIf="!editChannelName">
                     <mat-icon 
                         svgIcon="hashtag" 
                         aria-hidden="false" 
@@ -35,44 +40,61 @@
 
             </div>
 
-             <!-- <mat-form-field appearance="outline">
+             <mat-form-field *ngIf="editChannelName" appearance="outline">
                     <mat-icon class="icon" svgIcon="hashtag" aria-hidden="false" aria-label="Workspace icon"></mat-icon>
                     <input matInput required
-                           placeholder="z.B. Kooperationsobjekte"
+                           placeholder=""
                            name="channelName"
                            [(ngModel)]="currentChannelName"
                            [ngModelOptions]="{standalone: true}"
                            maxlength="20"
+                           (click)="emptyInput()"
                            >
                            @if (nameFormControl.hasError('required')) {
                             <mat-error>Bitte geben Sie einen Namen ein.</mat-error>
                             }
-                </mat-form-field> -->
+                </mat-form-field>
 
-            <div class="channel-description">
-
-                <div>
-                    <div>
-                        <h2>Beschreibung</h2>
-                        <a (click)="editChannel()"><span>Bearbeiten</span></a>
-                    </div>
-                    
-                    <span>{{ channelsService.currentChannelDescription }}</span>
-                    <div><div class="line"></div></div>
-                    <div>
-                        <span>Erstellt von</span>
-                        <p class="creator">{{ currentUser?.name }}</p>
-                    </div>
-                </div>
-                <!-- <mat-form-field appearance="outline">
-                    <input matInput 
-                           placeholder="Dein Text hier"
-                           name="channelDescription"
-                           [(ngModel)]="currentChannelDescription"
-                           maxlength="200"
-                           >
-                </mat-form-field> -->
-            </div>
+                <div class="channel-description" 
+                [ngStyle]="{
+                    'border': editChannelDescription ? 'none' : '1px solid #ADB0D9',
+                    'padding': editChannelDescription ? '0px' : '20px'
+                }">
+           
+               <div>
+                   <div>
+                       <h2>Beschreibung</h2>
+                       <a *ngIf="!editChannelDescription" (click)="editDescription()"><span>Bearbeiten</span></a>
+                       <a *ngIf="editChannelDescription" (click)="editDescription()"><span>Speichern</span></a>
+                   </div>
+           
+                   <span *ngIf="!editChannelDescription">{{ channelsService.currentChannelDescription }}</span>
+           
+                   <div class="edit-channel-description">
+                       <mat-form-field *ngIf="editChannelDescription" appearance="outline">
+                           <input matInput 
+                                  placeholder="Dein Text hier"
+                                  name="channelDescription"
+                                  [(ngModel)]="currentChannelDescription"
+                                  
+                                  maxlength="200">
+                       </mat-form-field>
+           
+                       <div class="channel-description-bottom">
+                           <div>
+                               <div class="line"></div>
+                           </div>
+           
+                           <div class="creator-container">
+                               <p>Erstellt von</p>
+                               <p class="creator">{{ currentUser?.name }}</p>
+                           </div>
+                       </div>
+                   </div>
+               </div>
+           </div>
+           
+            
         </form>
         
     </section>

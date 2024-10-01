@@ -20,6 +20,7 @@ import { SafeUrlPipe } from '../../shared/pipes/safe-url.pipe';
 import { ChannelsService } from '../../shared/services/channels/channels.service';
 import { ChannelDescriptionDialogComponent } from '../../dialogs/channel-description-dialog/channel-description-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
+import { AddMemberDialogComponent } from '../../dialogs/add-member-dialog/add-member-dialog.component';
 
 
 
@@ -104,8 +105,12 @@ export class ChatWindowComponent implements OnInit {
 
   }
 
-  openDialog() {
+  openChannelDescriptionDialog() {
     this.dialog.open(ChannelDescriptionDialogComponent)
+  }
+
+  openAddMemberDialog() {
+    this.dialog.open(AddMemberDialogComponent)
   }
 
   loadUserData(uid: string | null) {
