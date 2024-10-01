@@ -1,5 +1,5 @@
-import { Injectable, EventEmitter, HostListener, Output } from '@angular/core';
-import { Firestore, doc, updateDoc, addDoc, collection, onSnapshot, query, orderBy } from '@angular/fire/firestore';
+import { Injectable, EventEmitter, HostListener, Output, ElementRef, ViewChild, ChangeDetectorRef } from '@angular/core';
+import { Firestore, doc, updateDoc, addDoc, collection, onSnapshot, query, orderBy, where } from '@angular/fire/firestore';
 import { Auth } from '@angular/fire/auth';
 import { UserService } from '../firestore/user-service/user.service';
 import { Message } from '../../models/message.class';
@@ -29,14 +29,15 @@ export class MessagesService {
     editedMessage = '';
 
     channelId: string | null = null;
-    selectedChannelId: string | null = 'hJHD4P2xWfH9J45vaZPS';
+    selectedChannelId: string | null = null;
     senderAvatar: string | null = null;
     senderName: string | null = null;
     selectedFile: File | null = null;// Service für den Datei-Upload
     filePreviewUrl: string | null = null;
     @Output() showThreadEvent = new EventEmitter<void>();
 
-    constructor(private firestore: Firestore, private auth: Auth, private userService: UserService, private uploadFileService: UploadFileService, private authService: AuthService) { }
+    constructor(private firestore: Firestore, private auth: Auth, private userService: UserService,
+        private uploadFileService: UploadFileService, private authService: AuthService) { }
 
 
     toggleEmojiPicker() {
@@ -83,6 +84,69 @@ export class MessagesService {
 
     showThread() {
         this.showThreadEvent.emit();
+    }
+
+    async loadMessages(channelId: string) {
+        const messagesRef = collection(this.firestore, 'messages');
+        console.log(channelId);
+        // Filtere die Nachrichten nach der übergebenen channelId
+        const messagesQuery = query(
+            messagesRef,
+            where('channelId', '==', channelId), // Hier filtern wir nach channelId
+            orderBy('timestamp')
+        );
+
+        onSnapshot(messagesQuery, async (snapshot) => {
+            let lastDisplayedDate: string | null = null;
+
+            this.messages = await Promise.all(snapshot.docs.map(async (doc) => {
+                const messageData = doc.data();
+                const message = new Message(messageData, this.currentUserUid);
+                message.messageId = doc.id;
+
+                // Überprüfen, ob senderID nicht null ist
+                if (message.senderID) {
+                    const senderUser = await this.userService.getUserById(message.senderID);
+                    message.senderAvatar = senderUser?.avatarPath || './assets/images/avatars/avatar5.svg';
+                } else {
+                    message.senderAvatar = './assets/images/avatars/avatar5.svg';
+                }
+
+                const messageTimestamp = messageData['timestamp'];
+                const messageDate = new Date(messageTimestamp.seconds * 1000);
+                const formattedDate = this.formatTimestamp(messageDate);
+
+                if (formattedDate !== lastDisplayedDate) {
+                    message.displayDate = formattedDate;
+                    lastDisplayedDate = formattedDate;
+                } else {
+                    message.displayDate = null;
+                }
+
+                message.formattedTimestamp = messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                return message;
+            }));
+        });
+    }
+
+
+
+    formatTimestamp(messageDate: Date): string {
+        const today = new Date();
+        const yesterday = new Date();
+        yesterday.setDate(today.getDate() - 1);
+
+        const isToday = messageDate.toDateString() === today.toDateString();
+        const isYesterday = messageDate.toDateString() === yesterday.toDateString();
+
+        if (isToday) {
+            return 'Heute'; // Wenn die Nachricht von heute ist
+        } else if (isYesterday) {
+            return 'Gestern'; // Wenn die Nachricht von gestern ist
+        } else {
+            // Format "13. September"
+            return messageDate.toLocaleDateString('de-DE', { day: 'numeric', month: 'long' });
+        }
     }
 
     // async saveMessage(message: Message) {
