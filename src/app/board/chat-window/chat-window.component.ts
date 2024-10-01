@@ -21,6 +21,7 @@ import { ChannelsService } from '../../shared/services/channels/channels.service
 import { ChannelDescriptionDialogComponent } from '../../dialogs/channel-description-dialog/channel-description-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { MessagesService } from '../../shared/services/messages/messages.service';
+import { AddMemberDialogComponent } from '../../dialogs/add-member-dialog/add-member-dialog.component';
 
 
 
@@ -28,7 +29,7 @@ import { MessagesService } from '../../shared/services/messages/messages.service
   selector: 'app-chat-window',
   standalone: true,
   imports: [MatCardModule, MatButtonModule, MatIconModule, MatDividerModule, FormsModule,
-    MatFormFieldModule, MatInputModule, CommonModule, PickerComponent, NgIf, NgFor, SafeUrlPipe],
+    MatFormFieldModule, MatInputModule, CommonModule, PickerComponent, NgIf, NgFor, SafeUrlPipe, AddMemberDialogComponent],
   templateUrl: './chat-window.component.html',
   styleUrl: './chat-window.component.scss',
   changeDetection: ChangeDetectionStrategy.Default,
