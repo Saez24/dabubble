@@ -20,7 +20,7 @@ import { SafeUrlPipe } from '../../shared/pipes/safe-url.pipe';
 import { ChannelsService } from '../../shared/services/channels/channels.service';
 import { ChannelDescriptionDialogComponent } from '../../dialogs/channel-description-dialog/channel-description-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
-import { AddMemberDialogComponent } from '../../dialogs/add-member-dialog/add-member-dialog.component';
+import { MessagesService } from '../../shared/services/messages/messages.service';
 
 
 
@@ -61,19 +61,20 @@ export class ChatWindowComponent implements OnInit {
   constructor(private firestore: Firestore, private auth: Auth,
     private userService: UserService, private cd: ChangeDetectorRef,
     private authService: AuthService, private uploadFileService: UploadFileService,
-    public channelsService: ChannelsService, public dialog: MatDialog,) { }
+    public channelsService: ChannelsService, public dialog: MatDialog, private messageService: MessagesService) { }
 
   ngOnInit() {
     this.loadData();
-    this.loadUserData(this.currentUserUid);
-    this.authService.getCurrentUser();
 
     // Überprüfe, ob selectedChannelId bereits gesetzt ist
-    const currentChannelId = this.channelsService.currentChannelId;
+
+    console.log(this.selectedChannelId);
 
     // Überprüfe, ob currentChannelId gesetzt ist
-    if (currentChannelId) {
-      this.loadMessages(currentChannelId);
+    if (this.selectedChannelId) {
+      this.messageService.loadMessages(this.selectedChannelId);
+      this.scrollToBottom();
+      this.cd.detectChanges();
     }
   }
 
@@ -117,32 +118,6 @@ export class ChatWindowComponent implements OnInit {
   loadUserData(uid: string | null) {
     this.authService.loadUserData(uid);
   }
-
-  async loadChannels() {
-    const channelsRef = collection(this.firestore, 'channels');
-    const channelsQuery = query(channelsRef);
-
-    onSnapshot(channelsQuery, (snapshot) => {
-      this.channels = snapshot.docs.map(doc => {
-        const channelData = doc.data() as Channel;
-        console.log(channelData);
-
-        return { ...channelData, id: doc.id }; // ID nach channelData hinzufügen
-      });
-    });
-  }
-
-  // getChannelName(channelId: string | null) {
-  //   const channel = this.channels.find(c => c.id === channelId);
-
-  //   if (channel) {
-  //     this.selectedChannelId = channel.id; // Setze die selectedChannelId
-  //     return channel.name;
-  //   } else {
-  //     this.selectedChannelId = null; // Setze die selectedChannelId auf null, wenn kein Kanal gefunden wird
-  //     return 'Unbekannter Kanal';
-  //   }
-  // }
 
   showEmoji() {
     this.showEmojiPicker = !this.showEmojiPicker;
@@ -248,7 +223,7 @@ export class ChatWindowComponent implements OnInit {
 
         this.chatMessage = ''; // Eingabefeld leeren
         this.selectedFile = null; // Reset selectedFile
-        this.loadMessages(this.selectedChannelId); // Übergebe die channelId
+        this.messageService.loadMessages(this.selectedChannelId); // Übergebe die channelId
         this.scrollToBottom();
         this.deleteUpload();
       } else {
@@ -256,55 +231,6 @@ export class ChatWindowComponent implements OnInit {
       }
     }
   }
-
-
-  async loadMessages(channelId: string) {
-    const messagesRef = collection(this.firestore, 'messages');
-
-    // Filtere die Nachrichten nach der übergebenen channelId
-    const messagesQuery = query(
-      messagesRef,
-      where('channelId', '==', channelId), // Hier filtern wir nach channelId
-      orderBy('timestamp')
-    );
-
-    onSnapshot(messagesQuery, async (snapshot) => {
-      let lastDisplayedDate: string | null = null;
-
-      this.messages = await Promise.all(snapshot.docs.map(async (doc) => {
-        const messageData = doc.data();
-        const message = new Message(messageData, this.currentUserUid);
-        message.messageId = doc.id;
-
-        // Überprüfen, ob senderID nicht null ist
-        if (message.senderID) {
-          const senderUser = await this.userService.getUserById(message.senderID);
-          message.senderAvatar = senderUser?.avatarPath || './assets/images/avatars/avatar5.svg';
-        } else {
-          message.senderAvatar = './assets/images/avatars/avatar5.svg';
-        }
-
-        const messageTimestamp = messageData['timestamp'];
-        const messageDate = new Date(messageTimestamp.seconds * 1000);
-        const formattedDate = this.formatTimestamp(messageDate);
-
-        if (formattedDate !== lastDisplayedDate) {
-          message.displayDate = formattedDate;
-          lastDisplayedDate = formattedDate;
-        } else {
-          message.displayDate = null;
-        }
-
-        message.formattedTimestamp = messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        return message;
-      }));
-
-      this.cd.detectChanges();
-      this.scrollToBottom();
-    });
-  }
-
-
 
   scrollToBottom(): void {
     if (this.chatWindow) {
@@ -316,23 +242,82 @@ export class ChatWindowComponent implements OnInit {
     }
   }
 
-  formatTimestamp(messageDate: Date): string {
-    const today = new Date();
-    const yesterday = new Date();
-    yesterday.setDate(today.getDate() - 1);
 
-    const isToday = messageDate.toDateString() === today.toDateString();
-    const isYesterday = messageDate.toDateString() === yesterday.toDateString();
+  // async loadMessages(channelId: string) {
+  //   const messagesRef = collection(this.firestore, 'messages');
+  //   console.log(channelId);
 
-    if (isToday) {
-      return 'Heute'; // Wenn die Nachricht von heute ist
-    } else if (isYesterday) {
-      return 'Gestern'; // Wenn die Nachricht von gestern ist
-    } else {
-      // Format "13. September"
-      return messageDate.toLocaleDateString('de-DE', { day: 'numeric', month: 'long' });
-    }
-  }
+
+  //   // Filtere die Nachrichten nach der übergebenen channelId
+  //   const messagesQuery = query(
+  //     messagesRef,
+  //     where('channelId', '==', channelId), // Hier filtern wir nach channelId
+  //     orderBy('timestamp')
+  //   );
+
+  //   onSnapshot(messagesQuery, async (snapshot) => {
+  //     let lastDisplayedDate: string | null = null;
+
+  //     this.messages = await Promise.all(snapshot.docs.map(async (doc) => {
+  //       const messageData = doc.data();
+  //       const message = new Message(messageData, this.currentUserUid);
+  //       message.messageId = doc.id;
+
+  //       // Überprüfen, ob senderID nicht null ist
+  //       if (message.senderID) {
+  //         const senderUser = await this.userService.getUserById(message.senderID);
+  //         message.senderAvatar = senderUser?.avatarPath || './assets/images/avatars/avatar5.svg';
+  //       } else {
+  //         message.senderAvatar = './assets/images/avatars/avatar5.svg';
+  //       }
+
+  //       const messageTimestamp = messageData['timestamp'];
+  //       const messageDate = new Date(messageTimestamp.seconds * 1000);
+  //       const formattedDate = this.formatTimestamp(messageDate);
+
+  //       if (formattedDate !== lastDisplayedDate) {
+  //         message.displayDate = formattedDate;
+  //         lastDisplayedDate = formattedDate;
+  //       } else {
+  //         message.displayDate = null;
+  //       }
+
+  //       message.formattedTimestamp = messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  //       return message;
+  //     }));
+
+  //     this.cd.detectChanges();
+  //     this.scrollToBottom();
+  //   });
+  // }
+
+  // scrollToBottom(): void {
+  //   if (this.chatWindow) {
+  //     try {
+  //       this.chatWindow.nativeElement.scrollTop = this.chatWindow.nativeElement.scrollHeight;
+  //     } catch (err) {
+  //       console.error('Scroll to bottom failed:', err);
+  //     }
+  //   }
+  // }
+
+  // formatTimestamp(messageDate: Date): string {
+  //   const today = new Date();
+  //   const yesterday = new Date();
+  //   yesterday.setDate(today.getDate() - 1);
+
+  //   const isToday = messageDate.toDateString() === today.toDateString();
+  //   const isYesterday = messageDate.toDateString() === yesterday.toDateString();
+
+  //   if (isToday) {
+  //     return 'Heute'; // Wenn die Nachricht von heute ist
+  //   } else if (isYesterday) {
+  //     return 'Gestern'; // Wenn die Nachricht von gestern ist
+  //   } else {
+  //     // Format "13. September"
+  //     return messageDate.toLocaleDateString('de-DE', { day: 'numeric', month: 'long' });
+  //   }
+  // }
 
   onFileSelected(event: Event) {
     const fileInput = event.target as HTMLInputElement;
