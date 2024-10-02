@@ -48,7 +48,7 @@ export class ChatWindowComponent implements OnInit {
   chatMessage = '';
   messageArea = true;
   editedMessage = '';
-  currentUserUid = this.authService.currentUserUid
+  currentUserUid = this.authService.currentUserUid;
   editingMessageId: string | null = null;
   senderAvatar: string | null = null;
   senderName: string | null = null;

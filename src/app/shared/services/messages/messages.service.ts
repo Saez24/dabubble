@@ -23,12 +23,8 @@ export class MessagesService {
     private showEmojiPicker: boolean = false;
     messages: Message[] = [];
     currentUserUid = this.authService.currentUserUid; // Setze den aktuellen Benutzer-UID
-
-
-
     messageArea = true;
     editedMessage = '';
-
     channelId = this.channelsService.currentChannelId;
     senderAvatar: string | null = null;
     senderName: string | null = null;

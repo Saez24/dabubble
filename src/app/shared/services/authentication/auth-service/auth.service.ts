@@ -26,19 +26,20 @@ export class AuthService {
 
   constructor(private firestore: Firestore) {
     this.initializeAuthState();
+    this.loadUserData(this.currentUserUid);
   }
 
-  getCurrentUser() {
-    const userId = this.currentUser()?.id;
-    console.log('Current User Id: ', userId);
-    console.log('Current User Avatar: ', this.currentUser()?.avatarPath);
-    if (userId) {
-      this.currentUserUid = userId;  // Speichere die aktuelle Benutzer-ID
-      this.loadUserData(this.currentUserUid);
-    } else {
-      console.log('Kein Benutzer angemeldet');
-    }
-  }
+  // getCurrentUser() {
+  //   const userId = this.currentUser()?.id;
+  //   console.log('Current User Id: ', userId);  // Überprüfen, ob die ID korrekt ist
+  //   if (userId) {
+  //     this.currentUserUid = userId;  // Speichere die aktuelle Benutzer-ID
+  //     this.loadUserData(this.currentUserUid);
+  //   } else {
+  //     console.log('Kein Benutzer angemeldet');
+  //   }
+  // }
+
 
   loadUserData(uid: string | null) {
     if (!uid) {
@@ -52,21 +53,32 @@ export class AuthService {
         const data = doc.data() as {
           name: string;
           avatarPath: string;
+          email: string;
+          channels: string[];
+          loginState: string;
         };
 
-        // Update currentUser with Firestore data
-        // this.currentUser = new User({
-        //   id: uid,
-        //   name: data.name,
-        //   avatarPath: data.avatarPath,
-        //   loginState: 'loggedIn', // Assuming the user is logged in
-        //   channels: [] // Load channels if necessary
-        // });
+        console.log('Benutzerdaten gefunden: ', data);
+
+        // Benutzer in das Signal setzen
+        const user = new User({
+          id: uid,
+          name: data.name,
+          avatarPath: data.avatarPath,
+          email: data.email,
+          loginState: data.loginState,
+          channels: data.channels,
+        });
+
+        this.setUser(user);  // Benutzerdaten im Signal speichern
       } else {
         console.log('Kein Benutzerdokument gefunden');
       }
+    }, (error) => {
+      console.error('Fehler beim Abrufen des Dokuments:', error);
     });
   }
+
 
   getUserSignal() {
     return this.userSignal;
@@ -86,12 +98,15 @@ export class AuthService {
   initializeAuthState() {
     this.authSubscription = user(this.auth).subscribe((authUser: AuthUser | null) => {
       if (authUser) {
+        console.log('Benutzer ist authentifiziert: ', authUser.uid);
         let currentUser = this.setCurrentUserObject(authUser);
         this.setUser(currentUser);
+        this.loadUserData(authUser.uid);  // Benutzer-Daten nach Authentifizierung laden
       } else {
-        this.setUser(null);
+        this.setUser(null);  // Kein Benutzer authentifiziert
+        console.log('Kein Benutzer authentifiziert');
       }
-    })
+    });
   }
 
 
