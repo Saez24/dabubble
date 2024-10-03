@@ -195,7 +195,7 @@ export class ChatWindowComponent implements OnInit {
           senderName: this.currentUser.name,
           message: this.chatMessage,
           channelId: this.channelsService.currentChannelId, // Verwende die gespeicherte channelId
-          reaction: '',
+          reactions: [],
           answers: [],
           fileURL: '',
         });
@@ -205,7 +205,7 @@ export class ChatWindowComponent implements OnInit {
           senderName: newMessage.senderName,
           message: newMessage.message,
           channelId: newMessage.channelId,
-          reaction: newMessage.reaction,
+          reaction: newMessage.reactions,
           answers: newMessage.answers,
           timestamp: new Date(),
         });

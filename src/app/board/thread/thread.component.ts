@@ -48,6 +48,9 @@ export class ThreadComponent implements OnInit {
   selectedFile: File | null = null;
   filePreviewUrl: string | null = null;
   @Input() selectedMessage: Message | null = null;
+  reactions: { emoji: string, senderName: string, count: number }[] = [];
+  selectedMessageId: string | null = null; // Füge dies hinzu
+
 
   @ViewChild('cthreadWindow') private threadWindow!: ElementRef;
   constructor(private firestore: Firestore, private auth: Auth, private userService: UserService, private cd: ChangeDetectorRef, private authService: AuthService, private uploadFileService: UploadFileService) { }
@@ -95,9 +98,7 @@ export class ThreadComponent implements OnInit {
   }
 
 
-  showEmoji() {
-    this.showEmojiPicker = !this.showEmojiPicker;
-  }
+
 
   showMessageEditToggle() {
     this.showMessageEdit = !this.showMessageEdit;
@@ -129,13 +130,59 @@ export class ThreadComponent implements OnInit {
   }
 
   isEditing(docId: string): boolean {
-    return this.editingMessageId === docId; // Prüfe gegen die Firestore-Dokument-ID
+    return this.editingMessageId === docId;
   }
 
-  addEmoji(event: any) {
-    this.threadMessage += event.emoji.native;
-    console.log(event.emoji.native);
+  showEmoji(messageId: string) {
+    this.selectedMessageId = messageId;
+    this.showEmojiPicker = true;
   }
+
+  // Emoji hinzufügen
+  addEmoji(event: any) {
+    const emoji = event.emoji.native;
+
+    let messageToUpdate: Message | null | undefined = this.messages.find(msg => msg.messageId === this.selectedMessageId);
+
+    if (!messageToUpdate) {
+      messageToUpdate = this.selectedMessage;
+    }
+    console.log('messageToUpdate before adding reaction:', messageToUpdate);
+
+    if (messageToUpdate) {
+      const existingReaction = messageToUpdate.reactions.find(r => r.emoji === emoji);
+
+      if (existingReaction) {
+        existingReaction.count += 1;
+      } else {
+        messageToUpdate.reactions.push({
+          emoji: emoji,
+          senderName: this.senderName || '',
+          count: 1
+        });
+      }
+      console.log('Updated reactions:', messageToUpdate.reactions);
+      this.updateMessageReactions(messageToUpdate);
+    }
+
+    this.showEmojiPicker = false;
+  }
+
+  async updateMessageReactions(message: Message) {
+    const messageRef = doc(this.firestore, `messages/${message.messageId}`);
+    console.log('Updating reactions for messageId:', message.messageId, 'with reactions:', message.reactions);
+
+    try {
+      await updateDoc(messageRef, {
+        reactions: message.reactions // Aktualisiere das gesamte Reactions-Array
+      });
+    } catch (error) {
+      console.error("Fehler beim Aktualisieren der Reaktionen: ", error);
+    }
+  }
+
+
+
 
   @HostListener('document:click', ['$event'])
   clickOutside(event: Event) {
@@ -166,37 +213,29 @@ export class ThreadComponent implements OnInit {
       const currentUser = this.authService.currentUser;
 
       if (currentUser()) {
+        const newMessageId = doc(collection(this.firestore, 'messages')).id;
         // Prüfe, ob es sich um eine Antwort handelt
-        if (this.selectedMessage) {
-          // Wenn es sich um eine Antwort handelt, füge die Nachricht nur zum answers-Array hinzu
-          const newMessage: Message = new Message({
-            senderID: this.currentUserUid,
-            senderName: this.senderName,
-            message: this.threadMessage,
-            reaction: '',
-            parentMessageId: this.selectedMessage.messageId,
-            fileURL: '',
-          });
+        const newMessage: Message = new Message({
+          senderID: this.currentUserUid,
+          senderName: this.senderName,
+          message: this.threadMessage,
+          reactions: [], // Leeres Array für Reaktionen
+          parentMessageId: this.selectedMessage ? this.selectedMessage.messageId : null,
+          fileURL: '',
+          messageId: newMessageId
+        });
 
+        if (this.selectedMessage) {
           // Speichere die Antwort im answers-Array der ausgewählten Nachricht
           await this.saveMessageToDatabase(newMessage, this.selectedMessage);
         } else {
           // Ansonsten erstelle eine neue Nachricht in der messages-Sammlung
           const messagesRef = collection(this.firestore, 'messages');
-          const newMessage: Message = new Message({
-            senderID: this.currentUserUid,
-            senderName: this.senderName,
-            message: this.threadMessage,
-            reaction: '',
-            parentMessageId: null,
-            fileURL: '',
-          });
-
           const messageDocRef = await addDoc(messagesRef, {
             senderID: newMessage.senderID,
             senderName: newMessage.senderName,
             message: newMessage.message,
-            reaction: newMessage.reaction,
+            reactions: newMessage.reactions, // Füge leeres Array hinzu
             parentMessageId: newMessage.parentMessageId,
             timestamp: new Date(),
           });
@@ -225,6 +264,7 @@ export class ThreadComponent implements OnInit {
     }
   }
 
+
   async saveMessageToDatabase(message: Message, selectedMessage: Message) {
     const messageRef = doc(this.firestore, 'messages', selectedMessage.messageId);
 
@@ -234,7 +274,8 @@ export class ThreadComponent implements OnInit {
         senderName: message.senderName,
         message: message.message,
         timestamp: new Date(),
-        reaction: '',
+        reactions: message.reactions,
+        messageId: message.messageId
       })
     });
   }
