@@ -39,8 +39,6 @@ export class ThreadComponent implements OnInit {
   showMessageEdit = false;
   showMessageEditArea = false;
   threadMessage = '';
-  messageArea = true;
-  editedMessage = '';
   currentUserUid: string | null = null;
   editingMessageId: string | null = null;
   senderAvatar: string | null = null;
@@ -49,7 +47,9 @@ export class ThreadComponent implements OnInit {
   filePreviewUrl: string | null = null;
   @Input() selectedMessage: Message | null = null;
   reactions: { emoji: string, senderName: string, count: number }[] = [];
-  selectedMessageId: string | null = null; // Füge dies hinzu
+  selectedMessageId: string | null = null;
+  originalMessage: string | null = null; // Ursprüngliche Nachricht speichern
+
 
 
   @ViewChild('cthreadWindow') private threadWindow!: ElementRef;
@@ -97,36 +97,53 @@ export class ThreadComponent implements OnInit {
     });
   }
 
-
-
-
   showMessageEditToggle() {
     this.showMessageEdit = !this.showMessageEdit;
   }
 
-  editMessage(docId: string) {
-    this.editingMessageId = docId; // Verwende die Dokument-ID
+  editMessage(docId: string, message: Message) {
+    this.editingMessageId = docId;
+    this.originalMessage = message.message;
     this.showMessageEditArea = true;
     this.showMessageEdit = false;
   }
 
+  async saveMessage(message: Message) {
+    if (this.editingMessageId && this.selectedMessage) {
+      const messageRef = doc(this.firestore, `messages/${this.selectedMessage.messageId}`);
+      const docSnap = await getDoc(messageRef);
 
-  saveMessage(message: Message) {
-    if (this.editingMessageId) { // Nutze die `editingMessageId` (Dokument-ID) anstelle von `message.messageId`
-      const messageRef = doc(this.firestore, `messages/${this.editingMessageId}`); // Verweise auf die Dokument-ID
+      if (docSnap.exists()) {
+        const mainMessage = docSnap.data();
+        const answers = mainMessage['answers'] || [];
+        const answerToUpdate = answers.find((answer: any) => answer.messageId === this.editingMessageId);
 
-      updateDoc(messageRef, { message: message.message }).then(() => {
-        this.editingMessageId = null;
-        this.showMessageEditArea = false;
-      }).catch(error => {
-        console.error("Fehler beim Speichern der Nachricht: ", error);
-      });
+        if (answerToUpdate) {
+          answerToUpdate.message = message.message;
+          await updateDoc(messageRef, { answers });
+          console.log('Antwort erfolgreich aktualisiert');
+          this.resetEditState();
+        } else {
+          console.error('Antwort nicht gefunden');
+        }
+      } else {
+        console.error('Hauptnachricht nicht gefunden');
+      }
     }
   }
 
-  cancelMessageEdit() {
+  cancelMessageEdit(message: Message) {
+    // Nachricht auf den ursprünglichen Wert zurücksetzen
+    if (this.originalMessage !== null) {
+      message.message = this.originalMessage;
+    }
+    this.resetEditState();
+  }
+
+  resetEditState() {
     this.editingMessageId = null;
     this.showMessageEditArea = false;
+    this.originalMessage = null;
   }
 
   isEditing(docId: string): boolean {
@@ -138,35 +155,55 @@ export class ThreadComponent implements OnInit {
     this.showEmojiPicker = true;
   }
 
-  // Emoji hinzufügen
   addEmoji(event: any) {
     const emoji = event.emoji.native;
+    if (this.selectedMessageId !== this.threadMessage) {
 
-    let messageToUpdate: Message | null | undefined = this.messages.find(msg => msg.messageId === this.selectedMessageId);
+      // Nachricht finden, die aktualisiert werden soll
+      const messageToUpdate = this.findMessageToUpdate();
 
-    if (!messageToUpdate) {
-      messageToUpdate = this.selectedMessage;
-    }
-    console.log('messageToUpdate before adding reaction:', messageToUpdate);
-
-    if (messageToUpdate) {
-      const existingReaction = messageToUpdate.reactions.find(r => r.emoji === emoji);
-
-      if (existingReaction) {
-        existingReaction.count += 1;
-      } else {
-        messageToUpdate.reactions.push({
-          emoji: emoji,
-          senderName: this.senderName || '',
-          count: 1
-        });
+      if (!messageToUpdate) {
+        console.error('Nachricht nicht gefunden oder keine gültige Nachricht ausgewählt.');
+        return; // Vorzeitiges Verlassen, falls keine Nachricht gefunden wurde
       }
-      console.log('Updated reactions:', messageToUpdate.reactions);
-      this.updateMessageReactions(messageToUpdate);
-    }
 
+      // Reaktion zur Nachricht hinzufügen oder Zähler erhöhen
+      this.addOrUpdateReaction(messageToUpdate, emoji);
+
+      // Reaktionen aktualisieren
+      this.updateMessageReactions(messageToUpdate);
+
+    }
+    else {
+      this.threadMessage += emoji;
+    }
     this.showEmojiPicker = false;
   }
+
+  private findMessageToUpdate(): Message | null {
+    let messageToUpdate = this.messages.find(msg => msg.messageId === this.selectedMessageId) || null;
+    if (!messageToUpdate) {
+      messageToUpdate = this.selectedMessage || null;
+    }
+    return messageToUpdate;
+  }
+
+  private addOrUpdateReaction(message: Message, emoji: string): void {
+    const existingReaction = message.reactions.find(r => r.emoji === emoji);
+
+    if (existingReaction) {
+      existingReaction.count += 1;
+    } else {
+      message.reactions.push({
+        emoji: emoji,
+        senderName: this.senderName || '',
+        count: 1
+      });
+    }
+
+    console.log('Updated reactions:', message.reactions);
+  }
+
 
   async updateMessageReactions(message: Message) {
     const messageRef = doc(this.firestore, `messages/${message.messageId}`);
@@ -174,7 +211,7 @@ export class ThreadComponent implements OnInit {
 
     try {
       await updateDoc(messageRef, {
-        reactions: message.reactions // Aktualisiere das gesamte Reactions-Array
+        reactions: message.reactions
       });
     } catch (error) {
       console.error("Fehler beim Aktualisieren der Reaktionen: ", error);
@@ -187,7 +224,6 @@ export class ThreadComponent implements OnInit {
   @HostListener('document:click', ['$event'])
   clickOutside(event: Event) {
     const target = event.target as HTMLElement;
-    console.log('Clicked element:', target);
 
     if (this.showEmojiPicker) {
       if (!target.closest('.emoji-box') && !target.closest('.message-icon') && !target.closest('.thread-message-icon')) {

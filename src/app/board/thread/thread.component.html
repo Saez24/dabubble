@@ -40,9 +40,6 @@
             <span>{{reaction.emoji}}</span>
             {{reaction.count}}
           </div>
-          <div>
-            <mat-icon>add_reaction</mat-icon>
-          </div>
         </div>
       </div>
       <div class="emoji-box">
@@ -107,7 +104,7 @@
             <mat-icon class="message-icon" (click)="showEmoji(message.messageId)">add_reaction</mat-icon>
             <mat-icon class="message-icon" (click)="showMessageEditToggle()">more_vert</mat-icon>
             <div *ngIf="showMessageEdit" class="thread-edit-message">
-              <span (click)="editMessage(message.messageId)">Nachricht bearbeiten</span>
+              <span (click)="editMessage(message.messageId, message)">Nachricht bearbeiten</span>
             </div>
           </div>
           <div class="user-message-info">
@@ -143,7 +140,7 @@
               <mat-icon fontIcon="sentiment_satisfied"></mat-icon>
             </div>
             <div class="thread-message-edit-action">
-              <button (click)="cancelMessageEdit()">Abbrechen</button>
+              <button (click)="cancelMessageEdit(message)">Abbrechen</button>
               <button class="save-btn" (click)="saveMessage(message)">Speichern</button>
             </div>
           </div>
@@ -166,7 +163,7 @@
         <div class="message-icon" (click)="triggerFileInput()"><mat-icon fontIcon="add"></mat-icon></div>
         <div class="separator"></div>
         <div  class="thread-message-icon">
-          <mat-icon fontIcon="sentiment_satisfied"></mat-icon>
+          <mat-icon (click)="showEmoji(threadMessage)" fontIcon="sentiment_satisfied"></mat-icon>
         </div>
         <div class="message-icon">
           <mat-icon fontIcon="alternate_email"></mat-icon>
