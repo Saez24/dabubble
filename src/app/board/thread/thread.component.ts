@@ -157,28 +157,36 @@ export class ThreadComponent implements OnInit {
 
   addEmoji(event: any) {
     const emoji = event.emoji.native;
-    if (this.selectedMessageId !== this.threadMessage) {
 
-      // Nachricht finden, die aktualisiert werden soll
+    // Überprüfen, ob eine Nachricht bearbeitet wird
+    if (this.selectedMessageId && this.isEditing(this.selectedMessageId)) {
+      // Nachricht finden, die bearbeitet wird
+      const messageToUpdate = this.messages.find(
+        (msg) => msg.messageId === this.selectedMessageId
+      );
+
+      if (messageToUpdate) {
+        // Emoji in das bearbeitete Textfeld einfügen
+        messageToUpdate.message += emoji;
+      } else {
+        console.error('Zu bearbeitende Nachricht nicht gefunden.');
+      }
+    } else if (this.selectedMessageId !== this.threadMessage) {
       const messageToUpdate = this.findMessageToUpdate();
 
       if (!messageToUpdate) {
         console.error('Nachricht nicht gefunden oder keine gültige Nachricht ausgewählt.');
-        return; // Vorzeitiges Verlassen, falls keine Nachricht gefunden wurde
+        return;
       }
-
-      // Reaktion zur Nachricht hinzufügen oder Zähler erhöhen
       this.addOrUpdateReaction(messageToUpdate, emoji);
-
-      // Reaktionen aktualisieren
       this.updateMessageReactions(messageToUpdate);
 
-    }
-    else {
+    } else {
       this.threadMessage += emoji;
     }
     this.showEmojiPicker = false;
   }
+
 
   private findMessageToUpdate(): Message | null {
     let messageToUpdate = this.messages.find(msg => msg.messageId === this.selectedMessageId) || null;
