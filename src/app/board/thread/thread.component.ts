@@ -19,8 +19,6 @@ import { UploadFileService } from '../../shared/services/firestore/storage-servi
 import { SafeUrlPipe } from '../../shared/pipes/safe-url.pipe';
 import { arrayUnion, getDoc } from 'firebase/firestore';
 
-
-
 @Component({
   selector: 'app-thread',
   standalone: true,
@@ -49,7 +47,6 @@ export class ThreadComponent implements OnInit {
   reactions: { emoji: string, senderName: string, count: number }[] = [];
   selectedMessageId: string | null = null;
   originalMessage: string | null = null; // Ursprüngliche Nachricht speichern
-
 
 
   @ViewChild('cthreadWindow') private threadWindow!: ElementRef;
@@ -187,7 +184,6 @@ export class ThreadComponent implements OnInit {
     this.showEmojiPicker = false;
   }
 
-
   private findMessageToUpdate(): Message | null {
     let messageToUpdate = this.messages.find(msg => msg.messageId === this.selectedMessageId) || null;
     if (!messageToUpdate) {
@@ -212,7 +208,6 @@ export class ThreadComponent implements OnInit {
     console.log('Updated reactions:', message.reactions);
   }
 
-
   async updateMessageReactions(message: Message) {
     const messageRef = doc(this.firestore, `messages/${message.messageId}`);
     console.log('Updating reactions for messageId:', message.messageId, 'with reactions:', message.reactions);
@@ -225,9 +220,6 @@ export class ThreadComponent implements OnInit {
       console.error("Fehler beim Aktualisieren der Reaktionen: ", error);
     }
   }
-
-
-
 
   @HostListener('document:click', ['$event'])
   clickOutside(event: Event) {
@@ -329,31 +321,34 @@ export class ThreadComponent implements OnInit {
       this.messages = []; // Wenn keine Nachricht ausgewählt ist, leere die Nachrichten
       return;
     }
-
+  
     const messageRef = doc(this.firestore, 'messages', this.selectedMessage.messageId);
     const messageSnap = await getDoc(messageRef);
-
+  
     if (messageSnap.exists()) {
       const selectedMessageData = messageSnap.data();
       const answers = selectedMessageData['answers'] || []; // Verwende Index-Signatur für den Zugriff
-
+  
+      // Bestimme, ob die ausgewählte Nachricht eine eigene Nachricht ist
+      this.selectedMessage.isOwnMessage = this.selectedMessage.senderID === this.currentUserUid;
+  
       // Lade nur die Nachrichten, die im answers-Array sind
       this.messages = await Promise.all(answers.map(async (answer: any) => {
         const message = new Message(answer, this.currentUserUid);
-
+  
         if (message.senderID) {
           const senderUser = await this.userService.getUserById(message.senderID);
           message.senderAvatar = senderUser?.avatarPath || './assets/images/avatars/avatar5.svg';
         } else {
           message.senderAvatar = './assets/images/avatars/avatar5.svg'; // Standard-Avatar
         }
-
+  
         const messageDate = new Date(answer.timestamp.seconds * 1000);
         message.formattedTimestamp = messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
+  
         return message;
       }));
-
+  
       this.cd.detectChanges();
       this.scrollToBottom();
     } else {
