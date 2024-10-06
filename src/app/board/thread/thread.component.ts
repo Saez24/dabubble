@@ -18,6 +18,8 @@ import { AuthService } from '../../shared/services/authentication/auth-service/a
 import { UploadFileService } from '../../shared/services/firestore/storage-service/upload-file.service';
 import { SafeUrlPipe } from '../../shared/pipes/safe-url.pipe';
 import { arrayUnion, getDoc } from 'firebase/firestore';
+import { ChannelsService } from '../../shared/services/channels/channels.service';
+import { Channel } from '../../shared/models/channel.class';
 
 @Component({
   selector: 'app-thread',
@@ -32,6 +34,7 @@ import { arrayUnion, getDoc } from 'firebase/firestore';
 export class ThreadComponent implements OnInit {
   messages: Message[] = [];
   users: User[] = [];
+  channels: Channel[] = [];
   currentUser = this.authService.getUserSignal();
   showEmojiPicker = false;
   showMessageEdit = false;
@@ -50,7 +53,7 @@ export class ThreadComponent implements OnInit {
 
 
   @ViewChild('cthreadWindow') private threadWindow!: ElementRef;
-  constructor(private firestore: Firestore, private auth: Auth, private userService: UserService, private cd: ChangeDetectorRef, private authService: AuthService, private uploadFileService: UploadFileService) { }
+  constructor(private firestore: Firestore, private auth: Auth, private userService: UserService, private cd: ChangeDetectorRef, private authService: AuthService, private uploadFileService: UploadFileService, public channelsService: ChannelsService) { }
   ngOnInit() {
     this.getCurrentUser();
     this.loadMessages();
