@@ -1,4 +1,4 @@
-import { Component, ViewChild, ViewEncapsulation, inject } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewEncapsulation, WritableSignal, inject } from '@angular/core';
 import { ChatWindowComponent } from "./chat-window/chat-window.component";
 import { WorkspaceComponent } from "./workspace/workspace.component";
 import { ThreadComponent } from './thread/thread.component';
@@ -50,12 +50,12 @@ import { ProfileEditorDialogComponent } from "../dialogs/profile-editor-dialog/p
   styleUrls: ['./board.component.scss', '../../styles.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class BoardComponent {
+export class BoardComponent implements OnInit {
 
   @ViewChild('drawer') drawer!: MatDrawer;
 
-  authService = inject(AuthService);
-  userService = inject(UserService);
+  // authService = inject(AuthService);
+  // userService = inject(UserService);
   searchInput: string = '';
   showThreadComponent: boolean = false;
   currentUser = this.authService.getUserSignal();
@@ -65,12 +65,33 @@ export class BoardComponent {
   selectedMessage: Message | null = null;
 
 
-  constructor(private iconsService: IconsService, private firestore: Firestore, private auth: Auth,) { }
+  constructor(
+    private iconsService: IconsService,
+    private firestore: Firestore,
+    private auth: Auth,
+    public authService: AuthService,
+    public userService: UserService
+  ) {
+    this.getCurrentUser();
+  }
 
 
   ngOnInit() {
-    this.getCurrentUser();
   }
+
+  // getCurrentUser() {
+  //   console.log('Current User Id: ', this.currentUser()?.id);
+  //   console.log('Current User Avatar: ', this.currentUser()?.avatarPath);
+  //   console.log('Current User Login state: ', this.currentUser()?.loginState);
+  //   const userId = this.currentUser()?.id;
+  //   if (userId) {
+  //     this.currentUserUid = userId;  // Speichere die aktuelle Benutzer-ID
+  //     this.loadUserData(this.currentUserUid);
+  //   } else {
+  //     console.log('Kein Benutzer angemeldet');
+  //   }
+  // }
+
 
   getCurrentUser() {
     const userId = this.currentUser()?.id;
@@ -112,6 +133,35 @@ export class BoardComponent {
       }
     });
   }
+
+
+  // loadUserData(uid: string | null) {
+  //   if (!uid) {
+  //     console.log('Keine Benutzer-ID gefunden');
+  //     return;
+  //   }
+
+  //   const userDocRef = doc(this.firestore, `users/${uid}`);
+  //   onSnapshot(userDocRef, (doc) => {
+  //     if (doc.exists()) {
+  //       const data = doc.data() as {
+  //         name: string;
+  //         avatarPath: string;
+  //       };
+
+  //       Update currentUser with Firestore data
+  //       this.currentUser = new User({
+  //         id: uid,
+  //         name: data.name,
+  //         avatarPath: data.avatarPath,
+  //         loginState: 'loggedIn', // Assuming the user is logged in
+  //         channels: [] // Load channels if necessary
+  //       });
+  //     } else {
+  //       console.log('Kein Benutzerdokument gefunden');
+  //     }
+  //   });
+  // }
 
   closeThread() {
     this.showThreadComponent = false;

@@ -1,8 +1,8 @@
 // Service for all Functions related to the User Object in Firestore
 
 import { Injectable, signal } from '@angular/core';
-import { Firestore, collectionData, collection, where, query, doc, getDoc, updateDoc, setDoc } from '@angular/fire/firestore';
-import { Observable, Subscription, of } from 'rxjs';
+import { Firestore, collection, doc, getDoc, updateDoc, setDoc } from '@angular/fire/firestore';
+import { Observable } from 'rxjs';
 import { User } from '../../../models/user.class';
 
 @Injectable({
@@ -12,12 +12,28 @@ export class UserService {
 
   public user: User = new User();
   public user$!: Observable<User[]>;
-  private subscription!: Subscription;
+  private userSignal = signal<User | null | undefined>(undefined);
+  public currentUser = this.getUserSignal(); // Change to hold an instance of the User class
+  public currentUserID: string | null = null;
   showProfile = signal<boolean>(false);
   showProfileEditor = signal<boolean>(false);
   showOverlay = signal<boolean>(false);
 
-  constructor(private firestore: Firestore) { }
+  constructor(private firestore: Firestore) {
+  }
+
+
+  getUserSignal() {
+    return this.userSignal;
+  }
+
+
+  setUser(user: User | null | undefined) {
+    this.userSignal.set(user);
+    console.log('user.service.currentUser() =', this.currentUser());
+    
+  }
+
 
   updateUserInFirestore(uid: string, data: any) {
     const userDocRef = doc(this.firestore, `users/${uid}`);
@@ -35,12 +51,12 @@ export class UserService {
   }
 
 
-  async updateUserDoc(userId:string, newUser: User) {
+  async updateUserDoc(userId: string, newUser: User) {
     try {
       let userRef = this.getUserDocReference(userId);
-      await updateDoc(userRef, {...newUser});
+      await updateDoc(userRef, { ...newUser });
     } catch (error) {
-      
+
     }
   }
 

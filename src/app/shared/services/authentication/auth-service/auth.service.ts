@@ -1,6 +1,6 @@
-import { inject, Injectable, OnDestroy, signal } from '@angular/core';
+import { inject, Injectable, signal, EventEmitter, Output  } from '@angular/core';
 import { Router } from '@angular/router';
-import { getAuth, signInWithEmailAndPassword, signOut, updateEmail, updateProfile, verifyBeforeUpdateEmail } from "firebase/auth";
+import { signInWithEmailAndPassword, signOut, updateProfile, verifyBeforeUpdateEmail } from "firebase/auth";
 import { UserCredential } from "firebase/auth";
 import { UserService } from '../../firestore/user-service/user.service';
 import { Auth, user, User as AuthUser } from '@angular/fire/auth';
@@ -14,7 +14,6 @@ import { doc, Firestore, onSnapshot } from '@angular/fire/firestore';
 })
 export class AuthService {
 
-  // auth = getAuth();
   auth = inject(Auth);
   router = inject(Router);
   userService = inject(UserService);
@@ -24,86 +23,72 @@ export class AuthService {
   currentUserUid: string | null = null;
   currentUser = this.getUserSignal(); // Change to hold an instance of the User class
 
+  @Output() userUpdated: EventEmitter<User | null | undefined> = new EventEmitter();
+
   constructor(private firestore: Firestore) {
     this.initializeAuthState();
+    this.userUpdated.subscribe((user) => {
+      this.userService.setUser(user);
+      console.log('auth.service.currentUser() =', this.currentUser());
+    });
   }
 
-  getCurrentUser() {
-    const userId = this.currentUser()?.id;
-    console.log('Current User Id: ', userId);
-    console.log('Current User Avatar: ', this.currentUser()?.avatarPath);
-    if (userId) {
-      this.currentUserUid = userId;  // Speichere die aktuelle Benutzer-ID
-      this.loadUserData(this.currentUserUid);
-    } else {
-      console.log('Kein Benutzer angemeldet');
-    }
-  }
 
-  loadUserData(uid: string | null) {
-    if (!uid) {
-      console.log('Keine Benutzer-ID gefunden');
-      return;
-    }
-
-    const userDocRef = doc(this.firestore, `users/${uid}`);
-    onSnapshot(userDocRef, (doc) => {
-      if (doc.exists()) {
-        const data = doc.data() as {
-          name: string;
-          avatarPath: string;
-        };
-
-        // Update currentUser with Firestore data
-        // this.currentUser = new User({
-        //   id: uid,
-        //   name: data.name,
-        //   avatarPath: data.avatarPath,
-        //   loginState: 'loggedIn', // Assuming the user is logged in
-        //   channels: [] // Load channels if necessary
-        // });
+  async initializeAuthState() {
+    this.authSubscription = user(this.auth).subscribe((authUser: AuthUser | null) => {
+      if (authUser) {
+        this.currentUserUid = authUser.uid;
+        this.getFirestoreUserData(authUser.uid);
       } else {
-        console.log('Kein Benutzerdokument gefunden');
+        this.setUser(null);
       }
     });
   }
 
-  getUserSignal() {
-    return this.userSignal;
+  getFirestoreUserData(authUserID: string) {
+    if (authUserID) {
+      const userDocRef = doc(this.firestore, `users/${authUserID}`);
+      onSnapshot(userDocRef, (docSnap) => {
+        if (docSnap.exists()) {
+          const firestoreUserData = docSnap.data() as User;
+          const currentUserObject = this.setCurrentUserObject(firestoreUserData);
+          this.setUser(currentUserObject);
+        } else {
+          console.log(`No Firestore User with id: ${authUserID} found`);
+          this.setUser(null);
+        }
+      });
+    } else {
+      console.log(`No Firestore User with id: ${authUserID} found`);
+      this.setUser(null);
+    }
   }
-
 
   setUser(user: User | null | undefined) {
     this.userSignal.set(user);
+    this.userUpdated.emit(user);
   }
 
+  setCurrentUserObject(user: User): User {
+    return {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      avatarPath: user.avatarPath,
+      loginState: 'loggedIn',
+      channels: user.channels
+    } as User;
+  }
 
   ngOnDestroy(): void {
-    this.authSubscription?.unsubscribe();
+    if (this.authSubscription) {
+      this.authSubscription.unsubscribe();
+    }
   }
 
 
-  initializeAuthState() {
-    this.authSubscription = user(this.auth).subscribe((authUser: AuthUser | null) => {
-      if (authUser) {
-        let currentUser = this.setCurrentUserObject(authUser);
-        this.setUser(currentUser);
-      } else {
-        this.setUser(null);
-      }
-    })
-  }
-
-
-  setCurrentUserObject(user: AuthUser): User {
-    return {
-      id: user.uid,
-      email: user.email,
-      name: user.displayName,
-      avatarPath: user.photoURL,
-      loginState: 'loggedIn',
-      channels: [] // Fetch channels from your userService if required
-    } as User
+  getUserSignal() {
+    return this.userSignal;
   }
 
 
@@ -170,7 +155,7 @@ export class AuthService {
         await verifyBeforeUpdateEmail(currentUser, email);
         alert('Email to confirm your new Email is send. This could take some Minutes');
         await this.logout();
-        
+
       }
     } catch (err: any) {
       if (err.code == 'auth/requires-recent-login') {

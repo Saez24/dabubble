@@ -65,8 +65,8 @@ export class ChatWindowComponent implements OnInit {
 
   ngOnInit() {
     this.loadData();
-    this.loadUserData(this.currentUserUid);
-    this.authService.getCurrentUser();
+    // this.loadUserData(this.currentUserUid);
+    // this.authService.getCurrentUser();
 
     // Überprüfe, ob selectedChannelId bereits gesetzt ist
     const currentChannelId = this.channelsService.currentChannelId;
@@ -114,9 +114,9 @@ export class ChatWindowComponent implements OnInit {
     this.dialog.open(AddMemberDialogComponent)
   }
 
-  loadUserData(uid: string | null) {
-    this.authService.loadUserData(uid);
-  }
+  // loadUserData(uid: string | null) {
+  //   this.authService.loadUserData(uid);
+  // }
 
   async loadChannels() {
     const channelsRef = collection(this.firestore, 'channels');
