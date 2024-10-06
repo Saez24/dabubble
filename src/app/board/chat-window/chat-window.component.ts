@@ -49,7 +49,7 @@ export class ChatWindowComponent implements OnInit {
   chatMessage = '';
   messageArea = true;
   editedMessage = '';
-  currentUserUid = this.authService.currentUserUid;
+  currentUserUid = '';
   editingMessageId: string | null = null;
   senderAvatar: string | null = null;
   senderName: string | null = null;
@@ -72,7 +72,7 @@ export class ChatWindowComponent implements OnInit {
     //   this.cd.detectChanges();
     // }
 
-    this.loadData();
+      this.loadData();
     // this.loadUserData(this.currentUser);
   }
 
@@ -81,7 +81,8 @@ export class ChatWindowComponent implements OnInit {
       if (user) {
         // this.currentUser = user.uid;
         this.loadUsers();
-        this.channelsService.loadChannels();
+        let currentUserId = this.authService.currentUser()?.id as string;
+        this.channelsService.loadChannels(currentUserId);
       } else {
         console.log('Kein Benutzer angemeldet');
       }

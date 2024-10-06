@@ -12,7 +12,7 @@ import { collection, doc, documentId, Firestore, getDoc, getDocs, onSnapshot, or
 import { Auth } from '@angular/fire/auth';
 import { User } from '../../shared/models/user.class';
 import { MessagesService } from '../../shared/services/messages/messages.service';
-import { UserService } from '../../shared/services/firestore/user-service/user.service';
+import { AuthService } from '../../shared/services/authentication/auth-service/auth.service';
 
 @Component({
   selector: 'app-workspace',
@@ -41,35 +41,29 @@ export class WorkspaceComponent {
   arrowRotated: boolean[] = [false, false];
   currentUserUid: string | null = null;
   currentUserChannels: Channel[] = [];
-  currentUser = this.userService.getUserSignal();
 
   constructor(
     public dialog: MatDialog,
     private iconsService: IconsService,
     public channelsService: ChannelsService,
-    private userService: UserService,
+    private authService: AuthService,
     private firestore: Firestore,
     private auth: Auth,
     private messageService: MessagesService
   ) {
-    this.currentUser = this.userService.getUserSignal();
   }
 
   ngOnInit() {
-    this.loadData();
-    this.fillArraysWithBoolean();
+    if (this.authService.currentUser()) {
+      this.loadData();
+      this.fillArraysWithBoolean();
+    }
   }
 
   async loadData() {
-    console.log('Benutzer:', this.currentUser);
-    
-      if (this.currentUser) {
-        console.log('Benutzer angemeldet:', this.currentUser()?.id);
-        await this.loadUsers();
-        await this.channelsService.loadChannels(this.currentUser()?.id as string);
-      } else {
-        console.log('Kein Benutzer angemeldet');
-      }
+      let currentUserId = this.authService.currentUser()?.id as string;
+      await this.loadUsers();
+      await this.channelsService.loadChannels(currentUserId);
   }
 
   async loadUsers() {

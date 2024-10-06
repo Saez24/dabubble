@@ -1,6 +1,5 @@
 import { Injectable, OnInit } from '@angular/core';
 import { Firestore, doc, onSnapshot, collection, query, orderBy } from '@angular/fire/firestore';
-import { AuthService } from '../authentication/auth-service/auth.service';
 import { Channel } from '../../models/channel.class';
 import { User } from '../../models/user.class';
 
@@ -22,15 +21,14 @@ export class ChannelsService implements OnInit {
   public channels: Channel[] = [];
   public currentUserChannels: Channel[] = [];
 
-  constructor(private firestore: Firestore, private authService: AuthService) {
+  constructor(private firestore: Firestore) {
 
   }
 
   ngOnInit(): void {
   }
 
-  async loadChannels(userId: string) {
-    let currentUserId = userId;
+  async loadChannels(currentUserId: string) {
     let channelsRef = collection(this.firestore, 'channels');
     let channelsQuery = query(channelsRef, orderBy('name'));
 
@@ -42,7 +40,7 @@ export class ChannelsService implements OnInit {
 
       if (currentUserId) {
         let userChannels = this.channels.filter(channel => {
-          return channel.memberUids && channel.memberUids.includes(currentUserId as string);
+          return channel.memberUids && channel.memberUids.includes(currentUserId);
         });
         this.currentUserChannels = userChannels;
       } else {

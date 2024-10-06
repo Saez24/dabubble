@@ -29,7 +29,6 @@ export class AuthService {
     this.initializeAuthState();
     this.userUpdated.subscribe((user) => {
       this.userService.setUser(user);
-      console.log('!!! =', this.currentUser()?.id);
       console.log('auth.service.currentUser() =', this.currentUser());
     });
   }
