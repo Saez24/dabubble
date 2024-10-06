@@ -8,7 +8,7 @@ export class Message {
     senderID: string | null;
     senderName: string | null;
     message: string | null;
-    reaction: string | null;
+    reactions: { emoji: string; senderName: string; count: number }[] = [];
     answers: Message[];
     formattedTimestamp: string;
     isOwnMessage: boolean = false;
@@ -24,7 +24,7 @@ export class Message {
         this.senderID = obj ? obj.senderID : null;
         this.senderName = obj ? obj.senderName : null;
         this.message = obj ? obj.message : null;
-        this.reaction = obj ? obj.reaction : null;
+        this.reactions = obj?.reactions || [];
         this.answers = obj && obj.answers ? obj.answers.map((answer: any) => new Message(answer)) : [];
         this.formattedTimestamp = '';
         this.displayDate = null;

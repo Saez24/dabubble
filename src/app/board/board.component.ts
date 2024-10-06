@@ -45,7 +45,7 @@ import { ProfileEditorDialogComponent } from "../dialogs/profile-editor-dialog/p
     ProfileDialogComponent,
     AddPeopleDialog,
     ProfileEditorDialogComponent
-],
+  ],
   templateUrl: './board.component.html',
   styleUrls: ['./board.component.scss', '../../styles.scss'],
   encapsulation: ViewEncapsulation.None

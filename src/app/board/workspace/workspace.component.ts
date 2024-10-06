@@ -11,6 +11,7 @@ import { Channel } from '../../shared/models/channel.class';
 import { collection, doc, documentId, Firestore, getDoc, getDocs, onSnapshot, orderBy, query, where } from '@angular/fire/firestore';
 import { Auth } from '@angular/fire/auth';
 import { User } from '../../shared/models/user.class';
+import { MessagesService } from '../../shared/services/messages/messages.service';
 
 @Component({
   selector: 'app-workspace',
@@ -46,9 +47,10 @@ export class WorkspaceComponent {
     private iconsService: IconsService,
     public channelsService: ChannelsService,
     private firestore: Firestore,
-    private auth: Auth
+    private auth: Auth,
+    private messageService: MessagesService
   ) {
-   }
+  }
 
   ngOnInit() {
     this.loadData();
@@ -59,8 +61,8 @@ export class WorkspaceComponent {
     this.auth.onAuthStateChanged(async (user) => {
       if (user) {
         this.currentUserUid = user.uid;
-        this.loadUsers(this.currentUserUid);
-        this.channelsService.loadChannels(this.currentUserUid);
+        await this.loadUsers(this.currentUserUid);
+        await this.channelsService.loadChannels(this.currentUserUid);
       } else {
         console.log('Kein Benutzer angemeldet');
       }
@@ -72,14 +74,14 @@ export class WorkspaceComponent {
     let usersQuery = query(usersRef, orderBy('name'));
 
     onSnapshot(usersQuery, async (snapshot) => {
-        this.users = await Promise.all(snapshot.docs.map(async (doc) => {
-            let userData = doc.data() as User;
-            return { ...userData, id: doc.id };
-        }));
-        this.loadCurrentUser(currentUserId);
-      });
+      this.users = await Promise.all(snapshot.docs.map(async (doc) => {
+        let userData = doc.data() as User;
+        return { ...userData, id: doc.id };
+      }));
+      this.loadCurrentUser(currentUserId);
+    });
   }
-  
+
   loadCurrentUser(currentUserId: string) {
     this.currentUser = this.users.find(user => user.id === currentUserId);
     console.log(this.currentUser)
@@ -97,6 +99,7 @@ export class WorkspaceComponent {
   // method to change background color for channel or user container
   openChannel(channel: Channel, i: number) {
     this.channelsService.clickChannelContainer(channel, i);
+    this.messageService.loadMessages(this.currentUser, channel.id);
   }
 
   clickUserContainer(user: User, i: number) {
@@ -127,26 +130,26 @@ export class WorkspaceComponent {
 // }
 
 
-  // async loadChannels(currentUserUid: string) {
-  //   let channelsRef = collection(this.firestore, 'channels');
-  //   let channelsQuery = query(channelsRef, orderBy('name'));
+// async loadChannels(currentUserUid: string) {
+//   let channelsRef = collection(this.firestore, 'channels');
+//   let channelsQuery = query(channelsRef, orderBy('name'));
 
-  //   onSnapshot(channelsQuery, async (snapshot) => {
-  //     this.channels = await Promise.all(snapshot.docs.map(async (doc) => {
-  //       let channelData = doc.data() as Channel;
-  //       return { ...channelData, id: doc.id };
-  //     }));
+//   onSnapshot(channelsQuery, async (snapshot) => {
+//     this.channels = await Promise.all(snapshot.docs.map(async (doc) => {
+//       let channelData = doc.data() as Channel;
+//       return { ...channelData, id: doc.id };
+//     }));
 
-  //     if (currentUserUid) {
-  //       let userChannels = this.channels.filter(channel => {
-  //         return channel.members && channel.members.includes(currentUserUid);
-  //       });
-  //       this.currentUserChannels = userChannels;
-  //     } else {
-  //       this.currentUserChannels = [];
-  //     }
-  //   });
-  // }
+//     if (currentUserUid) {
+//       let userChannels = this.channels.filter(channel => {
+//         return channel.members && channel.members.includes(currentUserUid);
+//       });
+//       this.currentUserChannels = userChannels;
+//     } else {
+//       this.currentUserChannels = [];
+//     }
+//   });
+// }
 
 
 
