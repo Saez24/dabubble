@@ -12,6 +12,7 @@ import { collection, doc, documentId, Firestore, getDoc, getDocs, onSnapshot, or
 import { Auth } from '@angular/fire/auth';
 import { User } from '../../shared/models/user.class';
 import { MessagesService } from '../../shared/services/messages/messages.service';
+import { UserService } from '../../shared/services/firestore/user-service/user.service';
 
 @Component({
   selector: 'app-workspace',
@@ -40,16 +41,18 @@ export class WorkspaceComponent {
   arrowRotated: boolean[] = [false, false];
   currentUserUid: string | null = null;
   currentUserChannels: Channel[] = [];
-  currentUser: User | any;
+  currentUser = this.userService.getUserSignal();
 
   constructor(
     public dialog: MatDialog,
     private iconsService: IconsService,
     public channelsService: ChannelsService,
+    private userService: UserService,
     private firestore: Firestore,
     private auth: Auth,
     private messageService: MessagesService
   ) {
+    this.currentUser = this.userService.getUserSignal();
   }
 
   ngOnInit() {
@@ -58,18 +61,18 @@ export class WorkspaceComponent {
   }
 
   async loadData() {
-    this.auth.onAuthStateChanged(async (user) => {
-      if (user) {
-        this.currentUserUid = user.uid;
-        await this.loadUsers(this.currentUserUid);
-        await this.channelsService.loadChannels(this.currentUserUid);
+    console.log('Benutzer:', this.currentUser);
+    
+      if (this.currentUser) {
+        console.log('Benutzer angemeldet:', this.currentUser()?.id);
+        await this.loadUsers();
+        await this.channelsService.loadChannels(this.currentUser()?.id as string);
       } else {
         console.log('Kein Benutzer angemeldet');
       }
-    });
   }
 
-  async loadUsers(currentUserId: string) {
+  async loadUsers() {
     let usersRef = collection(this.firestore, 'users');
     let usersQuery = query(usersRef, orderBy('name'));
 
@@ -78,14 +81,14 @@ export class WorkspaceComponent {
         let userData = doc.data() as User;
         return { ...userData, id: doc.id };
       }));
-      this.loadCurrentUser(currentUserId);
+      // this.loadCurrentUser(currentUserId);
     });
   }
 
-  loadCurrentUser(currentUserId: string) {
-    this.currentUser = this.users.find(user => user.id === currentUserId);
-    console.log(this.currentUser)
-  }
+  // loadCurrentUser(currentUserId: string) {
+  //   this.currentUser = this.users.find(user => user.id === currentUserId);
+  //   console.log(this.currentUser)
+  // }
 
   fillArraysWithBoolean() {
     this.channelsService.initializeArrays(this.currentUserChannels.length, this.users.length);
@@ -99,7 +102,7 @@ export class WorkspaceComponent {
   // method to change background color for channel or user container
   openChannel(channel: Channel, i: number) {
     this.channelsService.clickChannelContainer(channel, i);
-    this.messageService.loadMessages(this.currentUser, channel.id);
+    // this.messageService.loadMessages(this.currentUser, channel.id);
   }
 
   clickUserContainer(user: User, i: number) {

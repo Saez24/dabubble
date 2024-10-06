@@ -10,21 +10,23 @@
         <div class="profile-menu-container" (click)="toggleProfileMenu()">
             <span>{{ currentUser()?.name }}</span>
             <div class="avatar-container">
-                <!-- <img src="{{ currentUser()?.avatarPath }}" alt="Profil Icon" *ngIf="currentUser?.loginState === 'loggedIn'" >
-                    *ngIf="../../assets/images/icons/inactive.png === 'loggedIn'"
-
-                <img src="../../assets/images/icons/inactive.png" alt="" class="state-icon"> -->
-
+                <img src="{{ currentUser()?.avatarPath }}" alt="Profil Icon"*ngIf="currentUser()?.loginState === 'loggedIn'">
+                <img src="../../assets/images/icons/Online.png" alt="state Icon" *ngIf="currentUser()?.loginState === 'loggedIn'" class="state-icon">
+                <img src="../../assets/images/icons/offline.png" alt="state Icon" *ngIf="currentUser()?.loginState === 'loggedOut'" class="state-icon">
+                <img src="../../assets/images/icons/inactive.png" alt="state Icon" *ngIf="currentUser()?.loginState === 'inactive'" class="state-icon">
             </div>
             <mat-icon>keyboard_arrow_down</mat-icon>
             <div class="overlay" *ngIf="this.userService.showOverlay()" (click)="closeAllDialogs()">
                 <div class="profile-menu" (click)="stopPropagation($event)">
-                    <div class="profil-menu-link-container" *ngIf="!this.userService.showProfile() && !this.userService.showProfileEditor()">
+                    <div class="profil-menu-link-container"
+                        *ngIf="!this.userService.showProfile() && !this.userService.showProfileEditor()">
                         <div class="profil-menu-links" (click)="openUserProfile($event)">Profil</div>
                         <div class="profil-menu-links" (click)="authService.logout()">Log Out</div>
                     </div>
-                    <app-profile-dialog class="profil-details" [currentUser]="this.currentUser" *ngIf="this.userService.showProfile()"></app-profile-dialog>
-                    <app-profile-editor-dialog class="profil-editor" [currentUser]="this.currentUser" *ngIf="this.userService.showProfileEditor()"></app-profile-editor-dialog>
+                    <app-profile-dialog class="profil-details"
+                        *ngIf="this.userService.showProfile()"></app-profile-dialog>
+                    <app-profile-editor-dialog class="profil-editor"
+                        *ngIf="this.userService.showProfileEditor()"></app-profile-editor-dialog>
                 </div>
             </div>
         </div>

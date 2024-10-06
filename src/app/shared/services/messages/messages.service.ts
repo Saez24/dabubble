@@ -22,7 +22,7 @@ export class MessagesService {
     private showMessageEdit = false;
     private showEmojiPicker: boolean = false;
     messages: Message[] = [];
-    currentUserUid = this.authService.currentUserUid; // Setze den aktuellen Benutzer-UID
+    currentUserUid = this.authService.currentUser()?.id; // Setze den aktuellen Benutzer-UID
     messageArea = true;
     editedMessage = '';
     channelId = this.channelsService.currentChannelId;
@@ -82,7 +82,7 @@ export class MessagesService {
         this.showThreadEvent.emit();
     }
 
-    async loadMessages(currentUserUid: string, channelId: string) {
+    async loadMessages(currentUserUid: string | undefined, channelId: string) {
         const messagesRef = collection(this.firestore, 'messages');
         console.log(channelId);
 
@@ -108,6 +108,8 @@ export class MessagesService {
 
                 // Überprüfen, ob senderID nicht null ist
                 if (message.senderID) {
+                    console.log('SenderID: ', message.senderID);
+                    
                     const senderUser = await this.userService.getUserById(message.senderID);
                     message.senderAvatar = senderUser?.avatarPath || './assets/images/avatars/avatar5.svg';
                 } else {

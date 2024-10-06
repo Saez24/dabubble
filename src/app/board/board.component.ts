@@ -15,10 +15,9 @@ import { MatMenuModule } from '@angular/material/menu';
 import { AuthService } from '../shared/services/authentication/auth-service/auth.service';
 import { UserService } from '../shared/services/firestore/user-service/user.service';
 import { IconsService } from '../shared/services/icons/icons.service';
-import { doc, Firestore, onSnapshot, orderBy, query } from '@angular/fire/firestore';
+import { Firestore } from '@angular/fire/firestore';
 import { Message } from '../shared/models/message.class';
 import { Auth } from '@angular/fire/auth';
-import { User } from '../shared/models/user.class';
 import { AddPeopleDialog } from "../dialogs/create-new-channel-dialog/add-people-dialog/add-people-dialog.component";
 import { ProfileEditorDialogComponent } from "../dialogs/profile-editor-dialog/profile-editor-dialog.component";
 
@@ -45,7 +44,7 @@ import { ProfileEditorDialogComponent } from "../dialogs/profile-editor-dialog/p
     ProfileDialogComponent,
     AddPeopleDialog,
     ProfileEditorDialogComponent
-  ],
+],
   templateUrl: './board.component.html',
   styleUrls: ['./board.component.scss', '../../styles.scss'],
   encapsulation: ViewEncapsulation.None
@@ -54,14 +53,12 @@ export class BoardComponent implements OnInit {
 
   @ViewChild('drawer') drawer!: MatDrawer;
 
-  // authService = inject(AuthService);
-  // userService = inject(UserService);
   searchInput: string = '';
   showThreadComponent: boolean = false;
   currentUser = this.authService.getUserSignal();
   workspaceOpen = true;
   messages: Message[] = [];
-  currentUserUid: string | null = null;
+  currentUserUid: string | null | undefined = null;
   selectedMessage: Message | null = null;
 
 
@@ -72,96 +69,13 @@ export class BoardComponent implements OnInit {
     public authService: AuthService,
     public userService: UserService
   ) {
-    this.getCurrentUser();
+    this.currentUser = this.authService.getUserSignal();
   }
 
 
   ngOnInit() {
   }
 
-  // getCurrentUser() {
-  //   console.log('Current User Id: ', this.currentUser()?.id);
-  //   console.log('Current User Avatar: ', this.currentUser()?.avatarPath);
-  //   console.log('Current User Login state: ', this.currentUser()?.loginState);
-  //   const userId = this.currentUser()?.id;
-  //   if (userId) {
-  //     this.currentUserUid = userId;  // Speichere die aktuelle Benutzer-ID
-  //     this.loadUserData(this.currentUserUid);
-  //   } else {
-  //     console.log('Kein Benutzer angemeldet');
-  //   }
-  // }
-
-
-  getCurrentUser() {
-    const userId = this.currentUser()?.id;
-    console.log('Current User Id: ', userId);
-    console.log('Current User Avatar: ', this.currentUser()?.avatarPath);
-    console.log('Current User Login state: ', this.currentUser()?.loginState);
-    if (userId) {
-      this.currentUserUid = userId;  // Speichere die aktuelle Benutzer-ID
-      this.loadUserData(this.currentUserUid);
-    } else {
-      console.log('Kein Benutzer angemeldet');
-    }
-  }
-
-  loadUserData(uid: string | null) {
-    if (!uid) {
-      console.log('Keine Benutzer-ID gefunden');
-      return;
-    }
-
-    const userDocRef = doc(this.firestore, `users/${uid}`);
-    onSnapshot(userDocRef, (doc) => {
-      if (doc.exists()) {
-        const data = doc.data() as {
-          name: string;
-          avatarPath: string;
-        };
-
-        // Update currentUser with Firestore data
-        // this.currentUser = new User({
-        //   id: uid,
-        //   name: data.name,
-        //   avatarPath: data.avatarPath,
-        //   loginState: 'loggedIn', // Assuming the user is logged in
-        //   channels: [] // Load channels if necessary
-        // });
-      } else {
-        console.log('Kein Benutzerdokument gefunden');
-      }
-    });
-  }
-
-
-  // loadUserData(uid: string | null) {
-  //   if (!uid) {
-  //     console.log('Keine Benutzer-ID gefunden');
-  //     return;
-  //   }
-
-  //   const userDocRef = doc(this.firestore, `users/${uid}`);
-  //   onSnapshot(userDocRef, (doc) => {
-  //     if (doc.exists()) {
-  //       const data = doc.data() as {
-  //         name: string;
-  //         avatarPath: string;
-  //       };
-
-  //       Update currentUser with Firestore data
-  //       this.currentUser = new User({
-  //         id: uid,
-  //         name: data.name,
-  //         avatarPath: data.avatarPath,
-  //         loginState: 'loggedIn', // Assuming the user is logged in
-  //         channels: [] // Load channels if necessary
-  //       });
-  //     } else {
-  //       console.log('Kein Benutzerdokument gefunden');
-  //     }
-  //   });
-  // }
 
   closeThread() {
     this.showThreadComponent = false;

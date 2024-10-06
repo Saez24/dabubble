@@ -20,7 +20,7 @@ export class AuthService {
   private userSignal = signal<User | null | undefined>(undefined);
   private authSubscription: Subscription | null = null;
   errorCode: string | null = null
-  currentUserUid: string | null = null;
+  currentUserUid: string | null | undefined = null;
   currentUser = this.getUserSignal(); // Change to hold an instance of the User class
 
   @Output() userUpdated: EventEmitter<User | null | undefined> = new EventEmitter();
@@ -29,6 +29,7 @@ export class AuthService {
     this.initializeAuthState();
     this.userUpdated.subscribe((user) => {
       this.userService.setUser(user);
+      console.log('!!! =', this.currentUser()?.id);
       console.log('auth.service.currentUser() =', this.currentUser());
     });
   }

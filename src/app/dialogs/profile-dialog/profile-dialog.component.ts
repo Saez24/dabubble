@@ -11,7 +11,7 @@ import { User } from '../../shared/models/user.class';
   styleUrl: './profile-dialog.component.scss'
 })
 export class ProfileDialogComponent {
-  @Input() currentUser!: WritableSignal<User | null | undefined>;
+  // @Input() currentUser!: WritableSignal<User | null | undefined>;
 
   authService = inject(AuthService);
   userService = inject(UserService);

@@ -3,19 +3,19 @@
         <h3>Dein Profil bearbeiten</h3>
         <img src="../../../assets/images/icons/close.png" alt="" (click)="closeUserProfileEditor()">
     </div>
-    <img src="{{ currentUser()?.avatarPath }}" alt="" class="avatar-img">
+    <img src="{{ this.authService.currentUser()?.avatarPath }}" alt="" class="avatar-img">
     <div class="name-container">
-            <h2>{{ currentUser()?.name }}</h2>
+            <h2>{{ this.authService.currentUser()?.name }}</h2>
     </div>
     <form (ngSubmit)="onSubmit(editForm)" #editForm="ngForm">
         <div class="input-container">
             <label for="name"><img src="../../../assets/images/icons/account_circle.png">Vollständiger Name</label>
-            <input type="text" id="name" name="name" [(ngModel)]="fullname" #name="ngModel" placeholder="{{ currentUser()?.name }}">
+            <input type="text" id="name" name="name" [(ngModel)]="fullname" #name="ngModel" placeholder="{{ this.authService.currentUser()?.name }}">
         </div>
         <div class="input-container">
             <label for="name"><img src="../../../assets/images/icons/mail.png" alt="">E-Mail-Adresse</label>
             <input type="email" id="email" name="email" #email="ngModel" [(ngModel)]="mail"
-            pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}" placeholder="{{ currentUser()?.email }}">
+            pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}" placeholder="{{ this.authService.currentUser()?.email }}">
         </div>
         @if (email.touched && !email.valid) {
         <span class="error-message">Bitte geben sie eine gültige E-Mail-Adresse ein</span>

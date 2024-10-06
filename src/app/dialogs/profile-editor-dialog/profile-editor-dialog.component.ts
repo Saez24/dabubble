@@ -12,7 +12,7 @@ import { User } from '../../shared/models/user.class';
   styleUrl: './profile-editor-dialog.component.scss'
 })
 export class ProfileEditorDialogComponent {
-  @Input() currentUser!: WritableSignal<User | null | undefined>;
+  // @Input() currentUser!: WritableSignal<User | null | undefined>;
 
   fullname: string | null | undefined;
   mail: string | null | undefined;
@@ -27,9 +27,9 @@ export class ProfileEditorDialogComponent {
   }
 
   ngOnInit() {
-    if (this.currentUser()) {
-      this.fullname = this.currentUser()?.name;
-      this.mail = this.currentUser()?.email;
+    if (this.authService.currentUser()) {
+      this.fullname = this.authService.currentUser()?.name;
+      this.mail = this.authService.currentUser()?.email;
     }
     console.log(this.mail);
     console.log(this.fullname);
@@ -40,14 +40,14 @@ export class ProfileEditorDialogComponent {
 
   async onSubmit(ngForm: NgForm): Promise<void> {
     if (ngForm.submitted && ngForm.form.valid) {
-      if (this.currentUser) {
+      if (this.authService.currentUser()) {
         let updatedUser = this.getUpdatedUser();
         await this.authService.updateUserProfile({ displayName: this.fullname, photoURL: 'https://firebasestorage.googleapis.com/v0/b/dabubble-effe4.appspot.com/o/avatar_images%2Fcustom%2F1727618738594_Profil.jpg?alt=media&token=acc9532b-3254-4356-93d4-0009374ed845' });
         await this.authService.updateEmail(this.mail!);
         console.log(updatedUser!.id!);
         
         await this.userService.updateUserDoc(updatedUser!.id!, updatedUser!)
-        this.currentUser.set(updatedUser)
+        this.authService.currentUser.set(updatedUser)
         this.changesSuccessful.set(true);
 
         console.log(this.mail);
@@ -58,9 +58,9 @@ export class ProfileEditorDialogComponent {
 
 
   getUpdatedUser(): User | undefined {
-    if (this.currentUser()) {
+    if (this.authService.currentUser()) {
       return {
-        ...this.currentUser(),
+        ...this.authService.currentUser(),
         name: this.fullname!,
         email: this.mail!,
         avatarPath: this.avatarPath!
