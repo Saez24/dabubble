@@ -61,9 +61,8 @@ export class WorkspaceComponent {
   }
 
   async loadData() {
-      let currentUserId = this.authService.currentUser()?.id as string;
       await this.loadUsers();
-      await this.channelsService.loadChannels(currentUserId);
+      await this.channelsService.loadChannels();
   }
 
   async loadUsers() {

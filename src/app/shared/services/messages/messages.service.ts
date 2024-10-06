@@ -22,7 +22,7 @@ export class MessagesService {
     private showMessageEdit = false;
     private showEmojiPicker: boolean = false;
     messages: Message[] = [];
-    currentUserUid = this.authService.currentUser()?.id; // Setze den aktuellen Benutzer-UID
+    currentUserUid = this.authService.currentUser()?.id; // Braucht es das hier?
     messageArea = true;
     editedMessage = '';
     channelId = this.channelsService.currentChannelId;

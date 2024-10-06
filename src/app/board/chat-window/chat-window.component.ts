@@ -81,8 +81,7 @@ export class ChatWindowComponent implements OnInit {
       if (user) {
         // this.currentUser = user.uid;
         this.loadUsers();
-        let currentUserId = this.authService.currentUser()?.id as string;
-        this.channelsService.loadChannels(currentUserId);
+        this.channelsService.loadChannels();
       } else {
         console.log('Kein Benutzer angemeldet');
       }

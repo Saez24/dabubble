@@ -1,6 +1,6 @@
 import { inject, Injectable, signal, EventEmitter, Output  } from '@angular/core';
 import { Router } from '@angular/router';
-import { signInWithEmailAndPassword, signOut, updateProfile, verifyBeforeUpdateEmail } from "firebase/auth";
+import { confirmPasswordReset, sendPasswordResetEmail, signInWithEmailAndPassword, signOut, updateProfile, verifyBeforeUpdateEmail } from "firebase/auth";
 import { UserCredential } from "firebase/auth";
 import { UserService } from '../../firestore/user-service/user.service';
 import { Auth, user, User as AuthUser } from '@angular/fire/auth';
@@ -125,16 +125,6 @@ export class AuthService {
   }
 
 
-  async resetPassword() {
-
-  }
-
-
-  async sendPasswordResetMail() {
-
-  }
-
-
   async updateUserProfile(changes: {}): Promise<void> {
     try {
       if (this.auth.currentUser) {
@@ -164,6 +154,27 @@ export class AuthService {
         console.error('Error while updating auth user email', err.code);
         throw err;
       }
+    }
+  }
+
+
+  async resetPassword(code: string, password: string): Promise<void> {
+    try {
+      await confirmPasswordReset(this.auth, code, password);
+    } catch (err: any) {
+      console.error(err);
+      throw err;
+    }
+  }
+
+
+  async sendPasswordResetMail(mail: string): Promise<void> {
+    try {
+      const actionCodeSettings = { url: 'reset-password' };
+      await sendPasswordResetEmail(this.auth, mail, actionCodeSettings);
+    } catch (err: any) {
+      console.error(err);
+      throw err;
     }
   }
 }
