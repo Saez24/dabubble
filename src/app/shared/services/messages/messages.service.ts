@@ -84,7 +84,7 @@ export class MessagesService {
 
     async loadMessages(currentUserUid: string | undefined, channelId: string) {
         const messagesRef = collection(this.firestore, 'messages');
-        console.log(channelId);
+        // console.log(channelId);
 
         // Filtere die Nachrichten nach der übergebenen channelId
         const messagesQuery = query(
