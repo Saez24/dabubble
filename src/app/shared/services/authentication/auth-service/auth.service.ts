@@ -1,4 +1,4 @@
-import { inject, Injectable, signal, EventEmitter, Output  } from '@angular/core';
+import { inject, Injectable, signal, EventEmitter, Output, Injector  } from '@angular/core';
 import { Router } from '@angular/router';
 import { confirmPasswordReset, sendPasswordResetEmail, signInWithEmailAndPassword, signOut, updateProfile, verifyBeforeUpdateEmail } from "firebase/auth";
 import { UserCredential } from "firebase/auth";
