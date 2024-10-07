@@ -102,14 +102,14 @@ export class MessagesService {
 
                 message.messageId = doc.id;
                 message.isOwnMessage = message.senderID === currentUserUid;
-                console.log('isOwnMessage: ', message.isOwnMessage);
-                // console.log(message.senderID);
-                // console.log(this.currentUserUid);
+                // console.log('isOwnMessage: ', message.isOwnMessage);
+                // // console.log(message.senderID);
+                // // console.log(this.currentUserUid);
 
                 // Überprüfen, ob senderID nicht null ist
                 if (message.senderID) {
-                    console.log('SenderID: ', message.senderID);
-                    
+                    // console.log('SenderID: ', message.senderID);
+
                     const senderUser = await this.userService.getUserById(message.senderID);
                     message.senderAvatar = senderUser?.avatarPath || './assets/images/avatars/avatar5.svg';
                 } else {

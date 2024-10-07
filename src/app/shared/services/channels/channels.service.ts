@@ -45,7 +45,7 @@ export class ChannelsService implements OnInit {
     onSnapshot(channelsQuery, async (snapshot) => {
       this.channels = await Promise.all(snapshot.docs.map(async (doc) => {
         let channelData = doc.data() as Channel;
-        console.log(currentUserId);
+        // console.log(currentUserId);
 
         return { ...channelData, id: doc.id };
       }));

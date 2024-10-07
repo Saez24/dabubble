@@ -65,10 +65,12 @@ export class WorkspaceComponent {
   }
 
   async loadData(user: FirebaseUser) {
+    this.currentUserUid = user.uid; // Setze die currentUserUid hier
     await this.loadUsers();
-    await this.channelsService.loadChannels(user.uid); // Corrected to user.uid
-    console.log(user.uid);
+    await this.channelsService.loadChannels(user.uid);
+    // console.log(user.uid);
   }
+
 
 
   async loadUsers() {
@@ -101,8 +103,13 @@ export class WorkspaceComponent {
   // method to change background color for channel or user container
   openChannel(channel: Channel, i: number) {
     this.channelsService.clickChannelContainer(channel, i);
-    // this.messageService.loadMessages(this.currentUser, channel.id);
+    if (this.currentUserUid) {
+      this.messageService.loadMessages(this.currentUserUid, channel.id);
+    } else {
+      console.error("currentUserUid is null");
+    }
   }
+
 
   clickUserContainer(user: User, i: number) {
     this.channelsService.clickUserContainer(user, i);
