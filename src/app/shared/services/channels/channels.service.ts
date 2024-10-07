@@ -24,21 +24,29 @@ export class ChannelsService implements OnInit {
   public currentUserChannels: Channel[] = [];
 
   constructor(private firestore: Firestore, private authService: AuthService) {
-
+    // Initialize authentication state listener
+    this.authService.auth.onAuthStateChanged((user) => {
+      if (user) {
+        this.loadChannels(user.uid); // Pass the user ID to loadChannels
+      } else {
+        // Handle the case where the user is not logged in
+        console.log('No user logged in');
+      }
+    });
   }
 
   ngOnInit(): void {
   }
 
-
-  async loadChannels() {
-    let currentUserId = this.authService.currentUser()?.id as string;
+  async loadChannels(currentUserId: string) {
     let channelsRef = collection(this.firestore, 'channels');
     let channelsQuery = query(channelsRef, orderBy('name'));
 
     onSnapshot(channelsQuery, async (snapshot) => {
       this.channels = await Promise.all(snapshot.docs.map(async (doc) => {
         let channelData = doc.data() as Channel;
+        console.log(currentUserId);
+
         return { ...channelData, id: doc.id };
       }));
 
@@ -52,7 +60,7 @@ export class ChannelsService implements OnInit {
       }
     });
   }
-  
+
 
   getChannelData(channel: Channel) {
     this.currentChannelName = channel.name;

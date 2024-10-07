@@ -30,8 +30,6 @@ export class UserService {
 
   setUser(user: User | null | undefined) {
     this.userSignal.set(user);
-    console.log('user.service.currentUser() =', this.currentUser());
-    
   }
 
 

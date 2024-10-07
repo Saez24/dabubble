@@ -72,7 +72,7 @@ export class ChatWindowComponent implements OnInit {
     //   this.cd.detectChanges();
     // }
 
-      this.loadData();
+    this.loadData();
     // this.loadUserData(this.currentUser);
   }
 
@@ -81,7 +81,7 @@ export class ChatWindowComponent implements OnInit {
       if (user) {
         // this.currentUser = user.uid;
         this.loadUsers();
-        this.channelsService.loadChannels();
+        this.channelsService.loadChannels(user.uid);
       } else {
         console.log('Kein Benutzer angemeldet');
       }
