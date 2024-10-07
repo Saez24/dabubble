@@ -9,7 +9,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { CreateNewChannelDialog } from '../../dialogs/create-new-channel-dialog/create-new-channel-dialog.component';
 import { Channel } from '../../shared/models/channel.class';
 import { collection, doc, documentId, Firestore, getDoc, getDocs, onSnapshot, orderBy, query, where } from '@angular/fire/firestore';
-import { Auth } from '@angular/fire/auth';
+import { Auth, User as FirebaseUser } from '@angular/fire/auth';
 import { User } from '../../shared/models/user.class';
 import { MessagesService } from '../../shared/services/messages/messages.service';
 import { AuthService } from '../../shared/services/authentication/auth-service/auth.service';
@@ -54,16 +54,22 @@ export class WorkspaceComponent {
   }
 
   ngOnInit() {
-    if (this.authService.currentUser()) {
-      this.loadData();
-      this.fillArraysWithBoolean();
-    }
+    this.authService.auth.onAuthStateChanged((user: FirebaseUser | null) => {
+      if (user) {
+        this.loadData(user); // Pass the user to loadData
+        this.fillArraysWithBoolean();
+      } else {
+        console.log('No user logged in');
+      }
+    });
   }
 
-  async loadData() {
-      await this.loadUsers();
-      await this.channelsService.loadChannels();
+  async loadData(user: FirebaseUser) {
+    await this.loadUsers();
+    await this.channelsService.loadChannels(user.uid); // Corrected to user.uid
+    console.log(user.uid);
   }
+
 
   async loadUsers() {
     let usersRef = collection(this.firestore, 'users');
