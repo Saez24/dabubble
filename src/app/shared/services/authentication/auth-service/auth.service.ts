@@ -1,4 +1,4 @@
-import { inject, Injectable, signal, EventEmitter, Output, Injector  } from '@angular/core';
+import { inject, Injectable, signal, EventEmitter, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import { confirmPasswordReset, sendPasswordResetEmail, signInWithEmailAndPassword, signOut, updateProfile, verifyBeforeUpdateEmail } from "firebase/auth";
 import { UserCredential } from "firebase/auth";
@@ -51,6 +51,8 @@ export class AuthService {
       onSnapshot(userDocRef, (docSnap) => {
         if (docSnap.exists()) {
           const firestoreUserData = docSnap.data() as User;
+          // Hier wird die ID manuell hinzugefügt
+          firestoreUserData.id = docSnap.id;  // ID hinzufügen
           const currentUserObject = this.setCurrentUserObject(firestoreUserData);
           this.setUser(currentUserObject);
         } else {
@@ -63,6 +65,7 @@ export class AuthService {
       this.setUser(null);
     }
   }
+
 
   setUser(user: User | null | undefined) {
     this.userSignal.set(user);
