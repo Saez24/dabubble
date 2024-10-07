@@ -18,7 +18,7 @@ export class ChannelsService implements OnInit {
   currentChannelId: string = '';
   currentChannelMemberUids: string[] = [];
   currentChannelMembers: string[] | any;
-  userName: string = '';
+
   channel: Channel | [] = [];
   public channels: Channel[] = [];
   public currentUserChannels: Channel[] = [];
@@ -87,17 +87,7 @@ export class ChannelsService implements OnInit {
 
   // needs to be moved to workspace
 
-  getUserName(user: User) {
-    this.userName = user.name;
-    console.log(this.userName);
-  }
 
-  clickUserContainer(user: User, i: number) {
-    this.clickedUsers.fill(false);
-    this.clickedChannels.fill(false);
-    this.clickedUsers[i] = true;
-    this.getUserName(user);
-  }
 
   //
 

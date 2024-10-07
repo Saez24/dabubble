@@ -8,6 +8,8 @@ import { BehaviorSubject } from 'rxjs';
 import { UploadFileService } from '../firestore/storage-service/upload-file.service';
 import { AuthService } from '../authentication/auth-service/auth.service';
 import { ChannelsService } from '../channels/channels.service';
+import { DirectMessage } from '../../models/direct.message.class';
+import { User } from '../../models/user.class';
 // Importiere deinen UserService
 
 @Injectable({
@@ -22,6 +24,7 @@ export class MessagesService {
     private showMessageEdit = false;
     private showEmojiPicker: boolean = false;
     messages: Message[] = [];
+    directMessages: DirectMessage[] = [];
     currentUserUid = this.authService.currentUser()?.id; // Braucht es das hier?
     messageArea = true;
     editedMessage = '';
@@ -30,6 +33,7 @@ export class MessagesService {
     senderName: string | null = null;
     selectedFile: File | null = null;// Service für den Datei-Upload
     filePreviewUrl: string | null = null;
+    directMessageUser: User | null = null;
     @Output() showThreadEvent = new EventEmitter<void>();
 
     constructor(private firestore: Firestore, private auth: Auth, private userService: UserService,
@@ -133,6 +137,107 @@ export class MessagesService {
         });
     }
 
+    async loadDirectMessages(currentUserUid: string | undefined, targetUserId: string | undefined) {
+        const messagesRef = collection(this.firestore, 'direct_messages');
+        // Abfrage für empfangene Nachrichten
+        const receivedMessagesQuery = query(
+            messagesRef,
+            where('receiverId', '==', currentUserUid),
+            where('senderId', '==', targetUserId),
+            orderBy('timestamp')
+        );
+
+        // Abfrage für gesendete Nachrichten
+        const sentMessagesQuery = query(
+            messagesRef,
+            where('senderId', '==', currentUserUid),
+            where('receiverId', '==', targetUserId),
+            orderBy('timestamp')
+        );
+
+        // Snapshot für empfangene Nachrichten
+        const unsubscribeReceived = onSnapshot(receivedMessagesQuery, async (snapshot) => {
+            let lastDisplayedDate: string | null = null;
+            const receivedMessages = await Promise.all(snapshot.docs.map(async (doc) => {
+                const messageData = doc.data();
+                const message = new DirectMessage(messageData, currentUserUid);
+                message.messageId = doc.id;
+                message.isOwnMessage = false;
+
+                // Receiver Avatar
+                if (message.senderId) {
+                    const senderUser = await this.userService.getUserById(message.senderId);
+                    message.senderAvatar = senderUser?.avatarPath || './assets/images/avatars/avatar5.svg';
+                } else {
+                    message.senderAvatar = './assets/images/avatars/avatar5.svg';
+                }
+
+                const messageTimestamp = messageData['timestamp'];
+                const messageDate = new Date(messageTimestamp.seconds * 1000);
+                const formattedDate = this.formatTimestamp(messageDate);
+
+                if (formattedDate !== lastDisplayedDate) {
+                    message.displayDate = formattedDate;
+                    lastDisplayedDate = formattedDate;
+                } else {
+                    message.displayDate = null;
+                }
+
+                message.formattedTimestamp = messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                return message;
+            }));
+
+
+            this.directMessages = [...this.directMessages.filter(m => m.isOwnMessage), ...receivedMessages];
+        });
+
+        // Snapshot für gesendete Nachrichten
+        const unsubscribeSent = onSnapshot(sentMessagesQuery, async (snapshot) => {
+            let lastDisplayedDate: string | null = null;
+            const sentMessages = await Promise.all(snapshot.docs.map(async (doc) => {
+                const messageData = doc.data();
+                const message = new DirectMessage(messageData, currentUserUid);
+                message.messageId = doc.id;
+                message.isOwnMessage = true;
+
+                // Sender Avatar
+                if (message.senderId) {
+                    const senderUser = await this.userService.getUserById(message.senderId);
+                    message.senderAvatar = senderUser?.avatarPath || './assets/images/avatars/avatar5.svg';
+                } else {
+                    message.senderAvatar = './assets/images/avatars/avatar5.svg';
+                }
+
+                const messageTimestamp = messageData['timestamp'];
+                const messageDate = new Date(messageTimestamp.seconds * 1000);
+                const formattedDate = this.formatTimestamp(messageDate);
+
+                if (formattedDate !== lastDisplayedDate) {
+                    message.displayDate = formattedDate;
+                    lastDisplayedDate = formattedDate;
+                } else {
+                    message.displayDate = null;
+                }
+
+                message.formattedTimestamp = messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                return message;
+            }));
+
+            this.directMessages = [...sentMessages, ...this.directMessages.filter(m => !m.isOwnMessage)];
+        });
+
+        // Optional: Rückgabefunktion zum Abmelden von Snapshots
+        return () => {
+            unsubscribeReceived();
+            unsubscribeSent();
+
+        };
+    }
+
+
+
     formatTimestamp(messageDate: Date): string {
         const today = new Date();
         const yesterday = new Date();
@@ -151,6 +256,10 @@ export class MessagesService {
         }
     }
 
+
+    getUserName(user: User) {
+        this.directMessageUser = user;
+    }
 
     // async saveMessage(message: Message) {
     //     if (message.messageId) {
