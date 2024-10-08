@@ -212,17 +212,67 @@ export class ThreadComponent implements OnInit {
   }
 
   async updateMessageReactions(message: Message) {
-    const messageRef = doc(this.firestore, `messages/${message.messageId}`);
-    console.log('Updating reactions for messageId:', message.messageId, 'with reactions:', message.reactions);
-
+    if (!this.selectedMessageId) {
+      console.error('Fehlende selectedMessageId.');
+      return;
+    }
+  
     try {
-      await updateDoc(messageRef, {
-        reactions: message.reactions
-      });
+      const messageRef = doc(this.firestore, `messages/${this.selectedMessage?.messageId}`);
+      const docSnap = await getDoc(messageRef);
+  
+      if (docSnap.exists()) {
+        const mainMessage = docSnap.data();
+        if (this.isMainMessage()) {
+          await this.updateMainMessageReactions(message, mainMessage, messageRef);
+        } else {
+          await this.updateAnswerMessageReactions(message, mainMessage, messageRef);
+        }
+      } else {
+        console.error('Hauptnachricht nicht gefunden.');
+      }
     } catch (error) {
       console.error("Fehler beim Aktualisieren der Reaktionen: ", error);
     }
   }
+  
+  /**
+   * Prüft, ob die zu aktualisierende Nachricht die Hauptnachricht ist.
+   */
+  isMainMessage(): boolean {
+    return this.selectedMessageId === this.selectedMessage?.messageId;
+  }
+  
+  /**
+   * Aktualisiert die Reaktionen einer Hauptnachricht.
+   */
+  async updateMainMessageReactions(message: Message, mainMessage: any, messageRef: any) {
+    mainMessage['reactions'] = message.reactions;
+  
+    await updateDoc(messageRef, {
+      reactions: mainMessage['reactions']
+    });
+    console.log('Reaktionen der Hauptnachricht erfolgreich aktualisiert');
+  }
+  
+  /**
+   * Aktualisiert die Reaktionen einer Antwortnachricht im answers Array.
+   */
+  async updateAnswerMessageReactions(message: Message, mainMessage: any, messageRef: any) {
+    const answers = mainMessage['answers'] || [];
+    const answerToUpdate = answers.find((answer: any) => answer.messageId === this.selectedMessageId);
+  
+    if (answerToUpdate) {
+      answerToUpdate['reactions'] = message.reactions;
+  
+      await updateDoc(messageRef, {
+        answers: answers
+      });
+      console.log('Reaktionen der Antwort erfolgreich aktualisiert');
+    } else {
+      console.error('Keine passende Antwort gefunden, um die Reaktionen zu aktualisieren.');
+    }
+  }  
 
   @HostListener('document:click', ['$event'])
   clickOutside(event: Event) {
