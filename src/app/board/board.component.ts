@@ -20,6 +20,7 @@ import { Message } from '../shared/models/message.class';
 import { Auth } from '@angular/fire/auth';
 import { AddPeopleDialog } from "../dialogs/create-new-channel-dialog/add-people-dialog/add-people-dialog.component";
 import { ProfileEditorDialogComponent } from "../dialogs/profile-editor-dialog/profile-editor-dialog.component";
+import { DirectMessageComponent } from './chat-window/direct-message/direct-message/direct-message.component';
 
 @Component({
   selector: 'app-board',
@@ -43,8 +44,9 @@ import { ProfileEditorDialogComponent } from "../dialogs/profile-editor-dialog/p
     MatMenuModule,
     ProfileDialogComponent,
     AddPeopleDialog,
-    ProfileEditorDialogComponent
-],
+    ProfileEditorDialogComponent,
+    DirectMessageComponent,
+  ],
   templateUrl: './board.component.html',
   styleUrls: ['./board.component.scss', '../../styles.scss'],
   encapsulation: ViewEncapsulation.None
@@ -60,6 +62,8 @@ export class BoardComponent implements OnInit {
   messages: Message[] = [];
   currentUserUid: string | null | undefined = null;
   selectedMessage: Message | null = null;
+  showChatWindow: boolean = true;
+  showDirectMessage: boolean = false;
 
 
   constructor(
@@ -112,6 +116,16 @@ export class BoardComponent implements OnInit {
 
   stopPropagation(event: Event) {
     event.stopPropagation();
+  }
+
+  openChatWindow() {
+    this.showChatWindow = true;
+    this.showDirectMessage = false;
+  }
+
+  openDirectMessage() {
+    this.showDirectMessage = true;
+    this.showChatWindow = false;
   }
 
 }

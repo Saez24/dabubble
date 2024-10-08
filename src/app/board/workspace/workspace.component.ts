@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
@@ -40,7 +40,13 @@ export class WorkspaceComponent {
   panelOpenState = false;
   arrowRotated: boolean[] = [false, false];
   currentUserUid: string | null = null;
+  targetUserId: string | null = null;
   currentUserChannels: Channel[] = [];
+
+
+
+  @Output() openChannelEvent = new EventEmitter<void>();
+  @Output() clickUserEvent = new EventEmitter<void>();
 
   constructor(
     public dialog: MatDialog,
@@ -65,10 +71,12 @@ export class WorkspaceComponent {
   }
 
   async loadData(user: FirebaseUser) {
+    this.currentUserUid = user.uid; // Setze die currentUserUid hier
     await this.loadUsers();
-    await this.channelsService.loadChannels(user.uid); // Corrected to user.uid
-    console.log(user.uid);
+    await this.channelsService.loadChannels(user.uid);
+    // console.log(user.uid);
   }
+
 
 
   async loadUsers() {
@@ -101,57 +109,75 @@ export class WorkspaceComponent {
   // method to change background color for channel or user container
   openChannel(channel: Channel, i: number) {
     this.channelsService.clickChannelContainer(channel, i);
-    // this.messageService.loadMessages(this.currentUser, channel.id);
+    this.openChannelEvent.emit();
+    if (this.currentUserUid) {
+      this.messageService.loadMessages(this.currentUserUid, channel.id);
+    } else {
+      console.error("currentUserUid is null");
+    }
   }
 
-  clickUserContainer(user: User, i: number) {
-    this.channelsService.clickUserContainer(user, i);
-  }
 
   // helper method to toggle the clickContainer method
   openDialog() {
     this.dialog.open(CreateNewChannelDialog)
   }
+
+
+
+  clickUserContainer(user: User, i: number) {
+    this.clickedUsers.fill(false);
+    this.clickedChannels.fill(false);
+    this.clickedUsers[i] = true;
+    this.messageService.getUserName(user);
+    this.targetUserId = user.id;
+    this.clickUserEvent.emit();
+    if (this.currentUserUid && this.targetUserId) {
+      this.messageService.loadDirectMessages(this.currentUserUid, this.targetUserId);
+    } else {
+      console.error("currentUserUid is null");
+    }
+  }
+
+  // Alternative Methode, um auf die Kanäle des Nutzers zuzugreifen
+
+  // getUserChannels(uid: string) {
+  //   const userDocRef = doc(this.firestore, `users/${uid}`);
+  //   onSnapshot(userDocRef, (doc) => {
+  //     if (doc.exists()) {
+  //       const data = doc.data() as {
+  //         channels: string[];
+  //       };
+  //       this.currentUserChannels = data.channels,
+  //       console.log('Benutzerinformationen:', this.currentUserChannels);
+  //     } else {
+  //       console.log('Kein Benutzerdokument gefunden');
+  //     }
+  //   });
+  // }
+
+
+  // async loadChannels(currentUserUid: string) {
+  //   let channelsRef = collection(this.firestore, 'channels');
+  //   let channelsQuery = query(channelsRef, orderBy('name'));
+
+  //   onSnapshot(channelsQuery, async (snapshot) => {
+  //     this.channels = await Promise.all(snapshot.docs.map(async (doc) => {
+  //       let channelData = doc.data() as Channel;
+  //       return { ...channelData, id: doc.id };
+  //     }));
+
+  //     if (currentUserUid) {
+  //       let userChannels = this.channels.filter(channel => {
+  //         return channel.members && channel.members.includes(currentUserUid);
+  //       });
+  //       this.currentUserChannels = userChannels;
+  //     } else {
+  //       this.currentUserChannels = [];
+  //     }
+  //   });
+  // }
+
+
+
 }
-
-// Alternative Methode, um auf die Kanäle des Nutzers zuzugreifen
-
-// getUserChannels(uid: string) {
-//   const userDocRef = doc(this.firestore, `users/${uid}`);
-//   onSnapshot(userDocRef, (doc) => {
-//     if (doc.exists()) {
-//       const data = doc.data() as {
-//         channels: string[];
-//       };
-//       this.currentUserChannels = data.channels,
-//       console.log('Benutzerinformationen:', this.currentUserChannels);
-//     } else {
-//       console.log('Kein Benutzerdokument gefunden');
-//     }
-//   });
-// }
-
-
-// async loadChannels(currentUserUid: string) {
-//   let channelsRef = collection(this.firestore, 'channels');
-//   let channelsQuery = query(channelsRef, orderBy('name'));
-
-//   onSnapshot(channelsQuery, async (snapshot) => {
-//     this.channels = await Promise.all(snapshot.docs.map(async (doc) => {
-//       let channelData = doc.data() as Channel;
-//       return { ...channelData, id: doc.id };
-//     }));
-
-//     if (currentUserUid) {
-//       let userChannels = this.channels.filter(channel => {
-//         return channel.members && channel.members.includes(currentUserUid);
-//       });
-//       this.currentUserChannels = userChannels;
-//     } else {
-//       this.currentUserChannels = [];
-//     }
-//   });
-// }
-
-
-

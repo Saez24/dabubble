@@ -37,7 +37,35 @@
           }}</span>
         </div>
         <div class="thread-message-bubble">
-          <p>{{ selectedMessage.message }}</p>
+          <p>
+            {{ selectedMessage.message }}
+            <!-- Bildvorschau für URLs, die Bilddateien sind -->
+            <a
+              *ngIf="isImageFile(selectedMessage.fileURL)"
+              [href]="selectedMessage.fileURL"
+              target="_blank"
+            >
+              <img
+                class="image-preview"
+                [src]="selectedMessage.fileURL"
+                alt="Bildvorschau"
+                width="100%"
+              />
+            </a>
+            <!-- Datei-Link für alle anderen Dateitypen -->
+            <a
+              *ngIf="
+                selectedMessage.fileURL &&
+                !isImageFile(selectedMessage.fileURL) &&
+                !selectedMessage.fileURL?.endsWith('.pdf')
+              "
+              class="file-link"
+              [href]="selectedMessage.fileURL"
+              target="_blank"
+            >
+              {{ getFileNameFromURL(selectedMessage.fileURL) }}</a
+            >
+          </p>
         </div>
         <div class="thread-show-reactions">
           <div
@@ -104,7 +132,35 @@
             }}</span>
           </div>
           <div class="user-message-bubble">
-            <p>{{ selectedMessage.message }}</p>
+            <p>
+              {{ selectedMessage.message }}
+              <!-- Bildvorschau für URLs, die Bilddateien sind -->
+              <a
+                *ngIf="isImageFile(selectedMessage.fileURL)"
+                [href]="selectedMessage.fileURL"
+                target="_blank"
+              >
+                <img
+                  class="image-preview"
+                  [src]="selectedMessage.fileURL"
+                  alt="Bildvorschau"
+                  width="100%"
+                />
+              </a>
+              <!-- Datei-Link für alle anderen Dateitypen -->
+              <a
+                *ngIf="
+                  selectedMessage.fileURL &&
+                  !isImageFile(selectedMessage.fileURL) &&
+                  !selectedMessage.fileURL?.endsWith('.pdf')
+                "
+                class="file-link"
+                [href]="selectedMessage.fileURL"
+                target="_blank"
+              >
+                {{ getFileNameFromURL(selectedMessage.fileURL) }}</a
+              >
+            </p>
           </div>
           <div class="thread-show-reactions">
             <div
@@ -160,7 +216,7 @@
     </div>
 
     <!-- Kommentare -->
-    <div *ngFor="let message of messages" style="width: 100%">
+    <div *ngFor="let message of messages; let i = index" style="width: 100%">
       <div class="thread-message-container" *ngIf="!message.isOwnMessage">
         <img [src]="message.senderAvatar" alt="Profile Image" class="avatar" />
         <div class="thread-message-details">
@@ -178,7 +234,35 @@
             }}</span>
           </div>
           <div class="thread-message-bubble">
-            <p class="thread-message-text">{{ message.message }}</p>
+            <p class="thread-message-text">
+              {{ message.message }}
+              <!-- Bildvorschau für URLs, die Bilddateien sind -->
+              <a
+                *ngIf="isImageFile(message.fileURL)"
+                [href]="message.fileURL"
+                target="_blank"
+              >
+                <img
+                  class="image-preview"
+                  [src]="message.fileURL"
+                  alt="Bildvorschau"
+                  width="100%"
+                />
+              </a>
+              <!-- Datei-Link für alle anderen Dateitypen -->
+              <a
+                *ngIf="
+                  message.fileURL &&
+                  !isImageFile(message.fileURL) &&
+                  !message.fileURL?.endsWith('.pdf')
+                "
+                class="file-link"
+                [href]="message.fileURL"
+                target="_blank"
+              >
+                {{ getFileNameFromURL(message.fileURL) }}</a
+              >
+            </p>
           </div>
           <div class="thread-show-reactions">
             <div
@@ -202,7 +286,7 @@
     </div>
 
     <!-- Eigene Nachrichten -->
-    <div *ngFor="let message of messages" style="width: 100%">
+    <div *ngFor="let message of messages; let i = index" style="width: 100%">
       <div
         class="thread-message-container user-message-container"
         *ngIf="message.isOwnMessage"
@@ -234,7 +318,35 @@
             }}</span>
           </div>
           <div class="user-message-bubble">
-            <p>{{ message.message }}</p>
+            <p>
+              {{ message.message }}
+              <!-- Bildvorschau für URLs, die Bilddateien sind -->
+              <a
+                *ngIf="isImageFile(message.fileURL)"
+                [href]="message.fileURL"
+                target="_blank"
+              >
+                <img
+                  class="image-preview"
+                  [src]="message.fileURL"
+                  alt="Bildvorschau"
+                  width="100%"
+                />
+              </a>
+              <!-- Datei-Link für alle anderen Dateitypen -->
+              <a
+                *ngIf="
+                  message.fileURL &&
+                  !isImageFile(message.fileURL) &&
+                  !message.fileURL?.endsWith('.pdf')
+                "
+                class="file-link"
+                [href]="message.fileURL"
+                target="_blank"
+              >
+                {{ getFileNameFromURL(message.fileURL) }}</a
+              >
+            </p>
           </div>
           <div class="thread-show-reactions">
             <div

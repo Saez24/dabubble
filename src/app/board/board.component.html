@@ -10,10 +10,14 @@
         <div class="profile-menu-container" (click)="toggleProfileMenu()">
             <span>{{ currentUser()?.name }}</span>
             <div class="avatar-container">
-                <img src="{{ currentUser()?.avatarPath }}" alt="Profil Icon"*ngIf="currentUser()?.loginState === 'loggedIn'">
-                <img src="../../assets/images/icons/Online.png" alt="state Icon" *ngIf="currentUser()?.loginState === 'loggedIn'" class="state-icon">
-                <img src="../../assets/images/icons/offline.png" alt="state Icon" *ngIf="currentUser()?.loginState === 'loggedOut'" class="state-icon">
-                <img src="../../assets/images/icons/inactive.png" alt="state Icon" *ngIf="currentUser()?.loginState === 'inactive'" class="state-icon">
+                <img src="{{ currentUser()?.avatarPath }}" alt="Profil Icon"
+                    *ngIf="currentUser()?.loginState === 'loggedIn'">
+                <img src="../../assets/images/icons/Online.png" alt="state Icon"
+                    *ngIf="currentUser()?.loginState === 'loggedIn'" class="state-icon">
+                <img src="../../assets/images/icons/offline.png" alt="state Icon"
+                    *ngIf="currentUser()?.loginState === 'loggedOut'" class="state-icon">
+                <img src="../../assets/images/icons/inactive.png" alt="state Icon"
+                    *ngIf="currentUser()?.loginState === 'inactive'" class="state-icon">
             </div>
             <mat-icon>keyboard_arrow_down</mat-icon>
             <div class="overlay" *ngIf="this.userService.showOverlay()" (click)="closeAllDialogs()">
@@ -33,12 +37,17 @@
     </header>
     <mat-drawer-container class="mat-drawer-container" autosize>
         <mat-drawer #drawer class="sidenav" [opened]="true" mode="side">
-            <app-workspace></app-workspace>
+            <app-workspace (openChannelEvent)="openChatWindow()" (clickUserEvent)="openDirectMessage()"></app-workspace>
         </mat-drawer>
         <div class="sidenav-content">
             <mat-card class="chat-window-container" appearance="outlined">
                 <mat-card-content>
-                    <app-chat-window (showThreadEvent)="showThread($event)"></app-chat-window>
+                    <ng-container *ngIf="showChatWindow">
+                        <app-chat-window (showThreadEvent)="showThread($event)"></app-chat-window>
+                    </ng-container>
+                    <ng-container *ngIf="showDirectMessage">
+                        <app-direct-message></app-direct-message>
+                    </ng-container>
                 </mat-card-content>
             </mat-card>
             <mat-card class="thread-container" appearance="outlined" *ngIf="showThreadComponent">
