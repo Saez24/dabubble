@@ -8,37 +8,34 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule } from '@angular/forms';
 import { CommonModule, NgFor, NgIf } from '@angular/common';
 import { PickerComponent } from '@ctrl/ngx-emoji-mart';
-import { Message } from '../../shared/models/message.class';
-import { User } from '../../shared/models/user.class';
-import { Channel } from '../../shared/models/channel.class';
 import { addDoc, collection, doc, Firestore, onSnapshot, orderBy, query, updateDoc } from '@angular/fire/firestore';
 import { Auth } from '@angular/fire/auth';
-import { UserService } from '../../shared/services/firestore/user-service/user.service';
-import { AuthService } from '../../shared/services/authentication/auth-service/auth.service';
-import { UploadFileService } from '../../shared/services/firestore/storage-service/upload-file.service';
-import { SafeUrlPipe } from '../../shared/pipes/safe-url.pipe';
-import { ChannelsService } from '../../shared/services/channels/channels.service';
-import { ChannelDescriptionDialogComponent } from '../../dialogs/channel-description-dialog/channel-description-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
-import { MessagesService } from '../../shared/services/messages/messages.service';
-import { AddMemberDialogComponent } from '../../dialogs/add-member-dialog/add-member-dialog.component';
-import { DirectMessageComponent } from './direct-message/direct-message/direct-message.component';
-import { ChannelMessageComponent } from './channel-message/channel-message/channel-message.component';
+import { User } from '../../../../shared/models/user.class';
+import { Channel } from '../../../../shared/models/channel.class';
+import { UserService } from '../../../../shared/services/firestore/user-service/user.service';
+import { AuthService } from '../../../../shared/services/authentication/auth-service/auth.service';
+import { UploadFileService } from '../../../../shared/services/firestore/storage-service/upload-file.service';
+import { ChannelsService } from '../../../../shared/services/channels/channels.service';
+import { MessagesService } from '../../../../shared/services/messages/messages.service';
+import { SafeUrlPipe } from '../../../../shared/pipes/safe-url.pipe';
+import { AddMemberDialogComponent } from '../../../../dialogs/add-member-dialog/add-member-dialog.component';
+import { ChannelDescriptionDialogComponent } from '../../../../dialogs/channel-description-dialog/channel-description-dialog.component';
+import { Message } from '../../../../shared/models/message.class';
 
 
 
 @Component({
-  selector: 'app-chat-window',
+  selector: 'app-channel-message',
   standalone: true,
   imports: [MatCardModule, MatButtonModule, MatIconModule, MatDividerModule, FormsModule,
-    MatFormFieldModule, MatInputModule, CommonModule, PickerComponent, NgIf, NgFor, SafeUrlPipe, AddMemberDialogComponent, DirectMessageComponent, ChannelMessageComponent],
-  templateUrl: './chat-window.component.html',
-  styleUrl: './chat-window.component.scss',
+    MatFormFieldModule, MatInputModule, CommonModule, PickerComponent, NgIf, NgFor, SafeUrlPipe, AddMemberDialogComponent],
+  templateUrl: './channel-message.component.html',
+  styleUrl: './channel-message.component.scss',
   changeDetection: ChangeDetectionStrategy.Default,
   encapsulation: ViewEncapsulation.None,
 })
-
-export class ChatWindowComponent implements OnInit {
+export class ChannelMessageComponent {
   messages = this.messageService.messages;
   users: User[] = [];
   channels: Channel[] = [];
@@ -280,132 +277,5 @@ export class ChatWindowComponent implements OnInit {
     const fileName = decodedUrl.split('?')[0].split('/').pop();
     return fileName || 'Datei'; // Wenn kein Dateiname gefunden wird, 'Datei' als Fallback anzeigen
   }
-
-  // ngAfterViewChecked() {
-  //   this.scrollToBottom(); // Stelle sicher, dass das Chat-Fenster nach jeder View-Änderung nach unten scrollt
-  // }
-
-  // async getCurrentUser() {
-  //   const currentUser = this.authService.currentUser;
-
-  //   if (currentUser && currentUser.id != null && currentUser.id != undefined) {
-  //     this.currentUserUid = currentUser.id; // Speichere die aktuelle Benutzer-ID
-
-  //     // Benutzerdaten von Firestore abrufen
-  //     const userDoc = await this.userService.getUserById(currentUser.id);
-
-  //     // Überprüfe, ob userDoc existiert und einen avatarPath hat
-  //     if (userDoc) {
-  //       this.senderAvatar = userDoc.avatarPath || './assets/images/avatars/default-avatar.svg'; // Standard-Avatar, wenn avatarPath nicht vorhanden ist
-  //       this.senderName = userDoc.name; // Setze den Benutzernamen
-  //     } else {
-  //       console.warn('Benutzerdaten nicht gefunden für UID:', currentUser.id);
-  //       this.senderAvatar = './assets/images/avatars/default-avatar.svg'; // Setze einen Standard-Avatar
-  //     }
-
-  //   } else {
-  //     console.log('Kein Benutzer angemeldet');
-  //   }
-  // }
-
-  // async loadChannels() {
-  //   const channelsRef = collection(this.firestore, 'channels');
-  //   const channelsQuery = query(channelsRef);
-
-  //   onSnapshot(channelsQuery, (snapshot) => {
-  //     this.channels = snapshot.docs.map(doc => {
-  //       const channelData = doc.data() as Channel;
-  //       return { ...channelData, id: doc.id }; // ID nach channelData hinzufügen
-  //     });
-  //   });
-  // }
-
-  // getChannelName(channelId: string | null) {
-  //   const channel = this.channels.find(c => c.id === channelId);
-
-  //   if (channel) {
-  //     this.selectedChannelId = channel.id; // Setze die selectedChannelId
-  //     return channel.name;
-  //   } else {
-  //     this.selectedChannelId = null; // Setze die selectedChannelId auf null, wenn kein Kanal gefunden wird
-  //     return 'Unbekannter Kanal';
-  //   }
-  // }
-
-  // async loadMessages(channelId: string) {
-  //   const messagesRef = collection(this.firestore, 'messages');
-  //   console.log(channelId);
-
-
-  //   // Filtere die Nachrichten nach der übergebenen channelId
-  //   const messagesQuery = query(
-  //     messagesRef,
-  //     where('channelId', '==', channelId), // Hier filtern wir nach channelId
-  //     orderBy('timestamp')
-  //   );
-
-  //   onSnapshot(messagesQuery, async (snapshot) => {
-  //     let lastDisplayedDate: string | null = null;
-
-  //     this.messages = await Promise.all(snapshot.docs.map(async (doc) => {
-  //       const messageData = doc.data();
-  //       const message = new Message(messageData, this.currentUserUid);
-  //       message.messageId = doc.id;
-
-  //       // Überprüfen, ob senderID nicht null ist
-  //       if (message.senderID) {
-  //         const senderUser = await this.userService.getUserById(message.senderID);
-  //         message.senderAvatar = senderUser?.avatarPath || './assets/images/avatars/avatar5.svg';
-  //       } else {
-  //         message.senderAvatar = './assets/images/avatars/avatar5.svg';
-  //       }
-
-  //       const messageTimestamp = messageData['timestamp'];
-  //       const messageDate = new Date(messageTimestamp.seconds * 1000);
-  //       const formattedDate = this.formatTimestamp(messageDate);
-
-  //       if (formattedDate !== lastDisplayedDate) {
-  //         message.displayDate = formattedDate;
-  //         lastDisplayedDate = formattedDate;
-  //       } else {
-  //         message.displayDate = null;
-  //       }
-
-  //       message.formattedTimestamp = messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  //       return message;
-  //     }));
-
-  //     this.cd.detectChanges();
-  //     this.scrollToBottom();
-  //   });
-  // }
-
-  // scrollToBottom(): void {
-  //   if (this.chatWindow) {
-  //     try {
-  //       this.chatWindow.nativeElement.scrollTop = this.chatWindow.nativeElement.scrollHeight;
-  //     } catch (err) {
-  //       console.error('Scroll to bottom failed:', err);
-  //     }
-  //   }
-  // }
-
-  // formatTimestamp(messageDate: Date): string {
-  //   const today = new Date();
-  //   const yesterday = new Date();
-  //   yesterday.setDate(today.getDate() - 1);
-
-  //   const isToday = messageDate.toDateString() === today.toDateString();
-  //   const isYesterday = messageDate.toDateString() === yesterday.toDateString();
-
-  //   if (isToday) {
-  //     return 'Heute'; // Wenn die Nachricht von heute ist
-  //   } else if (isYesterday) {
-  //     return 'Gestern'; // Wenn die Nachricht von gestern ist
-  //   } else {
-  //     // Format "13. September"
-  //     return messageDate.toLocaleDateString('de-DE', { day: 'numeric', month: 'long' });
-  //   }
-  // }
 
 }

@@ -24,40 +24,6 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.chat-search-bar {
-    width: 100%;
-    padding: 20px 0 0 0;
-
-    >.mat-mdc-text-field-wrapper {
-        border-radius: 30px !important;
-        border: 1px solid rgba(173, 176, 217, 1);
-        transition: border 0.1s ease;
-    }
-
-    /* Wenn ein Element innerhalb des Wrappers fokussiert wird, soll der Rahmen des Wrappers dicker werden */
-    >.mat-mdc-text-field-wrapper:focus-within {
-        border: 1px solid #535AF1;
-    }
-
-    >.mdc-text-field--filled:not(.mdc-text-field--disabled) {
-        background-color: transparent;
-    }
-}
-
-.mat-mdc-form-field-focus-overlay {
-    background-color: transparent !important;
-}
-
-.mdc-line-ripple::before {
-    border-bottom-width: 0px !important;
-}
-
-.mdc-line-ripple::after {
-    border-bottom-width: 0px !important;
-}
-
-
-
 .mat-mdc-card-content {
     padding: 0;
 }
@@ -483,6 +449,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
+    ;
 
     >.save-btn {
         background: #444DF2;
