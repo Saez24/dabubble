@@ -8,7 +8,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule } from '@angular/forms';
 import { CommonModule, NgFor, NgIf } from '@angular/common';
 import { PickerComponent } from '@ctrl/ngx-emoji-mart';
-import { addDoc, collection, doc, Firestore, onSnapshot, orderBy, query, updateDoc } from '@angular/fire/firestore';
+import { addDoc, arrayUnion, collection, doc, Firestore, onSnapshot, orderBy, query, updateDoc } from '@angular/fire/firestore';
 import { Auth } from '@angular/fire/auth';
 import { MatDialog } from '@angular/material/dialog';
 import { ChannelsService } from '../../../../shared/services/channels/channels.service';
@@ -51,15 +51,21 @@ export class DirectMessageComponent implements OnInit {
   selectedFile: File | null = null;// Service für den Datei-Upload
   filePreviewUrl: string | null = null;
   selectedUser = this.messageService.directMessageUser;
+  messageId: string | null = null;
 
   @ViewChild('chatWindow') private chatWindow!: ElementRef;
   constructor(private firestore: Firestore, private auth: Auth,
     private userService: UserService, private cd: ChangeDetectorRef,
     private authService: AuthService, private uploadFileService: UploadFileService,
-    public channelsService: ChannelsService, public dialog: MatDialog, public messageService: MessagesService) { }
+    public channelsService: ChannelsService, public dialog: MatDialog, public messageService: MessagesService) {
+
+  }
 
   ngOnInit() {
-
+    this.messageService.messageId$.subscribe(id => {
+      this.messageId = id;
+      // console.log('Aktuelle Message ID:', this.messageId);
+    });
   }
 
   async loadData() {
@@ -98,7 +104,6 @@ export class DirectMessageComponent implements OnInit {
     this.showMessageEditArea = true;
     this.showMessageEdit = false;
   }
-
 
   saveMessage(message: DirectMessage) {
     if (this.editingMessageId) { // Nutze die `editingMessageId` (Dokument-ID) anstelle von `message.messageId`
@@ -152,41 +157,78 @@ export class DirectMessageComponent implements OnInit {
       if (currentUser()) {
         const messagesRef = collection(this.firestore, 'direct_messages');
 
-        const newMessage: DirectMessage = new DirectMessage({
-          senderId: this.currentUser()?.id,
-          senderName: this.currentUser()?.name,
-          message: this.chatMessage,
-          reactions: [],
-          fileURL: '',
-          receiverId: this.selectedUser?.id,
-          receiverName: this.selectedUser?.name,
+        if (this.messageId) {
+          // Konversation existiert, also aktualisiere sie
+          const messageDocRef = doc(messagesRef, this.messageId);
 
-        });
+          // Füge die neue Nachricht zur bestehenden Konversation hinzu
+          await updateDoc(messageDocRef, {
+            conversation: arrayUnion({
+              senderName: currentUser()?.name,
+              message: this.chatMessage,
+              reaction: [],
+              timestamp: new Date(),
+              receiverName: this.selectedUser?.name,
+              senderId: currentUser()?.id,
+              receiverId: this.selectedUser?.id,
+            })
+          });
 
-        const messageDocRef = await addDoc(messagesRef, {
-          senderId: newMessage.senderId,
-          senderName: newMessage.senderName,
-          message: newMessage.message,
-          reaction: newMessage.reactions,
-          timestamp: new Date(),
-          receiverId: newMessage.receiverId,
-          receiverName: newMessage.receiverName,
-        });
+          // Datei verarbeiten, falls vorhanden
+          if (this.selectedFile && this.currentUserUid) {
+            try {
+              const fileURL = await this.uploadFileService.uploadFileWithIds(this.selectedFile, this.currentUserUid, messageDocRef.id);
+              await updateDoc(messageDocRef, { fileURL });
+            } catch (error) {
+              console.error('Datei-Upload fehlgeschlagen:', error);
+            }
+          }
+        } else {
+          // Es gibt keine Konversation, also erstelle eine neue
+          const newMessage: DirectMessage = new DirectMessage({
+            conversation: [],
+            senderId: currentUser()?.id,
+            senderName: currentUser()?.name,
+            message: this.chatMessage,
+            reactions: [],
+            fileURL: '',
+            receiverId: this.messageService.directMessageUser?.id,
+            receiverName: this.messageService.directMessageUser?.name,
+          });
 
-        if (this.selectedFile && this.currentUserUid) {
-          try {
-            const fileURL = await this.uploadFileService.uploadFileWithIds(this.selectedFile, this.currentUserUid, messageDocRef.id); // Verwende die ID des neuen Dokuments
-            newMessage.fileURL = fileURL; // Setze die Download-URL in der Nachricht
-            await updateDoc(messageDocRef, { fileURL: newMessage.fileURL }); // Aktualisiere das Dokument mit der Datei-URL
-          } catch (error) {
-            console.error('Datei-Upload fehlgeschlagen:', error);
+          // Füge die neue Konversation in Firestore hinzu
+          const messageDocRef = await addDoc(messagesRef, {
+            senderId: newMessage.senderId,
+            receiverId: newMessage.receiverId,
+            timestamp: new Date(),
+            conversation: [
+              {
+                senderName: newMessage.senderName,
+                message: newMessage.message,
+                reaction: newMessage.reactions,
+                timestamp: new Date(),
+                receiverName: newMessage.receiverName,
+                senderId: newMessage.senderId,
+                receiverId: newMessage.receiverId,
+              }
+            ]
+          });
+
+          // Datei verarbeiten, falls vorhanden
+          if (this.selectedFile && this.currentUserUid) {
+            try {
+              const fileURL = await this.uploadFileService.uploadFileWithIds(this.selectedFile, this.currentUserUid, messageDocRef.id);
+              newMessage.fileURL = fileURL;
+              await updateDoc(messageDocRef, { fileURL: newMessage.fileURL });
+            } catch (error) {
+              console.error('Datei-Upload fehlgeschlagen:', error);
+            }
           }
         }
 
-        this.chatMessage = ''; // Eingabefeld leeren
-        this.selectedFile = null; // Reset selectedFile
-        // this.messageService.loadMessages(this.authService.currentUser()?.id, this.channelsService.currentChannelId);
-        // Übergebe die channelId
+        // Eingabefelder bereinigen und Scrollen
+        this.chatMessage = '';
+        this.selectedFile = null;
         this.scrollToBottom();
         this.deleteUpload();
       } else {
@@ -194,6 +236,7 @@ export class DirectMessageComponent implements OnInit {
       }
     }
   }
+
 
   scrollToBottom(): void {
     if (this.chatWindow) {

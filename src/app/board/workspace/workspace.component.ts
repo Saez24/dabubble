@@ -134,7 +134,10 @@ export class WorkspaceComponent {
     this.clickUserEvent.emit();
     if (this.currentUserUid && this.targetUserId) {
       this.messageService.loadDirectMessages(this.currentUserUid, this.targetUserId);
+      this.messageService.setMessageId(null);
     } else {
+
+
       console.error("currentUserUid is null");
     }
   }
