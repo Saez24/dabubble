@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -44,17 +44,17 @@ export class ChatWindowComponent implements OnInit {
   channels: Channel[] = [];
   currentUser = this.authService.getUserSignal();
   showEmojiPicker = false;
-  showMessageEdit = false;
-  showMessageEditArea = false;
   chatMessage = '';
-  messageArea = true;
-  editedMessage = '';
   currentUserUid = '';
-  editingMessageId: string | null = null;
   senderAvatar: string | null = null;
   senderName: string | null = null;
   selectedFile: File | null = null;// Service für den Datei-Upload
   filePreviewUrl: string | null = null;
+  searchQuery: string = '';
+  filteredChannels: Channel[] = [];
+  filteredUsers: User[] = [];
+  isSearching: boolean = false;
+  selectedUser = this.messageService.directMessageUser;
 
 
   @ViewChild('chatWindow') private chatWindow!: ElementRef;
@@ -64,14 +64,52 @@ export class ChatWindowComponent implements OnInit {
     public channelsService: ChannelsService, public dialog: MatDialog, public messageService: MessagesService) { }
 
   ngOnInit() {
-
+    this.loadData();
   }
+
+  openChannelDescriptionDialog() {
+    this.dialog.open(ChannelDescriptionDialogComponent)
+  }
+
+  openAddMemberDialog() {
+    this.dialog.open(AddMemberDialogComponent)
+  }
+
+  async onSearch(event: any) {
+    this.searchQuery = event.target.value.trim().toLowerCase();
+    this.isSearching = this.searchQuery.length > 0;
+
+    if (this.searchQuery.startsWith('#')) {
+      // Suche nach Channels
+      this.filteredChannels = this.channels.filter(channel =>
+        channel.name.toLowerCase().includes(this.searchQuery.slice(1))
+      );
+      this.filteredUsers = []; // User-Suchergebnisse leeren
+    } else if (this.searchQuery.startsWith('@') || this.isValidEmail(this.searchQuery)) {
+      // Suche nach Usern (nach @ oder E-Mail-Adresse)
+      this.filteredUsers = this.users.filter(user =>
+      (user.name.toLowerCase().includes(this.searchQuery.slice(1)) ||
+        (user.email && user.email.toLowerCase().includes(this.searchQuery))) // Null-Prüfung für user.email
+      );
+      this.filteredChannels = []; // Channel-Suchergebnisse leeren
+    } else {
+      // Leere Ergebnisse, falls die Eingabe nicht passt
+      this.filteredChannels = [];
+      this.filteredUsers = [];
+    }
+  }
+
+  isValidEmail(email: string): boolean {
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailPattern.test(email);
+  }
+
 
   async loadData() {
     this.auth.onAuthStateChanged(async (user) => {
       if (user) {
         this.loadUsers();
-        this.channelsService.loadChannels(user.uid);
+        this.loadChannels();
       } else {
         console.log('Kein Benutzer angemeldet');
       }
@@ -91,49 +129,21 @@ export class ChatWindowComponent implements OnInit {
     });
   }
 
-  openChannelDescriptionDialog() {
-    this.dialog.open(ChannelDescriptionDialogComponent)
-  }
+  async loadChannels() {
+    let channelRef = collection(this.firestore, 'channels');
+    let channelQuery = query(channelRef, orderBy('name'));
 
-  openAddMemberDialog() {
-    this.dialog.open(AddMemberDialogComponent)
+    onSnapshot(channelQuery, async (snapshot) => {
+      this.channels = await Promise.all(snapshot.docs.map(async (doc) => {
+        let channelData = doc.data() as Channel;
+        return { ...channelData, id: doc.id };
+      }));
+
+    });
   }
 
   showEmoji() {
     this.showEmojiPicker = !this.showEmojiPicker;
-  }
-
-  showMessageEditToggle() {
-    this.showMessageEdit = !this.showMessageEdit;
-  }
-
-  editMessage(docId: string) {
-    this.editingMessageId = docId; // Verwende die Dokument-ID
-    this.showMessageEditArea = true;
-    this.showMessageEdit = false;
-  }
-
-
-  saveMessage(message: Message) {
-    if (this.editingMessageId) { // Nutze die `editingMessageId` (Dokument-ID) anstelle von `message.messageId`
-      const messageRef = doc(this.firestore, `messages/${this.editingMessageId}`); // Verweise auf die Dokument-ID
-
-      updateDoc(messageRef, { message: message.message }).then(() => {
-        this.editingMessageId = null;
-        this.showMessageEditArea = false;
-      }).catch(error => {
-        console.error("Fehler beim Speichern der Nachricht: ", error);
-      });
-    }
-  }
-
-  cancelMessageEdit() {
-    this.editingMessageId = null;
-    this.showMessageEditArea = false;
-  }
-
-  isEditing(docId: string): boolean {
-    return this.editingMessageId === docId; // Prüfe gegen die Firestore-Dokument-ID
   }
 
   addEmoji(event: any) {
@@ -148,11 +158,6 @@ export class ChatWindowComponent implements OnInit {
     if (this.showEmojiPicker && !target.closest('emoji-mart') && !target.closest('.message-icon')) {
       this.showEmojiPicker = false;
     }
-  }
-
-  @Output() showThreadEvent = new EventEmitter<Message>();
-  showThread(message: Message) {
-    this.showThreadEvent.emit(message);
   }
 
   showError() {
@@ -280,132 +285,4 @@ export class ChatWindowComponent implements OnInit {
     const fileName = decodedUrl.split('?')[0].split('/').pop();
     return fileName || 'Datei'; // Wenn kein Dateiname gefunden wird, 'Datei' als Fallback anzeigen
   }
-
-  // ngAfterViewChecked() {
-  //   this.scrollToBottom(); // Stelle sicher, dass das Chat-Fenster nach jeder View-Änderung nach unten scrollt
-  // }
-
-  // async getCurrentUser() {
-  //   const currentUser = this.authService.currentUser;
-
-  //   if (currentUser && currentUser.id != null && currentUser.id != undefined) {
-  //     this.currentUserUid = currentUser.id; // Speichere die aktuelle Benutzer-ID
-
-  //     // Benutzerdaten von Firestore abrufen
-  //     const userDoc = await this.userService.getUserById(currentUser.id);
-
-  //     // Überprüfe, ob userDoc existiert und einen avatarPath hat
-  //     if (userDoc) {
-  //       this.senderAvatar = userDoc.avatarPath || './assets/images/avatars/default-avatar.svg'; // Standard-Avatar, wenn avatarPath nicht vorhanden ist
-  //       this.senderName = userDoc.name; // Setze den Benutzernamen
-  //     } else {
-  //       console.warn('Benutzerdaten nicht gefunden für UID:', currentUser.id);
-  //       this.senderAvatar = './assets/images/avatars/default-avatar.svg'; // Setze einen Standard-Avatar
-  //     }
-
-  //   } else {
-  //     console.log('Kein Benutzer angemeldet');
-  //   }
-  // }
-
-  // async loadChannels() {
-  //   const channelsRef = collection(this.firestore, 'channels');
-  //   const channelsQuery = query(channelsRef);
-
-  //   onSnapshot(channelsQuery, (snapshot) => {
-  //     this.channels = snapshot.docs.map(doc => {
-  //       const channelData = doc.data() as Channel;
-  //       return { ...channelData, id: doc.id }; // ID nach channelData hinzufügen
-  //     });
-  //   });
-  // }
-
-  // getChannelName(channelId: string | null) {
-  //   const channel = this.channels.find(c => c.id === channelId);
-
-  //   if (channel) {
-  //     this.selectedChannelId = channel.id; // Setze die selectedChannelId
-  //     return channel.name;
-  //   } else {
-  //     this.selectedChannelId = null; // Setze die selectedChannelId auf null, wenn kein Kanal gefunden wird
-  //     return 'Unbekannter Kanal';
-  //   }
-  // }
-
-  // async loadMessages(channelId: string) {
-  //   const messagesRef = collection(this.firestore, 'messages');
-  //   console.log(channelId);
-
-
-  //   // Filtere die Nachrichten nach der übergebenen channelId
-  //   const messagesQuery = query(
-  //     messagesRef,
-  //     where('channelId', '==', channelId), // Hier filtern wir nach channelId
-  //     orderBy('timestamp')
-  //   );
-
-  //   onSnapshot(messagesQuery, async (snapshot) => {
-  //     let lastDisplayedDate: string | null = null;
-
-  //     this.messages = await Promise.all(snapshot.docs.map(async (doc) => {
-  //       const messageData = doc.data();
-  //       const message = new Message(messageData, this.currentUserUid);
-  //       message.messageId = doc.id;
-
-  //       // Überprüfen, ob senderID nicht null ist
-  //       if (message.senderID) {
-  //         const senderUser = await this.userService.getUserById(message.senderID);
-  //         message.senderAvatar = senderUser?.avatarPath || './assets/images/avatars/avatar5.svg';
-  //       } else {
-  //         message.senderAvatar = './assets/images/avatars/avatar5.svg';
-  //       }
-
-  //       const messageTimestamp = messageData['timestamp'];
-  //       const messageDate = new Date(messageTimestamp.seconds * 1000);
-  //       const formattedDate = this.formatTimestamp(messageDate);
-
-  //       if (formattedDate !== lastDisplayedDate) {
-  //         message.displayDate = formattedDate;
-  //         lastDisplayedDate = formattedDate;
-  //       } else {
-  //         message.displayDate = null;
-  //       }
-
-  //       message.formattedTimestamp = messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  //       return message;
-  //     }));
-
-  //     this.cd.detectChanges();
-  //     this.scrollToBottom();
-  //   });
-  // }
-
-  // scrollToBottom(): void {
-  //   if (this.chatWindow) {
-  //     try {
-  //       this.chatWindow.nativeElement.scrollTop = this.chatWindow.nativeElement.scrollHeight;
-  //     } catch (err) {
-  //       console.error('Scroll to bottom failed:', err);
-  //     }
-  //   }
-  // }
-
-  // formatTimestamp(messageDate: Date): string {
-  //   const today = new Date();
-  //   const yesterday = new Date();
-  //   yesterday.setDate(today.getDate() - 1);
-
-  //   const isToday = messageDate.toDateString() === today.toDateString();
-  //   const isYesterday = messageDate.toDateString() === yesterday.toDateString();
-
-  //   if (isToday) {
-  //     return 'Heute'; // Wenn die Nachricht von heute ist
-  //   } else if (isYesterday) {
-  //     return 'Gestern'; // Wenn die Nachricht von gestern ist
-  //   } else {
-  //     // Format "13. September"
-  //     return messageDate.toLocaleDateString('de-DE', { day: 'numeric', month: 'long' });
-  //   }
-  // }
-
 }
