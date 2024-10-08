@@ -21,6 +21,7 @@ import { Auth } from '@angular/fire/auth';
 import { AddPeopleDialog } from "../dialogs/create-new-channel-dialog/add-people-dialog/add-people-dialog.component";
 import { ProfileEditorDialogComponent } from "../dialogs/profile-editor-dialog/profile-editor-dialog.component";
 import { DirectMessageComponent } from './chat-window/direct-message/direct-message/direct-message.component';
+import { MessagesService } from '../shared/services/messages/messages.service';
 
 @Component({
   selector: 'app-board',
@@ -71,7 +72,8 @@ export class BoardComponent implements OnInit {
     private firestore: Firestore,
     private auth: Auth,
     public authService: AuthService,
-    public userService: UserService
+    public userService: UserService,
+    public messageService: MessagesService
   ) {
     this.currentUser = this.authService.getUserSignal();
   }

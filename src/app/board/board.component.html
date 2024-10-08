@@ -46,7 +46,7 @@
                         <app-chat-window (showThreadEvent)="showThread($event)"></app-chat-window>
                     </ng-container>
                     <ng-container *ngIf="showDirectMessage">
-                        <app-direct-message></app-direct-message>
+                        <app-direct-message [selectedUser]="messageService.directMessageUser"></app-direct-message>
                     </ng-container>
                 </mat-card-content>
             </mat-card>

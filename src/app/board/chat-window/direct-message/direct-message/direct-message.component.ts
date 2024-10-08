@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -50,8 +50,10 @@ export class DirectMessageComponent implements OnInit {
   senderName: string | null = null;
   selectedFile: File | null = null;// Service für den Datei-Upload
   filePreviewUrl: string | null = null;
-  selectedUser = this.messageService.directMessageUser;
+  @Input() selectedUser = this.messageService.directMessageUser;
   messageId: string | null = null;
+
+
 
   @ViewChild('chatWindow') private chatWindow!: ElementRef;
   constructor(private firestore: Firestore, private auth: Auth,

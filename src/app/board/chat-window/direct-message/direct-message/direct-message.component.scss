@@ -670,6 +670,20 @@
     justify-content: space-between;
 }
 
+.selected-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 24px;
+    font-weight: 700;
+
+    >img {
+        height: 50px;
+        width: 50px;
+        border-radius: 50%;
+    }
+}
+
 .delete-upload {
     &:hover {
         background: #d1d3e7;
