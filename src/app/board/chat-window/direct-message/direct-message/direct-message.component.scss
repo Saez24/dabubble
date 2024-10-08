@@ -655,8 +655,19 @@
     &:hover {
         background: #d1d3e7;
     }
+}
 
+.message-box {
+    width: 100%;
+    max-width: 1920px;
+}
 
+.message-content {
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .delete-upload {

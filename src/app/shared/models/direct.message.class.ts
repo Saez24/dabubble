@@ -1,3 +1,4 @@
+
 export class DirectMessage {
     timestamp(timestamp: any): string {
         throw new Error('Method not implemented.');
@@ -14,7 +15,21 @@ export class DirectMessage {
     fileURL: string | null;
     receiverId: string | null;
     receiverName: string | null;
-
+    conversation: { // Jede Nachricht in der Konversation
+        senderName: string | null;
+        message: string | null;
+        messageId: string;
+        reactions: { emoji: string; senderName: string; count: number }[];
+        timestamp: any; // Anpassen des Typs je nach Bedarf
+        receiverName: string | null;
+        receiverId: string | null;
+        senderId: string | null;
+        formattedTimestamp: string;
+        isOwnMessage: boolean;
+        displayDate: string | null;
+        senderAvatar: string | null | undefined;
+        fileURL: string | null;
+    }[];
 
 
     constructor(obj?: any, currentUserUid?: string | null) {
@@ -28,7 +43,7 @@ export class DirectMessage {
         this.fileURL = obj ? obj.fileURL : null;
         this.receiverId = obj ? obj.receiverId : null;
         this.receiverName = obj ? obj.receiverName : null;
-
+        this.conversation = obj ? obj.conversation : [];
 
 
         // Typensicherer Vergleich, um sowohl null als auch undefined abzudecken

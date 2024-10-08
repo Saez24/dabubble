@@ -1,10 +1,10 @@
 import { Injectable, EventEmitter, HostListener, Output, ElementRef, ViewChild, ChangeDetectorRef } from '@angular/core';
-import { Firestore, doc, updateDoc, addDoc, collection, onSnapshot, query, orderBy, where } from '@angular/fire/firestore';
+import { Firestore, doc, updateDoc, addDoc, collection, onSnapshot, query, orderBy, where, Timestamp } from '@angular/fire/firestore';
 import { Auth } from '@angular/fire/auth';
 import { UserService } from '../firestore/user-service/user.service';
 import { Message } from '../../models/message.class';
 import { PickerComponent } from '@ctrl/ngx-emoji-mart';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { UploadFileService } from '../firestore/storage-service/upload-file.service';
 import { AuthService } from '../authentication/auth-service/auth.service';
 import { ChannelsService } from '../channels/channels.service';
@@ -36,10 +36,16 @@ export class MessagesService {
     directMessageUser: User | null = null;
     @Output() showThreadEvent = new EventEmitter<void>();
 
+    private messageIdSubject: BehaviorSubject<string | null> = new BehaviorSubject<string | null>(null);
+    messageId$: Observable<string | null> = this.messageIdSubject.asObservable();
+
     constructor(private firestore: Firestore, private auth: Auth, private userService: UserService,
         private uploadFileService: UploadFileService, private authService: AuthService, public channelsService: ChannelsService,) { }
 
+    setMessageId(messageId: string | null) {
+        this.messageIdSubject.next(messageId);
 
+    }
     toggleEmojiPicker() {
         this.showEmojiPicker = !this.showEmojiPicker;
     }
@@ -139,15 +145,8 @@ export class MessagesService {
 
     async loadDirectMessages(currentUserUid: string | undefined, targetUserId: string | undefined) {
         const messagesRef = collection(this.firestore, 'direct_messages');
-        // Abfrage für empfangene Nachrichten
-        const receivedMessagesQuery = query(
-            messagesRef,
-            where('receiverId', '==', currentUserUid),
-            where('senderId', '==', targetUserId),
-            orderBy('timestamp')
-        );
+        // console.log(currentUserUid);
 
-        // Abfrage für gesendete Nachrichten
         const sentMessagesQuery = query(
             messagesRef,
             where('senderId', '==', currentUserUid),
@@ -155,84 +154,127 @@ export class MessagesService {
             orderBy('timestamp')
         );
 
-        // Snapshot für empfangene Nachrichten
-        const unsubscribeReceived = onSnapshot(receivedMessagesQuery, async (snapshot) => {
-            let lastDisplayedDate: string | null = null;
-            const receivedMessages = await Promise.all(snapshot.docs.map(async (doc) => {
-                const messageData = doc.data();
-                const message = new DirectMessage(messageData, currentUserUid);
-                message.messageId = doc.id;
-                message.isOwnMessage = false;
+        const receivedMessagesQuery = query(
+            messagesRef,
+            where('receiverId', '==', currentUserUid),
+            where('senderId', '==', targetUserId),
+            orderBy('timestamp')
+        );
 
-                // Receiver Avatar
-                if (message.senderId) {
-                    const senderUser = await this.userService.getUserById(message.senderId);
-                    message.senderAvatar = senderUser?.avatarPath || './assets/images/avatars/avatar5.svg';
-                } else {
-                    message.senderAvatar = './assets/images/avatars/avatar5.svg';
-                }
-
-                const messageTimestamp = messageData['timestamp'];
-                const messageDate = new Date(messageTimestamp.seconds * 1000);
-                const formattedDate = this.formatTimestamp(messageDate);
-
-                if (formattedDate !== lastDisplayedDate) {
-                    message.displayDate = formattedDate;
-                    lastDisplayedDate = formattedDate;
-                } else {
-                    message.displayDate = null;
-                }
-
-                message.formattedTimestamp = messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-                return message;
-            }));
-
-
-            this.directMessages = [...this.directMessages.filter(m => m.isOwnMessage), ...receivedMessages];
-        });
-
-        // Snapshot für gesendete Nachrichten
         const unsubscribeSent = onSnapshot(sentMessagesQuery, async (snapshot) => {
             let lastDisplayedDate: string | null = null;
+
             const sentMessages = await Promise.all(snapshot.docs.map(async (doc) => {
                 const messageData = doc.data();
+
                 const message = new DirectMessage(messageData, currentUserUid);
+                const conversation: DirectMessage[] = messageData['conversation'];
                 message.messageId = doc.id;
-                message.isOwnMessage = true;
 
-                // Sender Avatar
-                if (message.senderId) {
-                    const senderUser = await this.userService.getUserById(message.senderId);
-                    message.senderAvatar = senderUser?.avatarPath || './assets/images/avatars/avatar5.svg';
-                } else {
-                    message.senderAvatar = './assets/images/avatars/avatar5.svg';
-                }
+                // Sender Avatar und andere Eigenschaften für das conversation-Array laden
+                await Promise.all(conversation.map(async (msg: DirectMessage) => { // 'any' ist hier nur für den Typ
 
-                const messageTimestamp = messageData['timestamp'];
-                const messageDate = new Date(messageTimestamp.seconds * 1000);
-                const formattedDate = this.formatTimestamp(messageDate);
+                    // console.log("Message object:", msg);
 
-                if (formattedDate !== lastDisplayedDate) {
-                    message.displayDate = formattedDate;
-                    lastDisplayedDate = formattedDate;
-                } else {
-                    message.displayDate = null;
-                }
+                    const messageTimestamp = msg.timestamp;
+                    const senderId = msg.senderId;
 
-                message.formattedTimestamp = messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    // Sender Avatar
 
+                    if (senderId) {
+                        const senderUser = await this.userService.getUserById(senderId);
+                        msg.senderAvatar = senderUser?.avatarPath || './assets/images/avatars/avatar5.svg';
+                    } else {
+                        msg.senderAvatar = './assets/images/avatars/avatar5.svg';
+                        console.log("Sender ID is undefined for message:", msg);
+                    }
+
+                    if (messageTimestamp instanceof Timestamp) {
+                        const messageDate = messageTimestamp.toDate();
+                        const formattedDate = this.formatTimestamp(messageDate);
+
+                        // Überprüfen, ob es die eigene Nachricht ist
+                        msg.isOwnMessage = (msg.senderId === currentUserUid);
+
+                        // Setze das Anzeigen-Datum
+                        if (formattedDate !== lastDisplayedDate) {
+                            msg.displayDate = formattedDate;
+                            lastDisplayedDate = formattedDate;
+                        } else {
+                            msg.displayDate = null;
+                        }
+
+                        // Setze formattedTimestamp für die Nachricht
+                        msg.formattedTimestamp = messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    } else {
+                        console.error("Timestamp is not defined or in the expected format.", msg);
+                    }
+                }));
+                this.setMessageId(doc.id)
                 return message;
             }));
 
+            // console.log("Sent Messages:", sentMessages);
             this.directMessages = [...sentMessages, ...this.directMessages.filter(m => !m.isOwnMessage)];
         });
 
+        const unsubscribeReceived = onSnapshot(receivedMessagesQuery, async (snapshot) => {
+            let lastDisplayedDate: string | null = null;
+
+            const receivedMessages = await Promise.all(snapshot.docs.map(async (doc) => {
+                const messageData = doc.data();
+                const message = new DirectMessage(messageData, currentUserUid);
+                const conversation: DirectMessage[] = messageData['conversation'];
+                message.messageId = doc.id;
+
+                // Hier auf den Timestamp im conversation-Array zugreifen
+                await Promise.all(conversation.map(async (msg: DirectMessage) => { // 'any' ist hier nur für den Typ
+                    const messageTimestamp = msg.timestamp;
+
+                    // Sender Avatar
+                    if (msg.senderId) {
+                        const senderUser = await this.userService.getUserById(msg.senderId);
+                        msg.senderAvatar = senderUser?.avatarPath || './assets/images/avatars/avatar5.svg';
+                    } else {
+                        msg.senderAvatar = './assets/images/avatars/avatar5.svg';
+                        console.log("Sender ID is undefined for message:", msg);
+                    }
+
+                    if (messageTimestamp instanceof Timestamp) {
+                        const messageDate = messageTimestamp.toDate();
+                        const formattedDate = this.formatTimestamp(messageDate);
+
+                        // Überprüfen, ob es die eigene Nachricht ist
+                        msg.isOwnMessage = (msg.senderId === currentUserUid);
+
+                        // Setze das Anzeigen-Datum
+                        if (formattedDate !== lastDisplayedDate) {
+                            msg.displayDate = formattedDate;
+                            lastDisplayedDate = formattedDate;
+                        } else {
+                            msg.displayDate = null;
+                        }
+
+                        // Setze formattedTimestamp für die Nachricht
+                        msg.formattedTimestamp = messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    } else {
+                        console.error("Timestamp is not defined or in the expected format.", msg);
+                    }
+                }));
+                this.setMessageId(doc.id)
+                // console.log(`Message ID set to: ${doc.id}`);
+                return message;
+            }));
+
+            // console.log("Received Messages:", receivedMessages);
+            this.directMessages = [...this.directMessages.filter(m => m.isOwnMessage), ...receivedMessages];
+        });
+
+
         // Optional: Rückgabefunktion zum Abmelden von Snapshots
         return () => {
-            unsubscribeReceived();
             unsubscribeSent();
-
+            unsubscribeReceived();
         };
     }
 
