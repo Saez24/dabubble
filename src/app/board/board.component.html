@@ -37,16 +37,20 @@
     </header>
     <mat-drawer-container class="mat-drawer-container" autosize>
         <mat-drawer #drawer class="sidenav" [opened]="true" mode="side">
-            <app-workspace (openChannelEvent)="openChatWindow()" (clickUserEvent)="openDirectMessage()"></app-workspace>
+            <app-workspace (openChannelEvent)="openChannelMessage()" (clickUserEvent)="openDirectMessage()"
+                [openChatWindow]="openChatWindow.bind(this)"></app-workspace>
         </mat-drawer>
         <div class="sidenav-content">
             <mat-card class="chat-window-container" appearance="outlined">
                 <mat-card-content>
                     <ng-container *ngIf="showChatWindow">
-                        <app-chat-window (showThreadEvent)="showThread($event)"></app-chat-window>
+                        <app-chat-window></app-chat-window>
+                    </ng-container>
+                    <ng-container *ngIf="showChannelMessage">
+                        <app-channel-message (showThreadEvent)="showThread($event)"></app-channel-message>
                     </ng-container>
                     <ng-container *ngIf="showDirectMessage">
-                        <app-direct-message></app-direct-message>
+                        <app-direct-message [selectedUser]="messageService.directMessageUser"></app-direct-message>
                     </ng-container>
                 </mat-card-content>
             </mat-card>

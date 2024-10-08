@@ -21,6 +21,8 @@ import { Auth } from '@angular/fire/auth';
 import { AddPeopleDialog } from "../dialogs/create-new-channel-dialog/add-people-dialog/add-people-dialog.component";
 import { ProfileEditorDialogComponent } from "../dialogs/profile-editor-dialog/profile-editor-dialog.component";
 import { DirectMessageComponent } from './chat-window/direct-message/direct-message/direct-message.component';
+import { MessagesService } from '../shared/services/messages/messages.service';
+import { ChannelMessageComponent } from './chat-window/channel-message/channel-message/channel-message.component';
 
 @Component({
   selector: 'app-board',
@@ -46,6 +48,7 @@ import { DirectMessageComponent } from './chat-window/direct-message/direct-mess
     AddPeopleDialog,
     ProfileEditorDialogComponent,
     DirectMessageComponent,
+    ChannelMessageComponent
   ],
   templateUrl: './board.component.html',
   styleUrls: ['./board.component.scss', '../../styles.scss'],
@@ -62,7 +65,8 @@ export class BoardComponent implements OnInit {
   messages: Message[] = [];
   currentUserUid: string | null | undefined = null;
   selectedMessage: Message | null = null;
-  showChatWindow: boolean = true;
+  showChatWindow: boolean = false;
+  showChannelMessage: boolean = true;
   showDirectMessage: boolean = false;
 
 
@@ -71,7 +75,8 @@ export class BoardComponent implements OnInit {
     private firestore: Firestore,
     private auth: Auth,
     public authService: AuthService,
-    public userService: UserService
+    public userService: UserService,
+    public messageService: MessagesService
   ) {
     this.currentUser = this.authService.getUserSignal();
   }
@@ -118,14 +123,25 @@ export class BoardComponent implements OnInit {
     event.stopPropagation();
   }
 
-  openChatWindow() {
-    this.showChatWindow = true;
+
+  openChannelMessage() {
+    this.showChannelMessage = true;
     this.showDirectMessage = false;
+    this.showChatWindow = false;
   }
 
   openDirectMessage() {
     this.showDirectMessage = true;
+    this.showChannelMessage = false;
     this.showChatWindow = false;
+  }
+
+  openChatWindow() {
+    this.showChatWindow = true;
+    this.showDirectMessage = false;
+    this.showChannelMessage = false;
+    this.messageService.setMessageId(null);
+    this.messageService.directMessageUser = null;
   }
 
 }

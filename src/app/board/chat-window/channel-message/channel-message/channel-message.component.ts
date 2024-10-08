@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -8,32 +8,34 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule } from '@angular/forms';
 import { CommonModule, NgFor, NgIf } from '@angular/common';
 import { PickerComponent } from '@ctrl/ngx-emoji-mart';
-import { addDoc, arrayUnion, collection, doc, Firestore, onSnapshot, orderBy, query, updateDoc } from '@angular/fire/firestore';
+import { addDoc, collection, doc, Firestore, onSnapshot, orderBy, query, updateDoc } from '@angular/fire/firestore';
 import { Auth } from '@angular/fire/auth';
 import { MatDialog } from '@angular/material/dialog';
-import { ChannelsService } from '../../../../shared/services/channels/channels.service';
-import { MessagesService } from '../../../../shared/services/messages/messages.service';
-import { UploadFileService } from '../../../../shared/services/firestore/storage-service/upload-file.service';
-import { AuthService } from '../../../../shared/services/authentication/auth-service/auth.service';
-import { UserService } from '../../../../shared/services/firestore/user-service/user.service';
 import { User } from '../../../../shared/models/user.class';
 import { Channel } from '../../../../shared/models/channel.class';
+import { UserService } from '../../../../shared/services/firestore/user-service/user.service';
+import { AuthService } from '../../../../shared/services/authentication/auth-service/auth.service';
+import { UploadFileService } from '../../../../shared/services/firestore/storage-service/upload-file.service';
+import { ChannelsService } from '../../../../shared/services/channels/channels.service';
+import { MessagesService } from '../../../../shared/services/messages/messages.service';
+import { SafeUrlPipe } from '../../../../shared/pipes/safe-url.pipe';
+import { AddMemberDialogComponent } from '../../../../dialogs/add-member-dialog/add-member-dialog.component';
+import { ChannelDescriptionDialogComponent } from '../../../../dialogs/channel-description-dialog/channel-description-dialog.component';
 import { Message } from '../../../../shared/models/message.class';
-import { DirectMessage } from '../../../../shared/models/direct.message.class';
+
 
 
 @Component({
-  selector: 'app-direct-message',
+  selector: 'app-channel-message',
   standalone: true,
   imports: [MatCardModule, MatButtonModule, MatIconModule, MatDividerModule, FormsModule,
-    MatFormFieldModule, MatInputModule, CommonModule, PickerComponent, NgIf, NgFor],
-  templateUrl: './direct-message.component.html',
-  styleUrl: './direct-message.component.scss',
+    MatFormFieldModule, MatInputModule, CommonModule, PickerComponent, NgIf, NgFor, SafeUrlPipe, AddMemberDialogComponent],
+  templateUrl: './channel-message.component.html',
+  styleUrl: './channel-message.component.scss',
   changeDetection: ChangeDetectionStrategy.Default,
   encapsulation: ViewEncapsulation.None,
 })
-export class DirectMessageComponent implements OnInit {
-
+export class ChannelMessageComponent {
   messages = this.messageService.messages;
   users: User[] = [];
   channels: Channel[] = [];
@@ -50,30 +52,23 @@ export class DirectMessageComponent implements OnInit {
   senderName: string | null = null;
   selectedFile: File | null = null;// Service für den Datei-Upload
   filePreviewUrl: string | null = null;
-  @Input() selectedUser = this.messageService.directMessageUser;
-  messageId: string | null = null;
-
 
 
   @ViewChild('chatWindow') private chatWindow!: ElementRef;
   constructor(private firestore: Firestore, private auth: Auth,
     private userService: UserService, private cd: ChangeDetectorRef,
     private authService: AuthService, private uploadFileService: UploadFileService,
-    public channelsService: ChannelsService, public dialog: MatDialog, public messageService: MessagesService) {
-
-  }
+    public channelsService: ChannelsService, public dialog: MatDialog, public messageService: MessagesService) { }
 
   ngOnInit() {
-    this.messageService.messageId$.subscribe(id => {
-      this.messageId = id;
-      // console.log('Aktuelle Message ID:', this.messageId);
-    });
+
   }
 
   async loadData() {
     this.auth.onAuthStateChanged(async (user) => {
       if (user) {
         this.loadUsers();
+        this.channelsService.loadChannels(user.uid);
       } else {
         console.log('Kein Benutzer angemeldet');
       }
@@ -93,6 +88,14 @@ export class DirectMessageComponent implements OnInit {
     });
   }
 
+  openChannelDescriptionDialog() {
+    this.dialog.open(ChannelDescriptionDialogComponent)
+  }
+
+  openAddMemberDialog() {
+    this.dialog.open(AddMemberDialogComponent)
+  }
+
   showEmoji() {
     this.showEmojiPicker = !this.showEmojiPicker;
   }
@@ -107,9 +110,10 @@ export class DirectMessageComponent implements OnInit {
     this.showMessageEdit = false;
   }
 
-  saveMessage(message: DirectMessage) {
+
+  saveMessage(message: Message) {
     if (this.editingMessageId) { // Nutze die `editingMessageId` (Dokument-ID) anstelle von `message.messageId`
-      const messageRef = doc(this.firestore, `direct_messages/${this.editingMessageId}`); // Verweise auf die Dokument-ID
+      const messageRef = doc(this.firestore, `messages/${this.editingMessageId}`); // Verweise auf die Dokument-ID
 
       updateDoc(messageRef, { message: message.message }).then(() => {
         this.editingMessageId = null;
@@ -153,84 +157,51 @@ export class DirectMessageComponent implements OnInit {
   }
 
   async sendMessage() {
+    if (!this.channelsService.currentChannelId) {
+      this.showError(); // Fehler, wenn kein Kanal ausgewählt ist
+      return;
+    }
+
     if (this.chatMessage.trim() || this.selectedFile) {
       const currentUser = this.authService.currentUser;
 
       if (currentUser()) {
-        const messagesRef = collection(this.firestore, 'direct_messages');
+        const messagesRef = collection(this.firestore, 'messages');
 
-        if (this.messageId) {
-          // Konversation existiert, also aktualisiere sie
-          const messageDocRef = doc(messagesRef, this.messageId);
+        const newMessage: Message = new Message({
+          senderID: this.currentUser()?.id,
+          senderName: this.currentUser()?.name,
+          message: this.chatMessage,
+          channelId: this.channelsService.currentChannelId, // Verwende die gespeicherte channelId
+          reactions: [],
+          answers: [],
+          fileURL: '',
+        });
 
-          // Füge die neue Nachricht zur bestehenden Konversation hinzu
-          await updateDoc(messageDocRef, {
-            conversation: arrayUnion({
-              senderName: currentUser()?.name,
-              message: this.chatMessage,
-              reaction: [],
-              timestamp: new Date(),
-              receiverName: this.selectedUser?.name,
-              senderId: currentUser()?.id,
-              receiverId: this.selectedUser?.id,
-            })
-          });
+        const messageDocRef = await addDoc(messagesRef, {
+          senderID: newMessage.senderID,
+          senderName: newMessage.senderName,
+          message: newMessage.message,
+          channelId: newMessage.channelId,
+          reaction: newMessage.reactions,
+          answers: newMessage.answers,
+          timestamp: new Date(),
+        });
 
-          // Datei verarbeiten, falls vorhanden
-          if (this.selectedFile && this.currentUserUid) {
-            try {
-              const fileURL = await this.uploadFileService.uploadFileWithIds(this.selectedFile, this.currentUserUid, messageDocRef.id);
-              await updateDoc(messageDocRef, { fileURL });
-            } catch (error) {
-              console.error('Datei-Upload fehlgeschlagen:', error);
-            }
-          }
-        } else {
-          // Es gibt keine Konversation, also erstelle eine neue
-          const newMessage: DirectMessage = new DirectMessage({
-            conversation: [],
-            senderId: currentUser()?.id,
-            senderName: currentUser()?.name,
-            message: this.chatMessage,
-            reactions: [],
-            fileURL: '',
-            receiverId: this.messageService.directMessageUser?.id,
-            receiverName: this.messageService.directMessageUser?.name,
-          });
-
-          // Füge die neue Konversation in Firestore hinzu
-          const messageDocRef = await addDoc(messagesRef, {
-            senderId: newMessage.senderId,
-            receiverId: newMessage.receiverId,
-            timestamp: new Date(),
-            conversation: [
-              {
-                senderName: newMessage.senderName,
-                message: newMessage.message,
-                reaction: newMessage.reactions,
-                timestamp: new Date(),
-                receiverName: newMessage.receiverName,
-                senderId: newMessage.senderId,
-                receiverId: newMessage.receiverId,
-              }
-            ]
-          });
-
-          // Datei verarbeiten, falls vorhanden
-          if (this.selectedFile && this.currentUserUid) {
-            try {
-              const fileURL = await this.uploadFileService.uploadFileWithIds(this.selectedFile, this.currentUserUid, messageDocRef.id);
-              newMessage.fileURL = fileURL;
-              await updateDoc(messageDocRef, { fileURL: newMessage.fileURL });
-            } catch (error) {
-              console.error('Datei-Upload fehlgeschlagen:', error);
-            }
+        if (this.selectedFile && this.currentUserUid) {
+          try {
+            const fileURL = await this.uploadFileService.uploadFileWithIds(this.selectedFile, this.currentUserUid, messageDocRef.id); // Verwende die ID des neuen Dokuments
+            newMessage.fileURL = fileURL; // Setze die Download-URL in der Nachricht
+            await updateDoc(messageDocRef, { fileURL: newMessage.fileURL }); // Aktualisiere das Dokument mit der Datei-URL
+          } catch (error) {
+            console.error('Datei-Upload fehlgeschlagen:', error);
           }
         }
 
-        // Eingabefelder bereinigen und Scrollen
-        this.chatMessage = '';
-        this.selectedFile = null;
+        this.chatMessage = ''; // Eingabefeld leeren
+        this.selectedFile = null; // Reset selectedFile
+        this.messageService.loadMessages(this.authService.currentUser()?.id, this.channelsService.currentChannelId);
+        // Übergebe die channelId
         this.scrollToBottom();
         this.deleteUpload();
       } else {
@@ -238,7 +209,6 @@ export class DirectMessageComponent implements OnInit {
       }
     }
   }
-
 
   scrollToBottom(): void {
     if (this.chatWindow) {

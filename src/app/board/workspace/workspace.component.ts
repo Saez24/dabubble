@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, OnInit, Output, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
@@ -42,11 +42,13 @@ export class WorkspaceComponent {
   currentUserUid: string | null = null;
   targetUserId: string | null = null;
   currentUserChannels: Channel[] = [];
-
-
-
+  @Input() openChatWindow!: () => void;
   @Output() openChannelEvent = new EventEmitter<void>();
   @Output() clickUserEvent = new EventEmitter<void>();
+
+  triggerOpenChat() {
+    this.openChatWindow();
+  }
 
   constructor(
     public dialog: MatDialog,
@@ -122,8 +124,6 @@ export class WorkspaceComponent {
   openDialog() {
     this.dialog.open(CreateNewChannelDialog)
   }
-
-
 
   clickUserContainer(user: User, i: number) {
     this.clickedUsers.fill(false);

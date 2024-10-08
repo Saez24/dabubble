@@ -144,6 +144,11 @@ export class MessagesService {
     }
 
     async loadDirectMessages(currentUserUid: string | undefined, targetUserId: string | undefined) {
+        if (targetUserId) {
+            // Lade den Benutzer basierend auf der targetUserId und setze selectedUser
+            const selectedUser = await this.userService.getUserById(targetUserId);
+            this.directMessageUser = selectedUser;
+        }
         const messagesRef = collection(this.firestore, 'direct_messages');
         // console.log(currentUserUid);
 
