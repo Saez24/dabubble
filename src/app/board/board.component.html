@@ -44,7 +44,10 @@
             <mat-card class="chat-window-container" appearance="outlined">
                 <mat-card-content>
                     <ng-container *ngIf="showChatWindow">
-                        <app-chat-window></app-chat-window>
+                        <app-chat-window
+                            (openDirectMessageFromChatEvent)="openDirectMessageFromChat($event.selectedUser, $event.index)"
+                            (openChannelMessageFromChatEvent)="openChannelMessageFromChat($event.selectedChannel, $event.index)"
+                            (openChannelMessageEvent)="openChannelMessage()"></app-chat-window>
                     </ng-container>
                     <ng-container *ngIf="showChannelMessage">
                         <app-channel-message (showThreadEvent)="showThread($event)"></app-channel-message>
