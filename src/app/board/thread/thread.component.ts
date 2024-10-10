@@ -123,6 +123,7 @@ export class ThreadComponent implements OnInit {
           await updateDoc(messageRef, { answers });
           console.log('Antwort erfolgreich aktualisiert');
           this.resetEditState();
+          this.cd.detectChanges(); 
         } else {
           console.error('Antwort nicht gefunden');
         }
