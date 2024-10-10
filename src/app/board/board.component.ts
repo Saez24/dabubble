@@ -23,6 +23,8 @@ import { ProfileEditorDialogComponent } from "../dialogs/profile-editor-dialog/p
 import { DirectMessageComponent } from './chat-window/direct-message/direct-message/direct-message.component';
 import { MessagesService } from '../shared/services/messages/messages.service';
 import { ChannelMessageComponent } from './chat-window/channel-message/channel-message/channel-message.component';
+import { User } from '../shared/models/user.class';
+import { Channel } from '../shared/models/channel.class';
 
 @Component({
   selector: 'app-board',
@@ -57,7 +59,7 @@ import { ChannelMessageComponent } from './chat-window/channel-message/channel-m
 export class BoardComponent implements OnInit {
 
   @ViewChild('drawer') drawer!: MatDrawer;
-
+  @ViewChild(WorkspaceComponent) workspaceComponent!: WorkspaceComponent;
   searchInput: string = '';
   showThreadComponent: boolean = false;
   currentUser = this.authService.getUserSignal();
@@ -130,11 +132,26 @@ export class BoardComponent implements OnInit {
     this.showChatWindow = false;
   }
 
+  openChannelMessageFromChat(selectedChannel: Channel, index: number) {
+    this.showChannelMessage = true;
+    this.showDirectMessage = false;
+    this.showChatWindow = false;
+    this.workspaceComponent.openChannel(selectedChannel, index);
+  }
+
   openDirectMessage() {
     this.showDirectMessage = true;
     this.showChannelMessage = false;
     this.showChatWindow = false;
   }
+
+  openDirectMessageFromChat(selectedUser: User, index: number) {
+    this.showDirectMessage = true;
+    this.showChannelMessage = false;
+    this.showChatWindow = false;
+    this.workspaceComponent.clickUserContainer(selectedUser, index);
+  }
+
 
   openChatWindow() {
     this.showChatWindow = true;

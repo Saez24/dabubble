@@ -59,8 +59,9 @@
 
 .search-block {
     position: absolute;
-    max-height: 250px;
-    overflow-x: auto;
+    height: auto;
+    max-height: 220px;
+    overflow-y: scroll !important;
     top: 40px;
     margin: 40px;
     left: 0;
@@ -71,13 +72,43 @@
     background: white;
     padding: 20px;
     border-radius: 20px;
-    border: 1px solid #ADB0D9
+    border: 1px solid #ADB0D9;
+    z-index: 999;
+
+}
+
+.found-block {
+    scrollbar-width: thin !important;
+    /* Schmale Scrollbar */
+    scrollbar-color: #535AF1 #f1f1f1;
+    /* Farbe Scrollbar und Track */
+    overflow-y: scroll;
+}
+
+/* Anpassung der Scrollbar */
+.search-block::-webkit-scrollbar {
+    display: block !important;
+    width: 10px;
+    /* Breite der Scrollbar */
+}
+
+.search-block::-webkit-scrollbar-thumb {
+    background: #535AF1;
+    /* Farbe des Scrollbalkens */
+    border-radius: 5px;
+    /* Runde Ecken */
+}
+
+.search-block::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    /* Farbe des Scrolltrack */
 }
 
 .found-block {
     display: flex;
     flex-direction: column;
     gap: 14px;
+    min-height: 100%;
 }
 
 .found-users {
@@ -93,10 +124,29 @@
         height: 50px;
         width: 50px;
         border-radius: 50%;
-        ;
     }
 }
 
+.search-display {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    padding-left: 40px;
+    font-size: 18px;
+    font-weight: 400;
+    box-sizing: border-box;
+}
+
+.selected-avatar {
+    width: 32px;
+    /* oder eine andere Größe */
+    height: 32px;
+    /* oder eine andere Größe */
+    border-radius: 50%;
+    /* für runde Avatare */
+    margin-right: 5px;
+    /* Abstand zwischen Bild und Text */
+}
 
 .mat-mdc-card-content {
     padding: 0;
