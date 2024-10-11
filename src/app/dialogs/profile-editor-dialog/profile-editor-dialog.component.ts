@@ -2,6 +2,7 @@ import { Component, inject, Input, signal, WritableSignal } from '@angular/core'
 import { FormsModule, NgForm } from '@angular/forms';
 import { AuthService } from '../../shared/services/authentication/auth-service/auth.service';
 import { UserService } from '../../shared/services/firestore/user-service/user.service';
+import { MessagesService } from '../../shared/services/messages/messages.service';
 import { User } from '../../shared/models/user.class';
 
 @Component({
@@ -21,6 +22,7 @@ export class ProfileEditorDialogComponent {
 
   authService = inject(AuthService);
   userService = inject(UserService);
+  messagesService = inject(MessagesService);
 
 
   constructor() {
@@ -44,6 +46,7 @@ export class ProfileEditorDialogComponent {
       if (this.authService.currentUser()) {
         let updatedUser = this.getUpdatedUser();
         await this.authService.updateUserProfile({ displayName: this.fullname, photoURL: this.avatarPath });
+        this.messagesService.getMessagesFromCurrentUser();
         if (this.mail !== this.authService.currentUser()?.email) {
           // check if email is used
           await this.authService.updateEmail(this.mail!);

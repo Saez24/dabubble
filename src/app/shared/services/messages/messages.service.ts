@@ -1,5 +1,5 @@
 import { Injectable, EventEmitter, HostListener, Output, ViewChild } from '@angular/core';
-import { Firestore, collection, onSnapshot, query, orderBy, where, Timestamp, DocumentSnapshot, QuerySnapshot, DocumentData, doc, getDoc } from '@angular/fire/firestore';
+import { Firestore, collection, onSnapshot, query, orderBy, where, Timestamp, DocumentSnapshot, QuerySnapshot, DocumentData, doc, getDoc, collectionData, docData } from '@angular/fire/firestore';
 import { Auth } from '@angular/fire/auth';
 import { UserService } from '../firestore/user-service/user.service';
 import { Message } from '../../models/message.class';
@@ -11,6 +11,7 @@ import { DirectMessage } from '../../models/direct.message.class';
 import { User } from '../../models/user.class';
 import { WorkspaceComponent } from '../../../board/workspace/workspace.component';
 import { ChatUtilityService } from './chat-utility.service';
+import { getDocs, updateDoc } from 'firebase/firestore';
 
 
 @Injectable({
@@ -339,4 +340,32 @@ export class MessagesService {
     }
 
 
+    // updateSendernameOfMessages() {
+    //     this.messages.forEach(async (message) => {
+    //         if (message.senderID === this.currentUserUid) {
+    //             message.senderName = this.authService.currentUser()?.name;
+    //         }
+    //     });
+    // }
+
+
+    async getMessagesFromCurrentUser() {
+        const q = query(collection(this.firestore, 'messages'), where('senderID', '==', this.authService.currentUserUid));
+        const querySnapshot = await getDocs(q);
+        querySnapshot.forEach(async (doc) => {
+            const message = doc.data() as Message;
+            console.log('MESSAGES: ', message);
+            if (message.senderID === this.authService.currentUserUid) {
+                this.updateSendernameOfMessage(doc.id, this.authService.currentUser()?.name as string);
+            }
+        });
+    }
+
+
+    updateSendernameOfMessage(messageId: string, senderName: string) {
+        console.log('MESSAGE ID: ', messageId);
+        
+        const messageRef = doc(this.firestore, 'messages', messageId);
+        updateDoc(messageRef, { senderName: senderName });
+    }
 }
