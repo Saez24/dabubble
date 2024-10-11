@@ -136,8 +136,8 @@
                 <div (click)="sendMessage()" class="message-icon send"><mat-icon fontIcon="send"></mat-icon></div>
             </div>
         </div>
-        <emoji-mart class="emoji-mart-chat" *ngIf="showEmojiPicker" (emojiSelect)="addEmoji($event)" [darkMode]="false"
-            title="Pick your emoji…" emoji="point_up">
+        <emoji-mart class="emoji-mart-chat" *ngIf="messageService.showEmojiPicker" (emojiSelect)="addEmoji($event)"
+            [darkMode]="false" title="Pick your emoji…" emoji="point_up">
         </emoji-mart>
     </div>
 </div>

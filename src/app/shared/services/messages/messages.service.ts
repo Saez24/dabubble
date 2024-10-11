@@ -1,31 +1,30 @@
-import { Injectable, EventEmitter, HostListener, Output, ElementRef, ViewChild, ChangeDetectorRef } from '@angular/core';
-import { Firestore, doc, updateDoc, addDoc, collection, onSnapshot, query, orderBy, where, Timestamp } from '@angular/fire/firestore';
+import { Injectable, EventEmitter, HostListener, Output, ViewChild } from '@angular/core';
+import { Firestore, collection, onSnapshot, query, orderBy, where, Timestamp, DocumentSnapshot, QuerySnapshot, DocumentData, doc, getDoc } from '@angular/fire/firestore';
 import { Auth } from '@angular/fire/auth';
 import { UserService } from '../firestore/user-service/user.service';
 import { Message } from '../../models/message.class';
 import { PickerComponent } from '@ctrl/ngx-emoji-mart';
-import { BehaviorSubject, Observable } from 'rxjs';
 import { UploadFileService } from '../firestore/storage-service/upload-file.service';
 import { AuthService } from '../authentication/auth-service/auth.service';
 import { ChannelsService } from '../channels/channels.service';
 import { DirectMessage } from '../../models/direct.message.class';
 import { User } from '../../models/user.class';
-// Importiere deinen UserService
+import { WorkspaceComponent } from '../../../board/workspace/workspace.component';
+import { ChatUtilityService } from './chat-utility.service';
+
 
 @Injectable({
     providedIn: 'root'
 })
 export class MessagesService {
-    private messagesSubject = new BehaviorSubject<Message[]>([]);
-    messages$ = this.messagesSubject.asObservable();
-    private chatMessage: string = '';
-    private editingMessageId: string | null = null;
-    private showMessageEditArea: boolean = false;
-    private showMessageEdit = false;
-    private showEmojiPicker: boolean = false;
+    chatMessage: string = '';
+    editingMessageId: string | null = null;
+    showMessageEditArea: boolean = false;
+    showMessageEdit = false;
+    showEmojiPicker: boolean = false;
     messages: Message[] = [];
     directMessages: DirectMessage[] = [];
-    currentUserUid = this.authService.currentUser()?.id; // Braucht es das hier?
+    currentUserUid = this.authService.currentUser()?.id;
     messageArea = true;
     editedMessage = '';
     channelId = this.channelsService.currentChannelId;
@@ -33,22 +32,64 @@ export class MessagesService {
     senderName: string | null = null;
     selectedFile: File | null = null;// Service für den Datei-Upload
     filePreviewUrl: string | null = null;
-    directMessageUser: User | null = null;
+    lastAnswer: string = '';
+    selectedMessage: Message | null = null;
+
+
     @Output() showThreadEvent = new EventEmitter<void>();
+    @ViewChild(WorkspaceComponent) workspaceComponent!: WorkspaceComponent;
 
-    private messageIdSubject: BehaviorSubject<string | null> = new BehaviorSubject<string | null>(null);
-    messageId$: Observable<string | null> = this.messageIdSubject.asObservable();
-
-    constructor(private firestore: Firestore, private auth: Auth, private userService: UserService,
-        private uploadFileService: UploadFileService, private authService: AuthService, public channelsService: ChannelsService,) { }
-
-    setMessageId(messageId: string | null) {
-        this.messageIdSubject.next(messageId);
+    constructor(
+        private firestore: Firestore,
+        private auth: Auth,
+        private userService: UserService,
+        private uploadFileService: UploadFileService,
+        private authService: AuthService,
+        public channelsService: ChannelsService,
+        private chatUtilityService: ChatUtilityService
+    ) {
 
     }
-    toggleEmojiPicker() {
-        this.showEmojiPicker = !this.showEmojiPicker;
+
+    async loadAnswers() {
+        if (!this.selectedMessage) {
+            this.messages = []; // Wenn keine Nachricht ausgewählt ist, leere die Nachrichten
+            return;
+        }
+
+        const messageRef = doc(this.firestore, 'messages', this.selectedMessage.messageId);
+        const messageSnap = await getDoc(messageRef);
+
+        if (messageSnap.exists()) {
+            const selectedMessageData = messageSnap.data();
+            const answers = selectedMessageData['answers'] || []; // Verwende Index-Signatur für den Zugriff
+
+            // Bestimme, ob die ausgewählte Nachricht eine eigene Nachricht ist
+            this.selectedMessage.isOwnMessage = this.selectedMessage.senderID === this.currentUserUid;
+
+            // Lade nur die Nachrichten, die im answers-Array sind
+            this.messages = await Promise.all(answers.map(async (answer: any) => {
+                const message = new Message(answer, this.currentUserUid);
+
+                if (message.senderID) {
+                    const senderUser = await this.userService.getUserById(message.senderID);
+                    message.senderAvatar = senderUser?.avatarPath || './assets/images/avatars/avatar5.svg';
+                } else {
+                    message.senderAvatar = './assets/images/avatars/avatar5.svg'; // Standard-Avatar
+                }
+
+                const messageDate = new Date(answer.timestamp.seconds * 1000);
+                message.formattedTimestamp = messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                return message;
+            }));
+
+        } else {
+            console.error('Ausgewählte Nachricht existiert nicht');
+        }
     }
+
+
 
     toggleMessageEdit() {
         this.showMessageEditArea = !this.showMessageEditArea;
@@ -80,6 +121,10 @@ export class MessagesService {
         console.log(event.emoji.native);
     }
 
+    toggleEmojiPicker() {
+        this.showEmojiPicker = !this.showEmojiPicker;
+    }
+
     @HostListener('document:click', ['$event'])
     clickOutside(event: Event) {
         const target = event.target as HTMLElement;
@@ -93,41 +138,34 @@ export class MessagesService {
     }
 
     async loadMessages(currentUserUid: string | undefined, channelId: string) {
-        const messagesRef = collection(this.firestore, 'messages');
-        // console.log(channelId);
-
-        // Filtere die Nachrichten nach der übergebenen channelId
-        const messagesQuery = query(
-            messagesRef,
-            where('channelId', '==', channelId), // Hier filtern wir nach channelId
-            orderBy('timestamp')
-        );
+        const messagesQuery = this.createMessageQuery(channelId);
 
         onSnapshot(messagesQuery, async (snapshot) => {
-            let lastDisplayedDate: string | null = null;
+            this.messages = await this.processSnapshot(snapshot, currentUserUid);
+        });
+    }
 
-            this.messages = await Promise.all(snapshot.docs.map(async (doc) => {
-                const messageData = doc.data();
-                const message = new Message(messageData, currentUserUid);
+    private createMessageQuery(channelId: string) {
+        const messagesRef = collection(this.firestore, 'messages');
 
-                message.messageId = doc.id;
-                message.isOwnMessage = message.senderID === currentUserUid;
-                // console.log('isOwnMessage: ', message.isOwnMessage);
-                // // console.log(message.senderID);
-                // // console.log(this.currentUserUid);
+        // Filtere die Nachrichten nach der übergebenen channelId
+        return query(
+            messagesRef,
+            where('channelId', '==', channelId), // Filter nach channelId
+            orderBy('timestamp')
+        );
+    }
 
-                // Überprüfen, ob senderID nicht null ist
-                if (message.senderID) {
-                    // console.log('SenderID: ', message.senderID);
+    private async processSnapshot(snapshot: any, currentUserUid: string | undefined) {
+        let lastDisplayedDate: string | null = null;
 
-                    const senderUser = await this.userService.getUserById(message.senderID);
-                    message.senderAvatar = senderUser?.avatarPath || './assets/images/avatars/avatar5.svg';
-                } else {
-                    message.senderAvatar = './assets/images/avatars/avatar5.svg';
-                }
+        return Promise.all(snapshot.docs.map(async (doc: DocumentSnapshot) => {
+            const message = await this.mapMessageData(doc, currentUserUid);
+            const messageData = doc.data(); // Hier abrufen
 
-                const messageTimestamp = messageData['timestamp'];
-                const messageDate = new Date(messageTimestamp.seconds * 1000);
+            // Sicherstellen, dass messageData definiert ist
+            if (messageData) {
+                const messageDate = new Date(messageData['timestamp']?.seconds * 1000);
                 const formattedDate = this.formatTimestamp(messageDate);
 
                 if (formattedDate !== lastDisplayedDate) {
@@ -136,145 +174,50 @@ export class MessagesService {
                 } else {
                     message.displayDate = null;
                 }
+            }
 
-                message.formattedTimestamp = messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                return message;
-            }));
-        });
+            return message;
+        }));
+    }
+
+    private async mapMessageData(doc: DocumentSnapshot, currentUserUid: string | undefined) {
+        const messageData = doc.data();
+
+        // Sicherstellen, dass messageData definiert ist
+        if (!messageData) {
+            throw new Error('Message data is undefined'); // Fehlerbehandlung
+        }
+
+        const message = new Message(messageData, currentUserUid);
+        message.messageId = doc.id;
+        message.isOwnMessage = message.senderID === currentUserUid;
+
+        if (message.senderID) {
+            const senderUser = await this.userService.getUserById(message.senderID);
+            message.senderAvatar = senderUser?.avatarPath || './assets/images/avatars/avatar5.svg';
+        } else {
+            message.senderAvatar = './assets/images/avatars/avatar5.svg';
+        }
+
+        // Sicherstellen, dass timestamp definiert ist
+        const messageDate = new Date(messageData['timestamp']?.seconds * 1000);
+        message.formattedTimestamp = messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+        return message;
     }
 
     async loadDirectMessages(currentUserUid: string | undefined, targetUserId: string | undefined) {
         if (targetUserId) {
             // Lade den Benutzer basierend auf der targetUserId und setze selectedUser
-            const selectedUser = await this.userService.getUserById(targetUserId);
-            this.directMessageUser = selectedUser;
+            this.chatUtilityService.directMessageUser = await this.loadSelectedUser(targetUserId);
         }
+
         const messagesRef = collection(this.firestore, 'direct_messages');
-        // console.log(currentUserUid);
+        const sentMessagesQuery = this.createSentMessagesQuery(messagesRef, currentUserUid, targetUserId);
+        const receivedMessagesQuery = this.createReceivedMessagesQuery(messagesRef, currentUserUid, targetUserId);
 
-        const sentMessagesQuery = query(
-            messagesRef,
-            where('senderId', '==', currentUserUid),
-            where('receiverId', '==', targetUserId),
-            orderBy('timestamp')
-        );
-
-        const receivedMessagesQuery = query(
-            messagesRef,
-            where('receiverId', '==', currentUserUid),
-            where('senderId', '==', targetUserId),
-            orderBy('timestamp')
-        );
-
-        const unsubscribeSent = onSnapshot(sentMessagesQuery, async (snapshot) => {
-            let lastDisplayedDate: string | null = null;
-
-            const sentMessages = await Promise.all(snapshot.docs.map(async (doc) => {
-                const messageData = doc.data();
-
-                const message = new DirectMessage(messageData, currentUserUid);
-                const conversation: DirectMessage[] = messageData['conversation'];
-                message.messageId = doc.id;
-
-                // Sender Avatar und andere Eigenschaften für das conversation-Array laden
-                await Promise.all(conversation.map(async (msg: DirectMessage) => { // 'any' ist hier nur für den Typ
-
-                    // console.log("Message object:", msg);
-
-                    const messageTimestamp = msg.timestamp;
-                    const senderId = msg.senderId;
-
-                    // Sender Avatar
-
-                    if (senderId) {
-                        const senderUser = await this.userService.getUserById(senderId);
-                        msg.senderAvatar = senderUser?.avatarPath || './assets/images/avatars/avatar5.svg';
-                    } else {
-                        msg.senderAvatar = './assets/images/avatars/avatar5.svg';
-                        console.log("Sender ID is undefined for message:", msg);
-                    }
-
-                    if (messageTimestamp instanceof Timestamp) {
-                        const messageDate = messageTimestamp.toDate();
-                        const formattedDate = this.formatTimestamp(messageDate);
-
-                        // Überprüfen, ob es die eigene Nachricht ist
-                        msg.isOwnMessage = (msg.senderId === currentUserUid);
-
-                        // Setze das Anzeigen-Datum
-                        if (formattedDate !== lastDisplayedDate) {
-                            msg.displayDate = formattedDate;
-                            lastDisplayedDate = formattedDate;
-                        } else {
-                            msg.displayDate = null;
-                        }
-
-                        // Setze formattedTimestamp für die Nachricht
-                        msg.formattedTimestamp = messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                    } else {
-                        console.error("Timestamp is not defined or in the expected format.", msg);
-                    }
-                }));
-                this.setMessageId(doc.id)
-                return message;
-            }));
-
-            // console.log("Sent Messages:", sentMessages);
-            this.directMessages = [...sentMessages, ...this.directMessages.filter(m => !m.isOwnMessage)];
-        });
-
-        const unsubscribeReceived = onSnapshot(receivedMessagesQuery, async (snapshot) => {
-            let lastDisplayedDate: string | null = null;
-
-            const receivedMessages = await Promise.all(snapshot.docs.map(async (doc) => {
-                const messageData = doc.data();
-                const message = new DirectMessage(messageData, currentUserUid);
-                const conversation: DirectMessage[] = messageData['conversation'];
-                message.messageId = doc.id;
-
-                // Hier auf den Timestamp im conversation-Array zugreifen
-                await Promise.all(conversation.map(async (msg: DirectMessage) => { // 'any' ist hier nur für den Typ
-                    const messageTimestamp = msg.timestamp;
-
-                    // Sender Avatar
-                    if (msg.senderId) {
-                        const senderUser = await this.userService.getUserById(msg.senderId);
-                        msg.senderAvatar = senderUser?.avatarPath || './assets/images/avatars/avatar5.svg';
-                    } else {
-                        msg.senderAvatar = './assets/images/avatars/avatar5.svg';
-                        console.log("Sender ID is undefined for message:", msg);
-                    }
-
-                    if (messageTimestamp instanceof Timestamp) {
-                        const messageDate = messageTimestamp.toDate();
-                        const formattedDate = this.formatTimestamp(messageDate);
-
-                        // Überprüfen, ob es die eigene Nachricht ist
-                        msg.isOwnMessage = (msg.senderId === currentUserUid);
-
-                        // Setze das Anzeigen-Datum
-                        if (formattedDate !== lastDisplayedDate) {
-                            msg.displayDate = formattedDate;
-                            lastDisplayedDate = formattedDate;
-                        } else {
-                            msg.displayDate = null;
-                        }
-
-                        // Setze formattedTimestamp für die Nachricht
-                        msg.formattedTimestamp = messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                    } else {
-                        console.error("Timestamp is not defined or in the expected format.", msg);
-                    }
-                }));
-                this.setMessageId(doc.id)
-                // console.log(`Message ID set to: ${doc.id}`);
-                return message;
-            }));
-
-            // console.log("Received Messages:", receivedMessages);
-            this.directMessages = [...this.directMessages.filter(m => m.isOwnMessage), ...receivedMessages];
-        });
-
+        const unsubscribeSent = this.subscribeToSentMessages(sentMessagesQuery, currentUserUid);
+        const unsubscribeReceived = this.subscribeToReceivedMessages(receivedMessagesQuery, currentUserUid);
 
         // Optional: Rückgabefunktion zum Abmelden von Snapshots
         return () => {
@@ -283,7 +226,95 @@ export class MessagesService {
         };
     }
 
+    private async loadSelectedUser(targetUserId: string) {
+        return await this.userService.getUserById(targetUserId);
+    }
 
+    private createSentMessagesQuery(messagesRef: any, currentUserUid: string | undefined, targetUserId: string | undefined) {
+        return query(
+            messagesRef,
+            where('senderId', '==', currentUserUid),
+            where('receiverId', '==', targetUserId),
+            orderBy('timestamp')
+        );
+    }
+
+    private createReceivedMessagesQuery(messagesRef: any, currentUserUid: string | undefined, targetUserId: string | undefined) {
+        return query(
+            messagesRef,
+            where('receiverId', '==', currentUserUid),
+            where('senderId', '==', targetUserId),
+            orderBy('timestamp')
+        );
+    }
+
+    private subscribeToSentMessages(sentMessagesQuery: any, currentUserUid: string | undefined) {
+        return onSnapshot(sentMessagesQuery, async (snapshot: QuerySnapshot<DocumentData>) => {
+            this.directMessages = await this.processMessages(snapshot, currentUserUid, true);
+        });
+    }
+
+    private subscribeToReceivedMessages(receivedMessagesQuery: any, currentUserUid: string | undefined) {
+        return onSnapshot(receivedMessagesQuery, async (snapshot: QuerySnapshot<DocumentData>) => {
+            const receivedMessages = await this.processMessages(snapshot, currentUserUid, false);
+            this.directMessages = [...this.directMessages.filter(m => m.isOwnMessage), ...receivedMessages];
+        });
+    }
+
+    private async processMessages(snapshot: QuerySnapshot<DocumentData>, currentUserUid: string | undefined, isSent: boolean) {
+        let lastDisplayedDate: string | null = null;
+
+        return Promise.all(snapshot.docs.map(async (doc) => {
+            const messageData = doc.data();
+            const message = new DirectMessage(messageData, currentUserUid);
+            const conversation: DirectMessage[] = messageData['conversation'];
+            message.messageId = doc.id;
+
+            await this.processConversation(conversation, currentUserUid, lastDisplayedDate);
+            this.chatUtilityService.setMessageId(doc.id);
+
+            return message;
+        }));
+    }
+
+    private async processConversation(conversation: DirectMessage[], currentUserUid: string | undefined, lastDisplayedDate: string | null) {
+        await Promise.all(conversation.map(async (msg: DirectMessage) => {
+            await this.loadSenderAvatar(msg);
+            this.setMessageDisplayDate(msg, lastDisplayedDate, currentUserUid);
+        }));
+    }
+
+    private async loadSenderAvatar(msg: DirectMessage) {
+        if (msg.senderId) {
+            const senderUser = await this.userService.getUserById(msg.senderId);
+            msg.senderAvatar = senderUser?.avatarPath || './assets/images/avatars/avatar5.svg';
+        } else {
+            msg.senderAvatar = './assets/images/avatars/avatar5.svg';
+            console.log("Sender ID is undefined for message:", msg);
+        }
+    }
+
+    private setMessageDisplayDate(msg: DirectMessage, lastDisplayedDate: string | null, currentUserUid: string | undefined) {
+        const messageTimestamp = msg.timestamp;
+        if (messageTimestamp instanceof Timestamp) {
+            const messageDate = messageTimestamp.toDate();
+            const formattedDate = this.formatTimestamp(messageDate);
+            msg.isOwnMessage = (msg.senderId === currentUserUid);
+
+            // Setze das Anzeigen-Datum
+            if (formattedDate !== lastDisplayedDate) {
+                msg.displayDate = formattedDate;
+                lastDisplayedDate = formattedDate;
+            } else {
+                msg.displayDate = null;
+            }
+
+            // Setze formattedTimestamp für die Nachricht
+            msg.formattedTimestamp = messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        } else {
+            console.error("Timestamp is not defined or in the expected format.", msg);
+        }
+    }
 
     formatTimestamp(messageDate: Date): string {
         const today = new Date();
@@ -303,94 +334,9 @@ export class MessagesService {
         }
     }
 
-
     getUserName(user: User) {
-        this.directMessageUser = user;
+        this.chatUtilityService.directMessageUser = user;
     }
-
-    // async saveMessage(message: Message) {
-    //     if (message.messageId) {
-    //         const messageRef = doc(this.firestore, `messages/${message.messageId}`);
-    //         try {
-    //             await updateDoc(messageRef, { message: message.message });
-    //             this.editingMessageId = null;
-    //             this.showMessageEditArea = false;
-    //         } catch (error) {
-    //             console.error("Fehler beim Speichern der Nachricht: ", error);
-    //         }
-    //     }
-    // }
-
-    // showError() {
-    //     console.error("Kein Kanal ausgewählt.");
-    // }
-
-    // async sendMessage() {
-    //     if (!this.selectedChannelId) {
-    //         this.showError(); // Fehler, wenn kein Kanal ausgewählt ist
-    //         return;
-    //     }
-
-    //     if (this.chatMessage.trim() || this.selectedFile) {
-    //         const currentUser = this.authService.currentUser;
-
-    //         if (currentUser()) {
-    //             const messagesRef = collection(this.firestore, 'messages');
-
-    //             const newMessage: Message = new Message({
-    //                 senderID: this.currentUserUid,
-    //                 senderName: this.senderName,
-    //                 message: this.chatMessage,
-    //                 channelId: this.selectedChannelId, // Verwende die gespeicherte channelId
-    //                 reaction: '',
-    //                 answers: [],
-    //                 fileURL: '',
-    //             });
-
-    //             const messageDocRef = await addDoc(messagesRef, {
-    //                 senderID: newMessage.senderID,
-    //                 senderName: newMessage.senderName,
-    //                 message: newMessage.message,
-    //                 channelId: newMessage.channelId,
-    //                 reaction: newMessage.reaction,
-    //                 answers: newMessage.answers,
-    //                 timestamp: new Date(),
-    //             });
-
-    //             if (this.selectedFile && this.currentUserUid) {
-    //                 try {
-    //                     const fileURL = await this.uploadFileService.uploadFileWithIds(this.selectedFile, this.currentUserUid, messageDocRef.id); // Verwende die ID des neuen Dokuments
-    //                     newMessage.fileURL = fileURL; // Setze die Download-URL in der Nachricht
-    //                     await updateDoc(messageDocRef, { fileURL: newMessage.fileURL }); // Aktualisiere das Dokument mit der Datei-URL
-    //                 } catch (error) {
-    //                     console.error('Datei-Upload fehlgeschlagen:', error);
-    //                 }
-    //             }
-
-
-    //         } else {
-    //             console.error('Kein Benutzer angemeldet');
-    //         }
-    //     }
-    // }
-
-
-
-    // formatTimestamp(messageDate: Date): string {
-    //     const today = new Date();
-    //     const yesterday = new Date();
-    //     yesterday.setDate(today.getDate() - 1);
-
-    //     if (messageDate.toDateString() === today.toDateString()) {
-    //         return 'Heute';
-    //     } else if (messageDate.toDateString() === yesterday.toDateString()) {
-    //         return 'Gestern';
-    //     } else {
-    //         return messageDate.toLocaleDateString('de-DE', { day: 'numeric', month: 'long' });
-    //     }
-    // }
 
 
 }
-
-

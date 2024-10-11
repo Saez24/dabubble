@@ -37,23 +37,24 @@
     </header>
     <mat-drawer-container class="mat-drawer-container" autosize>
         <mat-drawer #drawer class="sidenav" [opened]="true" mode="side">
-            <app-workspace (openChannelEvent)="openChannelMessage()" (clickUserEvent)="openDirectMessage()"
-                [openChatWindow]="openChatWindow.bind(this)"></app-workspace>
+            <app-workspace (openChannelEvent)="chatUtilityService.openChannelMessage()"
+                (clickUserEvent)="chatUtilityService.openDirectMessage()"
+                [openChatWindow]="chatUtilityService.openChatWindow.bind(this)"></app-workspace>
         </mat-drawer>
         <div class="sidenav-content">
             <mat-card class="chat-window-container" appearance="outlined">
                 <mat-card-content>
-                    <ng-container *ngIf="showChatWindow">
+                    <ng-container *ngIf="this.chatUtilityService.showChatWindow">
                         <app-chat-window
-                            (openDirectMessageFromChatEvent)="openDirectMessageFromChat($event.selectedUser, $event.index)"
-                            (openChannelMessageFromChatEvent)="openChannelMessageFromChat($event.selectedChannel, $event.index)"
-                            (openChannelMessageEvent)="openChannelMessage()"></app-chat-window>
+                            (openDirectMessageFromChatEvent)="chatUtilityService.openDirectMessageFromChat($event.selectedUser, $event.index)"
+                            (openChannelMessageFromChatEvent)="chatUtilityService.openChannelMessageFromChat($event.selectedChannel, $event.index)"
+                            (openChannelMessageEvent)="chatUtilityService.openChannelMessage()"></app-chat-window>
                     </ng-container>
-                    <ng-container *ngIf="showChannelMessage">
+                    <ng-container *ngIf="this.chatUtilityService.showChannelMessage">
                         <app-channel-message (showThreadEvent)="showThread($event)"></app-channel-message>
                     </ng-container>
-                    <ng-container *ngIf="showDirectMessage">
-                        <app-direct-message [selectedUser]="messageService.directMessageUser"></app-direct-message>
+                    <ng-container *ngIf="this.chatUtilityService.showDirectMessage">
+                        <app-direct-message [selectedUser]="chatUtilityService.directMessageUser"></app-direct-message>
                     </ng-container>
                 </mat-card-content>
             </mat-card>
