@@ -97,7 +97,24 @@ export class ChannelMessageComponent {
   }
 
   showEmoji() {
-    this.showEmojiPicker = !this.showEmojiPicker;
+    this.messageService.showEmoji();
+  }
+
+  addEmoji(event: any) {
+    this.messageService.addEmoji(event);
+  }
+
+  toggleEmojiPicker() {
+    this.messageService.toggleEmojiPicker();
+  }
+
+  @HostListener('document:click', ['$event'])
+  clickOutside(event: Event) {
+    const target = event.target as HTMLElement;
+
+    if (this.messageService.showEmojiPicker && !target.closest('emoji-mart') && !target.closest('.message-icon')) {
+      this.messageService.showEmojiPicker = false;
+    }
   }
 
   showMessageEditToggle() {
@@ -131,20 +148,6 @@ export class ChannelMessageComponent {
 
   isEditing(docId: string): boolean {
     return this.editingMessageId === docId; // Prüfe gegen die Firestore-Dokument-ID
-  }
-
-  addEmoji(event: any) {
-    this.chatMessage += event.emoji.native;
-    console.log(event.emoji.native);
-  }
-
-  @HostListener('document:click', ['$event'])
-  clickOutside(event: Event) {
-    const target = event.target as HTMLElement;
-
-    if (this.showEmojiPicker && !target.closest('emoji-mart') && !target.closest('.message-icon')) {
-      this.showEmojiPicker = false;
-    }
   }
 
   @Output() showThreadEvent = new EventEmitter<Message>();

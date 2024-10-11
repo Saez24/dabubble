@@ -20,6 +20,7 @@ import { User } from '../../../../shared/models/user.class';
 import { Channel } from '../../../../shared/models/channel.class';
 import { Message } from '../../../../shared/models/message.class';
 import { DirectMessage } from '../../../../shared/models/direct.message.class';
+import { ChatUtilityService } from '../../../../shared/services/messages/chat-utility.service';
 
 
 @Component({
@@ -50,7 +51,7 @@ export class DirectMessageComponent implements OnInit {
   senderName: string | null = null;
   selectedFile: File | null = null;// Service für den Datei-Upload
   filePreviewUrl: string | null = null;
-  @Input() selectedUser = this.messageService.directMessageUser;
+  @Input() selectedUser = this.chatUtilityService.directMessageUser;
   messageId: string | null = null;
 
 
@@ -59,12 +60,12 @@ export class DirectMessageComponent implements OnInit {
   constructor(private firestore: Firestore, private auth: Auth,
     private userService: UserService, private cd: ChangeDetectorRef,
     private authService: AuthService, private uploadFileService: UploadFileService,
-    public channelsService: ChannelsService, public dialog: MatDialog, public messageService: MessagesService) {
+    public channelsService: ChannelsService, public dialog: MatDialog, public messageService: MessagesService, private chatUtilityService: ChatUtilityService) {
 
   }
 
   ngOnInit() {
-    this.messageService.messageId$.subscribe(id => {
+    this.chatUtilityService.messageId$.subscribe(id => {
       this.messageId = id;
       // console.log('Aktuelle Message ID:', this.messageId);
     });
@@ -94,7 +95,24 @@ export class DirectMessageComponent implements OnInit {
   }
 
   showEmoji() {
-    this.showEmojiPicker = !this.showEmojiPicker;
+    this.messageService.showEmoji();
+  }
+
+  addEmoji(event: any) {
+    this.messageService.addEmoji(event);
+  }
+
+  toggleEmojiPicker() {
+    this.messageService.toggleEmojiPicker();
+  }
+
+  @HostListener('document:click', ['$event'])
+  clickOutside(event: Event) {
+    const target = event.target as HTMLElement;
+
+    if (this.messageService.showEmojiPicker && !target.closest('emoji-mart') && !target.closest('.message-icon')) {
+      this.messageService.showEmojiPicker = false;
+    }
   }
 
   showMessageEditToggle() {
@@ -129,19 +147,6 @@ export class DirectMessageComponent implements OnInit {
     return this.editingMessageId === docId; // Prüfe gegen die Firestore-Dokument-ID
   }
 
-  addEmoji(event: any) {
-    this.chatMessage += event.emoji.native;
-    console.log(event.emoji.native);
-  }
-
-  @HostListener('document:click', ['$event'])
-  clickOutside(event: Event) {
-    const target = event.target as HTMLElement;
-
-    if (this.showEmojiPicker && !target.closest('emoji-mart') && !target.closest('.message-icon')) {
-      this.showEmojiPicker = false;
-    }
-  }
 
   @Output() showThreadEvent = new EventEmitter<Message>();
   showThread(message: Message) {
@@ -194,8 +199,8 @@ export class DirectMessageComponent implements OnInit {
             message: this.chatMessage,
             reactions: [],
             fileURL: '',
-            receiverId: this.messageService.directMessageUser?.id,
-            receiverName: this.messageService.directMessageUser?.name,
+            receiverId: this.chatUtilityService.directMessageUser?.id,
+            receiverName: this.chatUtilityService.directMessageUser?.name,
           });
 
           // Füge die neue Konversation in Firestore hinzu

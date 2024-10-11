@@ -102,7 +102,13 @@
 
                         </span>
 
-
+                        <span *ngIf="message?.answers && message.answers.length > 0" (click)="showThread(message)"
+                            class="answers-block">
+                            {{ message.answers.length }} Antworten
+                            <span class="message-time">Letzte Antwort
+                                <span class="message-time">{{ message.lastAnswer }}</span>
+                            </span>
+                        </span>
 
                         <div class="show-reactions">
                             <div class="reaction-icon-button">
@@ -113,6 +119,7 @@
                             </div>
                             <div class="reaction-icon"><mat-icon fontIcon="add_reaction"></mat-icon></div>
                         </div>
+
                     </div>
                     <div *ngIf="isEditing(message.messageId)" class="message-edit-container">
                         <textarea class="message-input" id="edit-message" type="text"
@@ -168,8 +175,8 @@
                 <div (click)="sendMessage()" class="message-icon send"><mat-icon fontIcon="send"></mat-icon></div>
             </div>
         </div>
-        <emoji-mart class="emoji-mart-chat" *ngIf="showEmojiPicker" (emojiSelect)="addEmoji($event)" [darkMode]="false"
-            title="Pick your emoji…" emoji="point_up">
+        <emoji-mart class="emoji-mart-chat" *ngIf="messageService.showEmojiPicker" (emojiSelect)="addEmoji($event)"
+            [darkMode]="false" title="Pick your emoji…" emoji="point_up">
         </emoji-mart>
     </div>
 </div>

@@ -123,6 +123,7 @@ export class ThreadComponent implements OnInit {
           await updateDoc(messageRef, { answers });
           console.log('Antwort erfolgreich aktualisiert');
           this.resetEditState();
+          this.cd.detectChanges(); 
         } else {
           console.error('Antwort nicht gefunden');
         }
@@ -216,11 +217,11 @@ export class ThreadComponent implements OnInit {
       console.error('Fehlende selectedMessageId.');
       return;
     }
-  
+
     try {
       const messageRef = doc(this.firestore, `messages/${this.selectedMessage?.messageId}`);
       const docSnap = await getDoc(messageRef);
-  
+
       if (docSnap.exists()) {
         const mainMessage = docSnap.data();
         if (this.isMainMessage()) {
@@ -235,36 +236,36 @@ export class ThreadComponent implements OnInit {
       console.error("Fehler beim Aktualisieren der Reaktionen: ", error);
     }
   }
-  
+
   /**
    * Prüft, ob die zu aktualisierende Nachricht die Hauptnachricht ist.
    */
   isMainMessage(): boolean {
     return this.selectedMessageId === this.selectedMessage?.messageId;
   }
-  
+
   /**
    * Aktualisiert die Reaktionen einer Hauptnachricht.
    */
   async updateMainMessageReactions(message: Message, mainMessage: any, messageRef: any) {
     mainMessage['reactions'] = message.reactions;
-  
+
     await updateDoc(messageRef, {
       reactions: mainMessage['reactions']
     });
     console.log('Reaktionen der Hauptnachricht erfolgreich aktualisiert');
   }
-  
+
   /**
    * Aktualisiert die Reaktionen einer Antwortnachricht im answers Array.
    */
   async updateAnswerMessageReactions(message: Message, mainMessage: any, messageRef: any) {
     const answers = mainMessage['answers'] || [];
     const answerToUpdate = answers.find((answer: any) => answer.messageId === this.selectedMessageId);
-  
+
     if (answerToUpdate) {
       answerToUpdate['reactions'] = message.reactions;
-  
+
       await updateDoc(messageRef, {
         answers: answers
       });
@@ -272,7 +273,7 @@ export class ThreadComponent implements OnInit {
     } else {
       console.error('Keine passende Antwort gefunden, um die Reaktionen zu aktualisieren.');
     }
-  }  
+  }
 
   @HostListener('document:click', ['$event'])
   clickOutside(event: Event) {
@@ -374,34 +375,34 @@ export class ThreadComponent implements OnInit {
       this.messages = []; // Wenn keine Nachricht ausgewählt ist, leere die Nachrichten
       return;
     }
-  
+
     const messageRef = doc(this.firestore, 'messages', this.selectedMessage.messageId);
     const messageSnap = await getDoc(messageRef);
-  
+
     if (messageSnap.exists()) {
       const selectedMessageData = messageSnap.data();
       const answers = selectedMessageData['answers'] || []; // Verwende Index-Signatur für den Zugriff
-  
+
       // Bestimme, ob die ausgewählte Nachricht eine eigene Nachricht ist
       this.selectedMessage.isOwnMessage = this.selectedMessage.senderID === this.currentUserUid;
-  
+
       // Lade nur die Nachrichten, die im answers-Array sind
       this.messages = await Promise.all(answers.map(async (answer: any) => {
         const message = new Message(answer, this.currentUserUid);
-  
+
         if (message.senderID) {
           const senderUser = await this.userService.getUserById(message.senderID);
           message.senderAvatar = senderUser?.avatarPath || './assets/images/avatars/avatar5.svg';
         } else {
           message.senderAvatar = './assets/images/avatars/avatar5.svg'; // Standard-Avatar
         }
-  
+
         const messageDate = new Date(answer.timestamp.seconds * 1000);
         message.formattedTimestamp = messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  
+
         return message;
       }));
-  
+
       this.cd.detectChanges();
       this.scrollToBottom();
     } else {

@@ -13,6 +13,7 @@ import { Auth, User as FirebaseUser } from '@angular/fire/auth';
 import { User } from '../../shared/models/user.class';
 import { MessagesService } from '../../shared/services/messages/messages.service';
 import { AuthService } from '../../shared/services/authentication/auth-service/auth.service';
+import { ChatUtilityService } from '../../shared/services/messages/chat-utility.service';
 
 @Component({
   selector: 'app-workspace',
@@ -30,7 +31,7 @@ import { AuthService } from '../../shared/services/authentication/auth-service/a
   styleUrl: './workspace.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class WorkspaceComponent {
+export class WorkspaceComponent implements OnInit {
 
   channels: Channel[] = [];
   users: User[] = [];
@@ -40,14 +41,13 @@ export class WorkspaceComponent {
   panelOpenState = false;
   arrowRotated: boolean[] = [false, false];
   currentUserUid: string | null = null;
-  targetUserId: string | null = null;
   currentUserChannels: Channel[] = [];
   @Input() openChatWindow!: () => void;
   @Output() openChannelEvent = new EventEmitter<void>();
   @Output() clickUserEvent = new EventEmitter<void>();
 
   triggerOpenChat() {
-    this.openChatWindow();
+    this.chatUtilityService.openChatWindow();
   }
 
   constructor(
@@ -57,7 +57,8 @@ export class WorkspaceComponent {
     private authService: AuthService,
     private firestore: Firestore,
     private auth: Auth,
-    private messageService: MessagesService
+    private messagesService: MessagesService,
+    private chatUtilityService: ChatUtilityService
   ) {
   }
 
@@ -69,6 +70,14 @@ export class WorkspaceComponent {
       } else {
         console.log('No user logged in');
       }
+    });
+
+    this.chatUtilityService.openDirectMessageEvent.subscribe(({ selectedUser, index }) => {
+      this.clickUserContainer(selectedUser, index);
+    });
+
+    this.chatUtilityService.openChannelMessageEvent.subscribe(({ selectedChannel, index }) => {
+      this.openChannel(selectedChannel, index);
     });
   }
 
@@ -113,7 +122,7 @@ export class WorkspaceComponent {
     this.channelsService.clickChannelContainer(channel, i);
     this.openChannelEvent.emit();
     if (this.currentUserUid) {
-      this.messageService.loadMessages(this.currentUserUid, channel.id);
+      this.messagesService.loadMessages(this.currentUserUid, channel.id);
     } else {
       console.error("currentUserUid is null");
     }
@@ -129,12 +138,11 @@ export class WorkspaceComponent {
     this.clickedUsers.fill(false);
     this.clickedChannels.fill(false);
     this.clickedUsers[i] = true;
-    this.messageService.getUserName(user);
-    this.targetUserId = user.id;
+    this.messagesService.getUserName(user);
     this.clickUserEvent.emit();
-    if (this.currentUserUid && this.targetUserId) {
-      this.messageService.loadDirectMessages(this.currentUserUid, this.targetUserId);
-      this.messageService.setMessageId(null);
+    if (this.currentUserUid) {
+      this.messagesService.loadDirectMessages(this.currentUserUid, user.id);
+      this.chatUtilityService.setMessageId(null);
     } else {
 
 
