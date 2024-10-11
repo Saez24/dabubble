@@ -30,23 +30,27 @@ export class ProfileEditorDialogComponent {
     if (this.authService.currentUser()) {
       this.fullname = this.authService.currentUser()?.name;
       this.mail = this.authService.currentUser()?.email;
+      this.avatarPath = this.authService.currentUser()?.avatarPath;
     }
     console.log(this.mail);
     console.log(this.fullname);
   }
-    
-    
+
+
 
 
   async onSubmit(ngForm: NgForm): Promise<void> {
     if (ngForm.submitted && ngForm.form.valid) {
       if (this.authService.currentUser()) {
         let updatedUser = this.getUpdatedUser();
-        await this.authService.updateUserProfile({ displayName: this.fullname, photoURL: 'https://firebasestorage.googleapis.com/v0/b/dabubble-effe4.appspot.com/o/avatar_images%2Fcustom%2F1727618738594_Profil.jpg?alt=media&token=acc9532b-3254-4356-93d4-0009374ed845' });
-        await this.authService.updateEmail(this.mail!);
+        await this.authService.updateUserProfile({ displayName: this.fullname, photoURL: this.avatarPath });
+        if (this.mail !== this.authService.currentUser()?.email) {
+          // check if email is used
+          await this.authService.updateEmail(this.mail!);
+        }
         console.log(updatedUser!.id!);
-        
-        await this.userService.updateUserDoc(updatedUser!.id!, updatedUser!)
+
+        await this.userService.updateUserInFirestore(updatedUser!.id!, updatedUser!)
         this.authService.currentUser.set(updatedUser)
         this.changesSuccessful.set(true);
 

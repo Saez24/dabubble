@@ -11,15 +11,15 @@
     <div class="status-container">
         @if (this.authService.currentUser()?.loginState == 'loggedIn') {
             <span class="status">
-                <img src="../../assets/images/icons/online.png" alt="" class="state-icon"> Online
+                <img src="../../../assets/images/icons/Online.png" alt="" class="state-icon"> Online
             </span>
             } @else if (this.authService.currentUser()?.loginState == 'inactive') {
             <span class="status">
-                <img src="../../assets/images/icons/inactive.png" alt="" class="state-icon"> Abwesend
+                <img src="../../../assets/images/icons/inactive.png" alt="" class="state-icon"> Abwesend
             </span>
             } @else if (this.authService.currentUser()?.loginState == 'loggedOut') {
             <span class="status">
-                <img src="../../assets/images/icons/offline.png" alt="" class="state-icon"> Offline
+                <img src="../../../assets/images/icons/offline.png" alt="" class="state-icon"> Offline
             </span>
             }
     </div>

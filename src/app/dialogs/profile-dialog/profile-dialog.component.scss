@@ -91,6 +91,9 @@
     gap: 15px;
 
     >span {
+        display: flex;
+        align-items: center;
+        justify-content: center;
         gap: 16px;
         color: #92C83E;
         font-size: 20px;
