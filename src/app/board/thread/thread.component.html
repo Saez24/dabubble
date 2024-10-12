@@ -71,11 +71,14 @@
           <div
             class="thread-reaction-icon-button"
             *ngFor="let reaction of selectedMessage.reactions"
+            (click)="addOrUpdateReaction(selectedMessage, reaction.emoji)"
           >
             <div class="thread-reaction-name-popup">
               <span>{{ reaction.emoji }}</span>
-              <h3>{{ reaction.senderName }}</h3>
-              <span>Hat reagiert</span>
+              <h3>
+                {{ formatSenderNames(reaction.senderName) }}
+              </h3>
+              <span>{{ getReactionVerb(reaction.senderName) }}</span>
             </div>
             <span>{{ reaction.emoji }}</span>
             {{ reaction.count }}
@@ -166,11 +169,14 @@
             <div
               class="thread-reaction-icon-button"
               *ngFor="let reaction of selectedMessage.reactions"
+              (click)="addOrUpdateReaction(selectedMessage, reaction.emoji)"
             >
               <div class="thread-reaction-name-popup">
                 <span>{{ reaction.emoji }}</span>
-                <h3>{{ reaction.senderName }}</h3>
-                <span>Hat reagiert</span>
+                <h3>
+                  {{ formatSenderNames(reaction.senderName) }}
+                </h3>
+                <span>{{ getReactionVerb(reaction.senderName) }}</span>
               </div>
               <span>{{ reaction.emoji }}</span>
               {{ reaction.count }}
@@ -268,17 +274,22 @@
             <div
               class="thread-reaction-icon-button"
               *ngFor="let reaction of message.reactions"
+              (click)="addOrUpdateReaction(message, reaction.emoji)"
             >
               <div class="thread-reaction-name-popup">
                 <span>{{ reaction.emoji }}</span>
-                <h3>{{ reaction.senderName }}</h3>
-                <span>Hat reagiert</span>
+                <h3>
+                  {{ formatSenderNames(reaction.senderName) }}
+                </h3>
+                <span>{{ getReactionVerb(reaction.senderName) }}</span>
               </div>
               <span>{{ reaction.emoji }}</span>
               {{ reaction.count }}
             </div>
-            <div>
-              <mat-icon>add_reaction</mat-icon>
+            <div class="emoji-btn">
+              <mat-icon (click)="showEmoji(message.messageId)"
+                >add_reaction</mat-icon
+              >
             </div>
           </div>
         </div>
@@ -352,17 +363,22 @@
             <div
               class="thread-reaction-icon-button"
               *ngFor="let reaction of message.reactions"
+              (click)="addOrUpdateReaction(message, reaction.emoji)"
             >
               <div class="thread-reaction-name-popup">
                 <span>{{ reaction.emoji }}</span>
-                <h3>{{ reaction.senderName }}</h3>
-                <span>Hat reagiert</span>
+                <h3>
+                  {{ formatSenderNames(reaction.senderName) }}
+                </h3>
+                <span>{{ getReactionVerb(reaction.senderName) }}</span>
               </div>
               <span>{{ reaction.emoji }}</span>
               {{ reaction.count }}
             </div>
-            <div>
-              <mat-icon>add_reaction</mat-icon>
+            <div class="emoji-btn">
+              <mat-icon (click)="showEmoji(message.messageId)"
+                >add_reaction</mat-icon
+              >
             </div>
           </div>
         </div>

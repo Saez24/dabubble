@@ -278,16 +278,22 @@
   justify-content: flex-start;
   gap: 10px;
 
+  h3{
+    margin: 0;
+  }
+
   >.thread-reaction-icon-button {
     position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
+    text-align: center;
     gap: 10px;
     height: 34px;
     width: 64px;
     border-radius: 30px;
     border: 1px solid rgba(173, 176, 217, 1);
+    cursor: pointer;
 
     &:hover {
       .thread-reaction-name-popup {

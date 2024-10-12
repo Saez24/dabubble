@@ -196,21 +196,91 @@ export class ThreadComponent implements OnInit {
     return messageToUpdate;
   }
 
-  private addOrUpdateReaction(message: Message, emoji: string): void {
-    const existingReaction = message.reactions.find(r => r.emoji === emoji);
-
-    if (existingReaction) {
-      existingReaction.count += 1;
+  addOrUpdateReaction(message: Message, emoji: string): void {
+    this.selectedMessageId = message.messageId;
+  
+    // Stelle sicher, dass senderName niemals null ist
+    const senderName = this.senderName || '';
+  
+    // Suche nach der Reaktion mit dem gleichen Emoji
+    const emojiReaction = message.reactions.find(r => r.emoji === emoji);
+  
+    if (emojiReaction) {
+      // Überprüfe, ob der aktuelle Benutzer bereits auf dieses Emoji reagiert hat
+      const senderNames = emojiReaction.senderName.split(', ');
+      const currentUserIndex = senderNames.indexOf(senderName);
+  
+      if (currentUserIndex > -1) {
+        // Benutzer hat bereits reagiert - Reaktion entfernen
+        senderNames.splice(currentUserIndex, 1); // Benutzer aus der Liste entfernen
+        emojiReaction.count -= 1; // Zähler verringern
+  
+        if (emojiReaction.count === 0) {
+          // Wenn der Zähler auf 0 fällt, die gesamte Reaktion entfernen
+          const emojiIndex = message.reactions.indexOf(emojiReaction);
+          message.reactions.splice(emojiIndex, 1);
+        } else {
+          // Aktualisiere die Liste der Namen
+          emojiReaction.senderName = senderNames.join(', ');
+        }
+  
+        console.log('Reaktion entfernt:', message.reactions);
+      } else {
+        // Benutzer hat noch nicht reagiert - Reaktion hinzufügen
+        emojiReaction.count += 1;
+        emojiReaction.senderName += (emojiReaction.senderName ? ', ' : '') + senderName;
+      }
     } else {
+      // Neue Reaktion hinzufügen
       message.reactions.push({
         emoji: emoji,
-        senderName: this.senderName || '',
+        senderName: senderName,
         count: 1
       });
     }
-
-    console.log('Updated reactions:', message.reactions);
+  
+    console.log('Aktualisierte Reaktionen:', message.reactions);
+    this.updateMessageReactions(message);
   }
+  
+
+
+formatSenderNames(senderNames: string): string {
+  const senderNameList = senderNames.split(', ');
+  const currentUser = this.senderName || '';
+
+  // Wenn der aktuelle Nutzer unter den Sendern ist, "Du" hinzufügen
+  const formattedNames = senderNameList.map(name => name === currentUser ? 'Du' : name);
+  
+  // Wenn mehrere Namen vorhanden sind, füge sie korrekt zusammen (mit "und")
+  if (formattedNames.length > 1) {
+    const lastSender = formattedNames.pop();
+    return formattedNames.join(', ') + ' und ' + lastSender;
+  }
+
+  // Falls nur ein Name vorhanden ist
+  return formattedNames[0];
+}
+
+getReactionVerb(senderNames: string): string {
+  const senderNameList = senderNames.split(', ');
+  const currentUser = this.senderName || '';
+  const formattedNames = senderNameList.map(name => name === currentUser ? 'Du' : name);
+
+  // Wenn nur "Du" vorhanden ist, verwende "hast"
+  if (formattedNames.length === 1 && formattedNames[0] === 'Du') {
+    return 'hast reagiert';
+  }
+
+  // Wenn nur ein anderer Name vorhanden ist, verwende "hat"
+  if (formattedNames.length === 1) {
+    return 'hat reagiert';
+  }
+
+  // Andernfalls verwende "haben"
+  return 'haben reagiert';
+}
+
 
   async updateMessageReactions(message: Message) {
     if (!this.selectedMessageId) {
@@ -280,7 +350,7 @@ export class ThreadComponent implements OnInit {
     const target = event.target as HTMLElement;
 
     if (this.showEmojiPicker) {
-      if (!target.closest('.emoji-box') && !target.closest('.message-icon') && !target.closest('.thread-message-icon')) {
+      if (!target.closest('.emoji-box') && !target.closest('.message-icon') && !target.closest('.thread-message-icon')&& !target.closest('.emoji-btn')) {
         console.log('Closing emoji picker');
         this.showEmojiPicker = false;
       } else {
@@ -307,7 +377,7 @@ export class ThreadComponent implements OnInit {
         // Prüfe, ob es sich um eine Antwort handelt
         const newMessage: Message = new Message({
           senderID: this.currentUserUid,
-          senderName: this.senderName,
+          senderNames: this.senderName,
           message: this.threadMessage,
           reactions: [], // Leeres Array für Reaktionen
           parentMessageId: this.selectedMessage ? this.selectedMessage.messageId : null,
