@@ -43,7 +43,8 @@ export class ChannelMessageComponent {
   showEmojiPicker = false;
   showMessageEdit = false;
   showMessageEditArea = false;
-  chatMessage = '';
+
+  channelChatMessage = '';
   messageArea = true;
   editedMessage = '';
   currentUserUid = '';
@@ -101,7 +102,7 @@ export class ChannelMessageComponent {
   }
 
   addEmoji(event: any) {
-    this.messageService.addEmoji(event);
+    this.channelChatMessage += event.emoji.native;
   }
 
   toggleEmojiPicker() {
@@ -165,7 +166,7 @@ export class ChannelMessageComponent {
       return;
     }
 
-    if (this.chatMessage.trim() || this.selectedFile) {
+    if (this.channelChatMessage.trim() || this.selectedFile) {
       const currentUser = this.authService.currentUser;
 
       if (currentUser()) {
@@ -174,7 +175,7 @@ export class ChannelMessageComponent {
         const newMessage: Message = new Message({
           senderID: this.currentUser()?.id,
           senderName: this.currentUser()?.name,
-          message: this.chatMessage,
+          message: this.channelChatMessage,
           channelId: this.channelsService.currentChannelId, // Verwende die gespeicherte channelId
           reactions: [],
           answers: [],
@@ -201,7 +202,7 @@ export class ChannelMessageComponent {
           }
         }
 
-        this.chatMessage = ''; // Eingabefeld leeren
+        this.channelChatMessage = ''; // Eingabefeld leeren
         this.selectedFile = null; // Reset selectedFile
         this.messageService.loadMessages(this.authService.currentUser()?.id, this.channelsService.currentChannelId);
         // Übergebe die channelId

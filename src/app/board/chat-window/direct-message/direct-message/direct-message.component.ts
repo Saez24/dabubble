@@ -42,7 +42,7 @@ export class DirectMessageComponent implements OnInit {
   showEmojiPicker = false;
   showMessageEdit = false;
   showMessageEditArea = false;
-  chatMessage = '';
+  directChatMessage = '';
   messageArea = true;
   editedMessage = '';
   currentUserUid = '';
@@ -99,7 +99,7 @@ export class DirectMessageComponent implements OnInit {
   }
 
   addEmoji(event: any) {
-    this.messageService.addEmoji(event);
+    this.directChatMessage += event.emoji.native;
   }
 
   toggleEmojiPicker() {
@@ -158,7 +158,7 @@ export class DirectMessageComponent implements OnInit {
   }
 
   async sendMessage() {
-    if (this.chatMessage.trim() || this.selectedFile) {
+    if (this.directChatMessage.trim() || this.selectedFile) {
       const currentUser = this.authService.currentUser;
 
       if (currentUser()) {
@@ -172,7 +172,7 @@ export class DirectMessageComponent implements OnInit {
           await updateDoc(messageDocRef, {
             conversation: arrayUnion({
               senderName: currentUser()?.name,
-              message: this.chatMessage,
+              message: this.directChatMessage,
               reaction: [],
               timestamp: new Date(),
               receiverName: this.selectedUser?.name,
@@ -196,7 +196,7 @@ export class DirectMessageComponent implements OnInit {
             conversation: [],
             senderId: currentUser()?.id,
             senderName: currentUser()?.name,
-            message: this.chatMessage,
+            message: this.directChatMessage,
             reactions: [],
             fileURL: '',
             receiverId: this.chatUtilityService.directMessageUser?.id,
@@ -234,7 +234,7 @@ export class DirectMessageComponent implements OnInit {
         }
 
         // Eingabefelder bereinigen und Scrollen
-        this.chatMessage = '';
+        this.directChatMessage = '';
         this.selectedFile = null;
         this.scrollToBottom();
         this.deleteUpload();
