@@ -340,21 +340,11 @@ export class MessagesService {
     }
 
 
-    // updateSendernameOfMessages() {
-    //     this.messages.forEach(async (message) => {
-    //         if (message.senderID === this.currentUserUid) {
-    //             message.senderName = this.authService.currentUser()?.name;
-    //         }
-    //     });
-    // }
-
-
     async getMessagesFromCurrentUser() {
         const q = query(collection(this.firestore, 'messages'), where('senderID', '==', this.authService.currentUserUid));
         const querySnapshot = await getDocs(q);
         querySnapshot.forEach(async (doc) => {
             const message = doc.data() as Message;
-            console.log('MESSAGES: ', message);
             if (message.senderID === this.authService.currentUserUid) {
                 this.updateSendernameOfMessage(doc.id, this.authService.currentUser()?.name as string);
             }
@@ -363,8 +353,6 @@ export class MessagesService {
 
 
     updateSendernameOfMessage(messageId: string, senderName: string) {
-        console.log('MESSAGE ID: ', messageId);
-        
         const messageRef = doc(this.firestore, 'messages', messageId);
         updateDoc(messageRef, { senderName: senderName });
     }

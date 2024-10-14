@@ -3,6 +3,7 @@ import { FormsModule, NgForm } from '@angular/forms';
 import { AuthService } from '../../shared/services/authentication/auth-service/auth.service';
 import { UserService } from '../../shared/services/firestore/user-service/user.service';
 import { MessagesService } from '../../shared/services/messages/messages.service';
+import { ChannelsService } from '../../shared/services/channels/channels.service';
 import { User } from '../../shared/models/user.class';
 
 @Component({
@@ -23,6 +24,7 @@ export class ProfileEditorDialogComponent {
   authService = inject(AuthService);
   userService = inject(UserService);
   messagesService = inject(MessagesService);
+  channelsService = inject(ChannelsService);
 
 
   constructor() {
@@ -46,7 +48,8 @@ export class ProfileEditorDialogComponent {
       if (this.authService.currentUser()) {
         let updatedUser = this.getUpdatedUser();
         await this.authService.updateUserProfile({ displayName: this.fullname, photoURL: this.avatarPath });
-        this.messagesService.getMessagesFromCurrentUser();
+        this.updateCurrentUserMessages();
+        this.updateCurrentUserChannels();
         if (this.mail !== this.authService.currentUser()?.email) {
           // check if email is used
           await this.authService.updateEmail(this.mail!);
@@ -60,7 +63,18 @@ export class ProfileEditorDialogComponent {
         console.log(this.mail);
         console.log(this.fullname);
       }
+      this.closeAllDialogs();
     }
+  }
+
+
+  updateCurrentUserMessages() {
+    this.messagesService.getMessagesFromCurrentUser();
+  }
+
+
+  updateCurrentUserChannels() {
+    this.channelsService.getChannelsFromCurrentUser();
   }
 
 
@@ -86,5 +100,12 @@ export class ProfileEditorDialogComponent {
   closeUserProfileEditor() {
     this.userService.showProfileEditor.set(false);
     this.userService.showProfile.set(true);
+  }
+
+
+  closeAllDialogs() {
+    this.userService.showProfileEditor.set(false);
+    this.userService.showProfile.set(false);
+    this.userService.showOverlay.set(false);
   }
 }
