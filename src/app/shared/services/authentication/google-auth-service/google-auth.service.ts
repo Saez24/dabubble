@@ -28,7 +28,7 @@ export class GoogleAuthService {
   async googlePopupLogin(): Promise<void> {
     try {
       const result = await signInWithPopup(this.auth, this.provider);
-      if (result.user) {
+      if (result.user) {        
         const firestoreUser = {
           uid: result.user.uid,
           email: result.user.email,

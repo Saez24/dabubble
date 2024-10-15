@@ -4,6 +4,7 @@ import { Channel } from '../../models/channel.class';
 import { User } from '../../models/user.class';
 import { Observable } from 'rxjs';
 import { AuthService } from '../authentication/auth-service/auth.service';
+import { getDocs, updateDoc, where } from 'firebase/firestore';
 
 @Injectable({
   providedIn: 'root',
@@ -83,6 +84,26 @@ export class ChannelsService implements OnInit {
   initializeArrays(channelCount: number, userCount: number) {
     this.clickedChannels = new Array(channelCount).fill(false);
     this.clickedUsers = new Array(userCount).fill(false);
+  }
+
+
+  async getChannelsFromCurrentUser() {
+    const q = query(collection(this.firestore, 'channels'), where('channelAuthorId', '==', this.authService.currentUserUid));
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach(async (doc) => {
+      const channel = doc.data() as Channel;
+      if (channel.channelAuthorId === this.authService.currentUserUid) {
+        this.updateChannelAuthor(doc.id);
+      }
+    });
+  }
+
+
+  updateChannelAuthor(messageId: string) {
+    const messageRef = doc(this.firestore, 'channels', messageId);
+    updateDoc(messageRef, {
+      channelAuthor: this.authService.currentUser()?.name,
+    });
   }
 
   // needs to be moved to workspace

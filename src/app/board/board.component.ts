@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ViewEncapsulation, WritableSignal, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewChild, ViewEncapsulation, WritableSignal, inject } from '@angular/core';
 import { ChatWindowComponent } from "./chat-window/chat-window.component";
 import { WorkspaceComponent } from "./workspace/workspace.component";
 import { ThreadComponent } from './thread/thread.component';
@@ -15,7 +15,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { AuthService } from '../shared/services/authentication/auth-service/auth.service';
 import { UserService } from '../shared/services/firestore/user-service/user.service';
 import { IconsService } from '../shared/services/icons/icons.service';
-import { Firestore } from '@angular/fire/firestore';
+import { collection, Firestore, onSnapshot, orderBy, query } from '@angular/fire/firestore';
 import { Message } from '../shared/models/message.class';
 import { Auth } from '@angular/fire/auth';
 import { AddPeopleDialog } from "../dialogs/create-new-channel-dialog/add-people-dialog/add-people-dialog.component";
@@ -23,6 +23,10 @@ import { ProfileEditorDialogComponent } from "../dialogs/profile-editor-dialog/p
 import { DirectMessageComponent } from './chat-window/direct-message/direct-message/direct-message.component';
 import { MessagesService } from '../shared/services/messages/messages.service';
 import { ChannelMessageComponent } from './chat-window/channel-message/channel-message/channel-message.component';
+import { User } from '../shared/models/user.class';
+import { Channel } from '../shared/models/channel.class';
+import { ChatUtilityService } from '../shared/services/messages/chat-utility.service';
+import { ChannelsService } from '../shared/services/channels/channels.service';
 
 @Component({
   selector: 'app-board',
@@ -57,7 +61,9 @@ import { ChannelMessageComponent } from './chat-window/channel-message/channel-m
 export class BoardComponent implements OnInit {
 
   @ViewChild('drawer') drawer!: MatDrawer;
-
+  // @ViewChild(WorkspaceComponent) workspaceComponent!: WorkspaceComponent;
+  users: User[] = [];
+  channels: Channel[] = [];
   searchInput: string = '';
   showThreadComponent: boolean = false;
   currentUser = this.authService.getUserSignal();
@@ -65,9 +71,7 @@ export class BoardComponent implements OnInit {
   messages: Message[] = [];
   currentUserUid: string | null | undefined = null;
   selectedMessage: Message | null = null;
-  showChatWindow: boolean = false;
-  showChannelMessage: boolean = true;
-  showDirectMessage: boolean = false;
+
 
 
   constructor(
@@ -76,14 +80,63 @@ export class BoardComponent implements OnInit {
     private auth: Auth,
     public authService: AuthService,
     public userService: UserService,
-    public messageService: MessagesService
+    public messageService: MessagesService,
+    public chatUtilityService: ChatUtilityService,
+    public cd: ChangeDetectorRef,
+    public channelsService: ChannelsService
   ) {
     this.currentUser = this.authService.getUserSignal();
   }
 
 
   ngOnInit() {
+    this.loadData();
   }
+
+  async loadData() {
+    this.auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        await this.loadUsers(); // Warten auf das Laden der Benutzer
+        // console.log('Users array in ngOnInit:', this.users); // Hier wird das Array korrekt angezeigt
+        await this.loadChannels();
+        // console.log('Channels array in ngOnInit:', this.channels);
+      } else {
+        console.log('Kein Benutzer angemeldet');
+      }
+    });
+  }
+
+  async loadUsers() {
+    const usersRef = collection(this.firestore, 'users');
+    const usersQuery = query(usersRef, orderBy('name'));
+
+    return new Promise((resolve) => {
+      onSnapshot(usersQuery, async (snapshot) => {
+        this.users = await Promise.all(snapshot.docs.map(async (doc) => {
+          const userData = doc.data() as User;
+          return { ...userData, id: doc.id };
+        }));
+        resolve(this.users); // Promise auflösen
+      });
+    });
+  }
+
+
+  async loadChannels() {
+    const channelRef = collection(this.firestore, 'channels');
+    const channelQuery = query(channelRef, orderBy('name'));
+
+    return new Promise((resolve) => {
+      onSnapshot(channelQuery, async (snapshot) => {
+        this.channels = await Promise.all(snapshot.docs.map(async (doc) => {
+          const channelData = doc.data() as Channel;// Prüfen, ob Kanäle geladen werden
+          return { ...channelData, id: doc.id };
+        }));
+        resolve(this.channels); // Promise auflösen
+      });
+    });
+  }
+
 
 
   closeThread() {
@@ -125,23 +178,27 @@ export class BoardComponent implements OnInit {
 
 
   openChannelMessage() {
-    this.showChannelMessage = true;
-    this.showDirectMessage = false;
-    this.showChatWindow = false;
+    this.chatUtilityService.openChannelMessage()
+  }
+
+  openChannelMessageFromChat(selectedChannel: Channel, index: number) {
+    this.chatUtilityService.openChannelMessageFromChat(selectedChannel, index);
+
   }
 
   openDirectMessage() {
-    this.showDirectMessage = true;
-    this.showChannelMessage = false;
-    this.showChatWindow = false;
+    this.chatUtilityService.openDirectMessage();
   }
 
+  openDirectMessageFromChat(selectedUser: User, index: number) {
+    this.chatUtilityService.openDirectMessageFromChat(selectedUser, index)
+  }
+
+
   openChatWindow() {
-    this.showChatWindow = true;
-    this.showDirectMessage = false;
-    this.showChannelMessage = false;
-    this.messageService.setMessageId(null);
-    this.messageService.directMessageUser = null;
+    this.chatUtilityService.openChatWindow();
+    this.chatUtilityService.setMessageId(null);
+    this.chatUtilityService.directMessageUser = null;
   }
 
 }

@@ -144,6 +144,7 @@ async createChannel(memberUids: string[]): Promise<Channel | null> {
         memberUids: memberUids,
         members: this.selectedUsers,
         channelAuthor: this.currentUser.name,
+        channelAuthorId: this.currentUser.id,
     });
 
     await addDoc(channelsRef, {
@@ -152,6 +153,7 @@ async createChannel(memberUids: string[]): Promise<Channel | null> {
         memberUids: newChannel.memberUids,
         members: newChannel.members,
         channelAuthor: newChannel.channelAuthor,
+        channelAuthorId: newChannel.channelAuthorId,
     });
 
     return newChannel;

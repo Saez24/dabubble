@@ -43,7 +43,8 @@ export class ChannelMessageComponent {
   showEmojiPicker = false;
   showMessageEdit = false;
   showMessageEditArea = false;
-  chatMessage = '';
+
+  channelChatMessage = '';
   messageArea = true;
   editedMessage = '';
   currentUserUid = '';
@@ -97,7 +98,24 @@ export class ChannelMessageComponent {
   }
 
   showEmoji() {
-    this.showEmojiPicker = !this.showEmojiPicker;
+    this.messageService.showEmoji();
+  }
+
+  addEmoji(event: any) {
+    this.channelChatMessage += event.emoji.native;
+  }
+
+  toggleEmojiPicker() {
+    this.messageService.toggleEmojiPicker();
+  }
+
+  @HostListener('document:click', ['$event'])
+  clickOutside(event: Event) {
+    const target = event.target as HTMLElement;
+
+    if (this.messageService.showEmojiPicker && !target.closest('emoji-mart') && !target.closest('.message-icon')) {
+      this.messageService.showEmojiPicker = false;
+    }
   }
 
   showMessageEditToggle() {
@@ -133,20 +151,6 @@ export class ChannelMessageComponent {
     return this.editingMessageId === docId; // Prüfe gegen die Firestore-Dokument-ID
   }
 
-  addEmoji(event: any) {
-    this.chatMessage += event.emoji.native;
-    console.log(event.emoji.native);
-  }
-
-  @HostListener('document:click', ['$event'])
-  clickOutside(event: Event) {
-    const target = event.target as HTMLElement;
-
-    if (this.showEmojiPicker && !target.closest('emoji-mart') && !target.closest('.message-icon')) {
-      this.showEmojiPicker = false;
-    }
-  }
-
   @Output() showThreadEvent = new EventEmitter<Message>();
   showThread(message: Message) {
     this.showThreadEvent.emit(message);
@@ -162,7 +166,7 @@ export class ChannelMessageComponent {
       return;
     }
 
-    if (this.chatMessage.trim() || this.selectedFile) {
+    if (this.channelChatMessage.trim() || this.selectedFile) {
       const currentUser = this.authService.currentUser;
 
       if (currentUser()) {
@@ -171,7 +175,7 @@ export class ChannelMessageComponent {
         const newMessage: Message = new Message({
           senderID: this.currentUser()?.id,
           senderName: this.currentUser()?.name,
-          message: this.chatMessage,
+          message: this.channelChatMessage,
           channelId: this.channelsService.currentChannelId, // Verwende die gespeicherte channelId
           reactions: [],
           answers: [],
@@ -198,7 +202,7 @@ export class ChannelMessageComponent {
           }
         }
 
-        this.chatMessage = ''; // Eingabefeld leeren
+        this.channelChatMessage = ''; // Eingabefeld leeren
         this.selectedFile = null; // Reset selectedFile
         this.messageService.loadMessages(this.authService.currentUser()?.id, this.channelsService.currentChannelId);
         // Übergebe die channelId
