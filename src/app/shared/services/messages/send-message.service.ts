@@ -308,4 +308,32 @@ export class SendMessageService {
     const fileName = decodedUrl.split('?')[0].split('/').pop();
     return fileName || 'Datei'; // Wenn kein Dateiname gefunden wird, 'Datei' als Fallback anzeigen
   }
+
+
+  async getThreadFromCurrentUser() {
+    const q = query(collection(this.firestore, 'direct_messages'));
+    const querySnapshot = await getDocs(q);
+
+    querySnapshot.forEach(async (doc) => {
+      const message = doc.data() as DirectMessage;
+
+      for (let index = 0; index < message.conversation.length; index++) {
+        const element = message.conversation[index];
+        if (element.receiverId === this.authService.currentUserUid) {
+          console.log('Empfangen: ', element);
+          this.updateSendernameOfThread(doc.id, 'receiverName');
+        }
+        if (element.senderId === this.authService.currentUserUid) {
+          console.log('Gesendet: ', element);
+          this.updateSendernameOfThread(doc.id, 'senderName');
+        }
+      }
+    });
+  }
+
+
+  updateSendernameOfThread(threadId: string, threadType: string) {
+    const threadRef = doc(this.firestore, 'direct_messages', threadId);
+    updateDoc(threadRef, { [(threadType)]: this.authService.currentUser()?.name });
+  }
 }

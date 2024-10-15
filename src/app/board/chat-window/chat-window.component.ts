@@ -86,18 +86,18 @@ export class ChatWindowComponent implements OnInit {
     this.loadData();
   }
 
-  async loadChannels() {
-    let channelRef = collection(this.firestore, 'channels');
-    let channelQuery = query(channelRef, orderBy('name'));
+  // async loadChannels() {
+  //   let channelRef = collection(this.firestore, 'channels');
+  //   let channelQuery = query(channelRef, orderBy('name'));
 
-    onSnapshot(channelQuery, async (snapshot) => {
-      this.channels = await Promise.all(snapshot.docs.map(async (doc) => {
-        let channelData = doc.data() as Channel;
-        return { ...channelData, id: doc.id };
-      }));
+  //   onSnapshot(channelQuery, async (snapshot) => {
+  //     this.channels = await Promise.all(snapshot.docs.map(async (doc) => {
+  //       let channelData = doc.data() as Channel;
+  //       return { ...channelData, id: doc.id };
+  //     }));
 
-    });
-  }
+  //   });
+  // }
 
   async onSearch(event: any) {
     this.searchQuery = event.target.value.trim().toLowerCase();
