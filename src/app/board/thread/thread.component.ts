@@ -123,6 +123,7 @@ export class ThreadComponent implements OnInit {
           await updateDoc(messageRef, { answers });
           console.log('Antwort erfolgreich aktualisiert');
           this.resetEditState();
+          this.cd.detectChanges(); 
         } else {
           console.error('Antwort nicht gefunden');
         }
@@ -195,32 +196,102 @@ export class ThreadComponent implements OnInit {
     return messageToUpdate;
   }
 
-  private addOrUpdateReaction(message: Message, emoji: string): void {
-    const existingReaction = message.reactions.find(r => r.emoji === emoji);
-
-    if (existingReaction) {
-      existingReaction.count += 1;
+  addOrUpdateReaction(message: Message, emoji: string): void {
+    this.selectedMessageId = message.messageId;
+  
+    // Stelle sicher, dass senderName niemals null ist
+    const senderName = this.senderName || '';
+  
+    // Suche nach der Reaktion mit dem gleichen Emoji
+    const emojiReaction = message.reactions.find(r => r.emoji === emoji);
+  
+    if (emojiReaction) {
+      // Überprüfe, ob der aktuelle Benutzer bereits auf dieses Emoji reagiert hat
+      const senderNames = emojiReaction.senderName.split(', ');
+      const currentUserIndex = senderNames.indexOf(senderName);
+  
+      if (currentUserIndex > -1) {
+        // Benutzer hat bereits reagiert - Reaktion entfernen
+        senderNames.splice(currentUserIndex, 1); // Benutzer aus der Liste entfernen
+        emojiReaction.count -= 1; // Zähler verringern
+  
+        if (emojiReaction.count === 0) {
+          // Wenn der Zähler auf 0 fällt, die gesamte Reaktion entfernen
+          const emojiIndex = message.reactions.indexOf(emojiReaction);
+          message.reactions.splice(emojiIndex, 1);
+        } else {
+          // Aktualisiere die Liste der Namen
+          emojiReaction.senderName = senderNames.join(', ');
+        }
+  
+        console.log('Reaktion entfernt:', message.reactions);
+      } else {
+        // Benutzer hat noch nicht reagiert - Reaktion hinzufügen
+        emojiReaction.count += 1;
+        emojiReaction.senderName += (emojiReaction.senderName ? ', ' : '') + senderName;
+      }
     } else {
+      // Neue Reaktion hinzufügen
       message.reactions.push({
         emoji: emoji,
-        senderName: this.senderName || '',
+        senderName: senderName,
         count: 1
       });
     }
-
-    console.log('Updated reactions:', message.reactions);
+  
+    console.log('Aktualisierte Reaktionen:', message.reactions);
+    this.updateMessageReactions(message);
   }
+  
+
+
+formatSenderNames(senderNames: string): string {
+  const senderNameList = senderNames.split(', ');
+  const currentUser = this.senderName || '';
+
+  // Wenn der aktuelle Nutzer unter den Sendern ist, "Du" hinzufügen
+  const formattedNames = senderNameList.map(name => name === currentUser ? 'Du' : name);
+  
+  // Wenn mehrere Namen vorhanden sind, füge sie korrekt zusammen (mit "und")
+  if (formattedNames.length > 1) {
+    const lastSender = formattedNames.pop();
+    return formattedNames.join(', ') + ' und ' + lastSender;
+  }
+
+  // Falls nur ein Name vorhanden ist
+  return formattedNames[0];
+}
+
+getReactionVerb(senderNames: string): string {
+  const senderNameList = senderNames.split(', ');
+  const currentUser = this.senderName || '';
+  const formattedNames = senderNameList.map(name => name === currentUser ? 'Du' : name);
+
+  // Wenn nur "Du" vorhanden ist, verwende "hast"
+  if (formattedNames.length === 1 && formattedNames[0] === 'Du') {
+    return 'hast reagiert';
+  }
+
+  // Wenn nur ein anderer Name vorhanden ist, verwende "hat"
+  if (formattedNames.length === 1) {
+    return 'hat reagiert';
+  }
+
+  // Andernfalls verwende "haben"
+  return 'haben reagiert';
+}
+
 
   async updateMessageReactions(message: Message) {
     if (!this.selectedMessageId) {
       console.error('Fehlende selectedMessageId.');
       return;
     }
-  
+
     try {
       const messageRef = doc(this.firestore, `messages/${this.selectedMessage?.messageId}`);
       const docSnap = await getDoc(messageRef);
-  
+
       if (docSnap.exists()) {
         const mainMessage = docSnap.data();
         if (this.isMainMessage()) {
@@ -235,36 +306,36 @@ export class ThreadComponent implements OnInit {
       console.error("Fehler beim Aktualisieren der Reaktionen: ", error);
     }
   }
-  
+
   /**
    * Prüft, ob die zu aktualisierende Nachricht die Hauptnachricht ist.
    */
   isMainMessage(): boolean {
     return this.selectedMessageId === this.selectedMessage?.messageId;
   }
-  
+
   /**
    * Aktualisiert die Reaktionen einer Hauptnachricht.
    */
   async updateMainMessageReactions(message: Message, mainMessage: any, messageRef: any) {
     mainMessage['reactions'] = message.reactions;
-  
+
     await updateDoc(messageRef, {
       reactions: mainMessage['reactions']
     });
     console.log('Reaktionen der Hauptnachricht erfolgreich aktualisiert');
   }
-  
+
   /**
    * Aktualisiert die Reaktionen einer Antwortnachricht im answers Array.
    */
   async updateAnswerMessageReactions(message: Message, mainMessage: any, messageRef: any) {
     const answers = mainMessage['answers'] || [];
     const answerToUpdate = answers.find((answer: any) => answer.messageId === this.selectedMessageId);
-  
+
     if (answerToUpdate) {
       answerToUpdate['reactions'] = message.reactions;
-  
+
       await updateDoc(messageRef, {
         answers: answers
       });
@@ -272,14 +343,14 @@ export class ThreadComponent implements OnInit {
     } else {
       console.error('Keine passende Antwort gefunden, um die Reaktionen zu aktualisieren.');
     }
-  }  
+  }
 
   @HostListener('document:click', ['$event'])
   clickOutside(event: Event) {
     const target = event.target as HTMLElement;
 
     if (this.showEmojiPicker) {
-      if (!target.closest('.emoji-box') && !target.closest('.message-icon') && !target.closest('.thread-message-icon')) {
+      if (!target.closest('.emoji-box') && !target.closest('.message-icon') && !target.closest('.thread-message-icon')&& !target.closest('.emoji-btn')) {
         console.log('Closing emoji picker');
         this.showEmojiPicker = false;
       } else {
@@ -306,7 +377,7 @@ export class ThreadComponent implements OnInit {
         // Prüfe, ob es sich um eine Antwort handelt
         const newMessage: Message = new Message({
           senderID: this.currentUserUid,
-          senderName: this.senderName,
+          senderNames: this.senderName,
           message: this.threadMessage,
           reactions: [], // Leeres Array für Reaktionen
           parentMessageId: this.selectedMessage ? this.selectedMessage.messageId : null,
@@ -374,34 +445,34 @@ export class ThreadComponent implements OnInit {
       this.messages = []; // Wenn keine Nachricht ausgewählt ist, leere die Nachrichten
       return;
     }
-  
+
     const messageRef = doc(this.firestore, 'messages', this.selectedMessage.messageId);
     const messageSnap = await getDoc(messageRef);
-  
+
     if (messageSnap.exists()) {
       const selectedMessageData = messageSnap.data();
       const answers = selectedMessageData['answers'] || []; // Verwende Index-Signatur für den Zugriff
-  
+
       // Bestimme, ob die ausgewählte Nachricht eine eigene Nachricht ist
       this.selectedMessage.isOwnMessage = this.selectedMessage.senderID === this.currentUserUid;
-  
+
       // Lade nur die Nachrichten, die im answers-Array sind
       this.messages = await Promise.all(answers.map(async (answer: any) => {
         const message = new Message(answer, this.currentUserUid);
-  
+
         if (message.senderID) {
           const senderUser = await this.userService.getUserById(message.senderID);
           message.senderAvatar = senderUser?.avatarPath || './assets/images/avatars/avatar5.svg';
         } else {
           message.senderAvatar = './assets/images/avatars/avatar5.svg'; // Standard-Avatar
         }
-  
+
         const messageDate = new Date(answer.timestamp.seconds * 1000);
         message.formattedTimestamp = messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  
+
         return message;
       }));
-  
+
       this.cd.detectChanges();
       this.scrollToBottom();
     } else {

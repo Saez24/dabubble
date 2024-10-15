@@ -1,31 +1,40 @@
 <div class="chat-container max-width">
     <div class="chat-header">
         <mat-form-field class="chat-search-bar">
-            <input type=" text" (input)="onSearch($event)" matInput
+            <input type=" text" [(ngModel)]="searchQuery" (input)="onSearch($event)" matInput
                 placeholder="An: #channel, oder @jemand oder E-Mail-Adresse">
         </mat-form-field>
+        <div *ngIf="selectedUser" class="search-display">
+            <img [src]="selectedUser.avatarPath" alt="Avatar" class="selected-avatar" />
+            <span>{{ selectedUser.name }}</span>
+            <mat-icon class="delete-selected-user" fontIcon="close" (click)="removeSelectedUser()"></mat-icon>
+        </div>
         <div class="search-block" *ngIf="isSearching">
-            <div class="found-block" *ngIf="filteredChannels.length">
-                <div class="found-users" *ngFor="let channel of filteredChannels"># {{ channel.name }}</div>
+            <div class="found-block" *ngIf="channels.length">
+                <div class="found-users" *ngFor="let channel of channels"
+                    (click)="selectChannel({ name: channel.name, id: channel.id })">
+                    # {{ channel.name }}</div>
             </div>
 
-            <div class="found-block" *ngIf="filteredUsers.length">
-                <div class="found-users" *ngFor="let user of filteredUsers"><img [src]="user.avatarPath" alt="">{{
+            <div class="found-block" *ngIf="users.length">
+                <div class="found-users" *ngFor="let user of users" (click)="selectUser(user)"><img
+                        [src]="user.avatarPath" alt="">{{
                     user.name }}</div>
             </div>
         </div>
     </div>
     <div class="chat-message-input-container">
-        <textarea class="message-input" id="chatMessage" [(ngModel)]="chatMessage" type="text"
+        <textarea class="message-input" id="chatMessage" [(ngModel)]="sendMessageService.chatMessage" type="text"
             placeholder="Schreiben Sie Ihre Nachricht"></textarea>
         <div class="message-icon-container">
             <div class="left-icon-container">
-                <input type="file" id="fileInput" (change)="onFileSelected($event)" hidden />
-                <div class="message-icon" (click)="triggerFileInput()">
+                <input type="file" id="fileInput" (change)="sendMessageService.onFileSelected($event)" hidden />
+                <div class="message-icon" (click)="sendMessageService.triggerFileInput()">
                     <mat-icon fontIcon="add"></mat-icon>
                 </div>
                 <div class="separator"></div>
-                <div (click)="showEmoji()" class="message-icon"><mat-icon fontIcon="sentiment_satisfied"></mat-icon>
+                <div (click)="messageService.showEmoji()" class="message-icon"><mat-icon
+                        fontIcon="sentiment_satisfied"></mat-icon>
                 </div>
                 <div class="message-icon"><mat-icon fontIcon="alternate_email"></mat-icon></div>
 
@@ -35,18 +44,21 @@
                     <a *ngIf="selectedFile && selectedFile.type === 'application/pdf'" [href]="filePreviewUrl"
                         target="_blank">PDF
                         anzeigen</a>
-                    <mat-icon class="delete-upload" fontIcon="close" (click)="deleteUpload()"></mat-icon>
+                    <mat-icon class="delete-upload" fontIcon="close"
+                        (click)="sendMessageService.deleteUpload()"></mat-icon>
                 </div>
 
             </div>
 
 
             <div class="right-icon-container">
-                <div (click)="sendMessage()" class="message-icon send"><mat-icon fontIcon="send"></mat-icon></div>
+                <div (click)="sendMessageService.sendMessage()" class="message-icon send"><mat-icon
+                        fontIcon="send"></mat-icon></div>
             </div>
         </div>
-        <emoji-mart class="emoji-mart-chat" *ngIf="showEmojiPicker" (emojiSelect)="addEmoji($event)" [darkMode]="false"
-            title="Pick your emoji…" emoji="point_up">
+        <emoji-mart class="emoji-mart-chat" *ngIf="messageService.showEmojiPicker"
+            (emojiSelect)="messageService.addEmoji($event)" [darkMode]="false" title="Pick your emoji…"
+            emoji="point_up">
         </emoji-mart>
     </div>
 </div>

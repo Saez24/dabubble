@@ -16,6 +16,7 @@ export class Message {
     senderAvatar: string | null | undefined;
     parentMessageId: string | null;
     fileURL: string | null;
+    lastAnswer: string | null;
 
 
     constructor(obj?: any, currentUserUid?: string | null) {
@@ -30,6 +31,9 @@ export class Message {
         this.displayDate = null;
         this.parentMessageId = obj ? obj.parentMessageId : null; //Um ThreadNachricht dem ausgewaehlten Kommentar zuzuweisen!
         this.fileURL = obj ? obj.fileURL : null;
+        this.lastAnswer = obj ? obj.lastAnswer : null;
+
+
 
 
 

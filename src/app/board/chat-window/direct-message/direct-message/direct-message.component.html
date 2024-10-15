@@ -102,7 +102,7 @@
 
     </div>
     <div class="chat-message-input-container">
-        <textarea class="message-input" id="chatMessage" [(ngModel)]="chatMessage" type="text"
+        <textarea class="message-input" id="dirctChatMessage" [(ngModel)]="directChatMessage" type="text"
             placeholder="Schreiben Sie Ihre Nachricht"></textarea>
 
         <!-- Datei-Vorschau -->
@@ -136,8 +136,8 @@
                 <div (click)="sendMessage()" class="message-icon send"><mat-icon fontIcon="send"></mat-icon></div>
             </div>
         </div>
-        <emoji-mart class="emoji-mart-chat" *ngIf="showEmojiPicker" (emojiSelect)="addEmoji($event)" [darkMode]="false"
-            title="Pick your emoji…" emoji="point_up">
+        <emoji-mart class="emoji-mart-chat" *ngIf="messageService.showEmojiPicker" (emojiSelect)="addEmoji($event)"
+            [darkMode]="false" title="Pick your emoji…" emoji="point_up">
         </emoji-mart>
     </div>
 </div>

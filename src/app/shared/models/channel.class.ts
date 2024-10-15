@@ -5,6 +5,7 @@ export class Channel {
     members: string[] | any[];
     memberUids: string[];
     channelAuthor: string;
+    channelAuthorId: string;
 
     constructor(obj? : any) {
         this.id = obj ? obj.id : null;
@@ -13,5 +14,6 @@ export class Channel {
         this.members = Array.isArray(obj?.members) ? obj.members : []; 
         this.memberUids = obj? obj.memberUids : [];
         this.channelAuthor = obj ? obj.channelAuthor : null;
+        this.channelAuthorId = obj ? obj.channelAuthorId : null;
     }
 }

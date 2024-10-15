@@ -1,7 +1,7 @@
 // Service for all Functions related to the User Object in Firestore
 
 import { Injectable, signal } from '@angular/core';
-import { Firestore, collection, doc, getDoc, updateDoc, setDoc } from '@angular/fire/firestore';
+import { Firestore, collection, doc, getDoc, updateDoc, setDoc, query, orderBy, onSnapshot } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import { User } from '../../../models/user.class';
 
@@ -18,10 +18,26 @@ export class UserService {
   showProfile = signal<boolean>(false);
   showProfileEditor = signal<boolean>(false);
   showOverlay = signal<boolean>(false);
+  users: User[] = [];
+  selectedUser: User | null = null;
+  selectedUserId: string = '';
 
   constructor(private firestore: Firestore) {
   }
 
+  async loadUsers() {
+    let usersRef = collection(this.firestore, 'users');
+    let usersQuery = query(usersRef, orderBy('name'));
+
+    onSnapshot(usersQuery, async (snapshot) => {
+      this.users = await Promise.all(snapshot.docs.map(async (doc) => {
+        let userData = doc.data() as User;
+        console.log(this.users);
+        return { ...userData, id: doc.id };
+      }));
+
+    });
+  }
 
   getUserSignal() {
     return this.userSignal;
