@@ -108,4 +108,9 @@ export class UserService {
     }
   }
 
+
+  showUserProfile(selectedUser: string | null) {
+    console.log('selectedUser: ', selectedUser);
+  }
+
 }

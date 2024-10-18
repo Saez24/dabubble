@@ -57,7 +57,7 @@ export class ChannelMessageComponent {
 
   @ViewChild('chatWindow') private chatWindow!: ElementRef;
   constructor(private firestore: Firestore, private auth: Auth,
-    private userService: UserService, private cd: ChangeDetectorRef,
+    public userService: UserService, private cd: ChangeDetectorRef,
     private authService: AuthService, private uploadFileService: UploadFileService,
     public channelsService: ChannelsService, public dialog: MatDialog, public messageService: MessagesService) { }
 
