@@ -16,11 +16,17 @@ span {
     padding: 32px 30px 32px 30px;
 }
 
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
 .mat-mdc-card {
     @include dFlex($fd: column, $g: 25px);
     box-shadow: none;
     width: 366px;
-    border-radius: 30px;    
+    border-radius: 30px;
 }
 
 .mat-mdc-card-content {
@@ -43,15 +49,16 @@ header {
             font-size: 24px;
             font-weight: 700;
         }
+
         div:nth-of-type(1) {
             @include dFlex();
             width: 60px;
             height: 60px;
             border-radius: 100%;
             background: #010147;
-        }  
+        }
     }
-} 
+}
 
 section {
     width: 100%;
@@ -61,6 +68,7 @@ section {
 
         .panel-container {
             @include dFlex($g: 10px, $jc: flex-start);
+
             span {
                 font-size: 20px;
                 font-weight: 700;
@@ -69,61 +77,72 @@ section {
 
         .panel-container-open {
             @include dFlex($fd: column, $g: 10px, $ai: flex-start);
-            > div {
+
+            >div {
                 @include dFlex($g: 15px);
                 padding: 4px 20px 4px 20px;
                 border-radius: 20px;
+
                 &:nth-child(1) {
                     margin-top: 25px;
                 }
+
                 &:nth-last-child(1) {
                     margin-bottom: 25px;
                 }
+
                 &:hover {
                     background-color: $light-purple;
                     cursor: pointer;
+
                     .icon {
                         color: $purple;
                     }
-                } 
+                }
             }
-            
+
         }
 
         .add-channel-container {
             @include dFlex($g: 10px, $jc: flex-start);
             padding: 4px 20px 4px 20px;
             border-radius: 20px;
+
             &:hover {
                 cursor: pointer;
+
                 .icon {
                     color: $purple;
                 }
+
                 span {
                     color: $purple;
                 }
             }
         }
-                
+
 
         .chat-container-open {
             @include dFlex($fd: column, $g: 13px, $ai: flex-start);
             overflow-y: auto;
-            > div {
+
+            >div {
                 @include dFlex($g: 15px);
                 padding: 4px 20px 4px 20px;
                 border-radius: 35px;
+
                 &:nth-child(1) {
                     margin-top: 25px;
                 }
+
                 &:hover {
                     cursor: pointer;
                     background-color: $light-purple;
                 }
 
-                > div {
+                >div {
                     @include dFlex($ai: flex-end);
-                    
+
                 }
 
                 img {
@@ -131,7 +150,7 @@ section {
                     height: 50px;
                 }
 
-                > div .status {
+                >div .status {
                     width: 14px;
                     height: 14px;
                     border: 2px solid white;
@@ -142,13 +161,13 @@ section {
                 span {
                     font-size: 18px;
                     font-weight: 400;
-                    white-space: nowrap;      
-                    overflow: hidden;          
-                    text-overflow: ellipsis; 
-                    max-width: 168px; 
-                } 
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    max-width: 168px;
+                }
             }
-            
+
         }
     }
 }
@@ -161,7 +180,7 @@ section {
         color: $purple;
         cursor: pointer;
     }
-} 
+}
 
 .arrow {
     transform: rotate(0deg) !important;
@@ -212,7 +231,7 @@ section {
 
     .new-chat-icon {
         width: 24px !important;
-        height: 24px !important; 
+        height: 24px !important;
     }
 }
 
@@ -224,12 +243,14 @@ section {
     height: 48px !important;
 }
 
-.mat-expansion-panel-header-description, .mat-expansion-panel-header-title {
+.mat-expansion-panel-header-description,
+.mat-expansion-panel-header-title {
     flex-grow: unset;
     gap: 10px;
 }
 
-.mat-expansion-panel-header:focus, .mat-expansion-panel-header:hover {
+.mat-expansion-panel-header:focus,
+.mat-expansion-panel-header:hover {
     color: $purple;
     background: none !important;
 }
@@ -241,6 +262,3 @@ section {
 .dialog-container .mat-dialog-container {
     border-radius: 30px !important;
 }
-  
-
-
