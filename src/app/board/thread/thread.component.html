@@ -41,7 +41,7 @@
             {{ selectedMessage.message }}
             <!-- Bildvorschau für URLs, die Bilddateien sind -->
             <a
-              *ngIf="isImageFile(selectedMessage.fileURL)"
+              *ngIf="sendMessageService.isImageFile(selectedMessage.fileURL)"
               [href]="selectedMessage.fileURL"
               target="_blank"
             >
@@ -56,14 +56,16 @@
             <a
               *ngIf="
                 selectedMessage.fileURL &&
-                !isImageFile(selectedMessage.fileURL) &&
+                !sendMessageService.isImageFile(selectedMessage.fileURL) &&
                 !selectedMessage.fileURL?.endsWith('.pdf')
               "
               class="file-link"
               [href]="selectedMessage.fileURL"
               target="_blank"
             >
-              {{ getFileNameFromURL(selectedMessage.fileURL) }}</a
+              {{
+                sendMessageService.getFileNameFromURL(selectedMessage.fileURL)
+              }}</a
             >
           </p>
         </div>
@@ -114,13 +116,13 @@
               (click)="showEmoji(selectedMessage.messageId)"
               >add_reaction</mat-icon
             >
-            <mat-icon class="message-icon" (click)="showMessageEditToggle()"
+            <mat-icon class="message-icon" (click)="toggleEditBtn()"
               >more_vert</mat-icon
             >
             <div *ngIf="showMessageEdit" class="thread-edit-message">
               <span
                 (click)="
-                  editMessage(selectedMessage.messageId, selectedMessage)
+                  enableEditMode(selectedMessage.messageId, selectedMessage)
                 "
                 >Nachricht bearbeiten</span
               >
@@ -139,7 +141,7 @@
               {{ selectedMessage.message }}
               <!-- Bildvorschau für URLs, die Bilddateien sind -->
               <a
-                *ngIf="isImageFile(selectedMessage.fileURL)"
+                *ngIf="sendMessageService.isImageFile(selectedMessage.fileURL)"
                 [href]="selectedMessage.fileURL"
                 target="_blank"
               >
@@ -154,14 +156,16 @@
               <a
                 *ngIf="
                   selectedMessage.fileURL &&
-                  !isImageFile(selectedMessage.fileURL) &&
+                  !sendMessageService.isImageFile(selectedMessage.fileURL) &&
                   !selectedMessage.fileURL?.endsWith('.pdf')
                 "
                 class="file-link"
                 [href]="selectedMessage.fileURL"
                 target="_blank"
               >
-                {{ getFileNameFromURL(selectedMessage.fileURL) }}</a
+                {{
+                  sendMessageService.getFileNameFromURL(selectedMessage.fileURL)
+                }}</a
               >
             </p>
           </div>
@@ -203,10 +207,13 @@
               <mat-icon fontIcon="sentiment_satisfied"></mat-icon>
             </div>
             <div class="thread-message-edit-action">
-              <button (click)="cancelMessageEdit(selectedMessage)">
+              <button (click)="cancelEditMode(selectedMessage)">
                 Abbrechen
               </button>
-              <button class="save-btn" (click)="saveMessage(selectedMessage)">
+              <button
+                class="save-btn"
+                (click)="saveEditedMessage(selectedMessage)"
+              >
                 Speichern
               </button>
             </div>
@@ -244,7 +251,7 @@
               {{ message.message }}
               <!-- Bildvorschau für URLs, die Bilddateien sind -->
               <a
-                *ngIf="isImageFile(message.fileURL)"
+                *ngIf="sendMessageService.isImageFile(message.fileURL)"
                 [href]="message.fileURL"
                 target="_blank"
               >
@@ -259,14 +266,14 @@
               <a
                 *ngIf="
                   message.fileURL &&
-                  !isImageFile(message.fileURL) &&
+                  !sendMessageService.isImageFile(message.fileURL) &&
                   !message.fileURL?.endsWith('.pdf')
                 "
                 class="file-link"
                 [href]="message.fileURL"
                 target="_blank"
               >
-                {{ getFileNameFromURL(message.fileURL) }}</a
+                {{ sendMessageService.getFileNameFromURL(message.fileURL) }}</a
               >
             </p>
           </div>
@@ -313,11 +320,11 @@
               (click)="showEmoji(message.messageId)"
               >add_reaction</mat-icon
             >
-            <mat-icon class="message-icon" (click)="showMessageEditToggle()"
+            <mat-icon class="message-icon" (click)="toggleEditBtn()"
               >more_vert</mat-icon
             >
             <div *ngIf="showMessageEdit" class="thread-edit-message">
-              <span (click)="editMessage(message.messageId, message)"
+              <span (click)="enableEditMode(message.messageId, message)"
                 >Nachricht bearbeiten</span
               >
             </div>
@@ -333,7 +340,7 @@
               {{ message.message }}
               <!-- Bildvorschau für URLs, die Bilddateien sind -->
               <a
-                *ngIf="isImageFile(message.fileURL)"
+                *ngIf="sendMessageService.isImageFile(message.fileURL)"
                 [href]="message.fileURL"
                 target="_blank"
               >
@@ -348,14 +355,14 @@
               <a
                 *ngIf="
                   message.fileURL &&
-                  !isImageFile(message.fileURL) &&
+                  !sendMessageService.isImageFile(message.fileURL) &&
                   !message.fileURL?.endsWith('.pdf')
                 "
                 class="file-link"
                 [href]="message.fileURL"
                 target="_blank"
               >
-                {{ getFileNameFromURL(message.fileURL) }}</a
+                {{ sendMessageService.getFileNameFromURL(message.fileURL) }}</a
               >
             </p>
           </div>
@@ -399,8 +406,8 @@
               <mat-icon fontIcon="sentiment_satisfied"></mat-icon>
             </div>
             <div class="thread-message-edit-action">
-              <button (click)="cancelMessageEdit(message)">Abbrechen</button>
-              <button class="save-btn" (click)="saveMessage(message)">
+              <button (click)="cancelEditMode(message)">Abbrechen</button>
+              <button class="save-btn" (click)="saveEditedMessage(message)">
                 Speichern
               </button>
             </div>
@@ -415,7 +422,7 @@
     <textarea
       class="message-input"
       placeholder="Schreiben Sie Ihre Nachricht"
-      [(ngModel)]="threadMessage"
+      [(ngModel)]="typedMessage"
       type="text"
     ></textarea>
     <div class="message-icon-container">
@@ -423,16 +430,19 @@
         <input
           type="file"
           id="fileInput"
-          (change)="onFileSelected($event)"
+          (change)="sendMessageService.onFileSelected($event)"
           hidden
         />
-        <div class="message-icon" (click)="triggerFileInput()">
+        <div
+          class="message-icon"
+          (click)="sendMessageService.triggerFileInput()"
+        >
           <mat-icon fontIcon="add"></mat-icon>
         </div>
         <div class="separator"></div>
         <div class="thread-message-icon">
           <mat-icon
-            (click)="showEmoji(threadMessage)"
+            (click)="showEmoji(typedMessage)"
             fontIcon="sentiment_satisfied"
           ></mat-icon>
         </div>
@@ -454,7 +464,7 @@
           <mat-icon
             class="delete-upload"
             fontIcon="close"
-            (click)="deleteUpload()"
+            (click)="sendMessageService.deleteUpload()"
           ></mat-icon>
         </div>
       </div>
