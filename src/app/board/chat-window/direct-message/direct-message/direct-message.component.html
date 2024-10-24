@@ -18,7 +18,7 @@
                             <div class="reaction-icon"><mat-icon fontIcon="add_reaction"></mat-icon></div>
                             <div class="reaction-icon"><mat-icon fontIcon="comment"></mat-icon></div>
                         </div>
-                        <span class="sender-name">{{ message.senderName }}
+                        <span class="sender-name" (click)="this.getSelectedUserInfo(message.senderId)">{{ message.senderName }}
                             <span class="message-time">{{ message.formattedTimestamp }}</span>
                         </span>
                         <span class="message-recieved">{{ message.message }}
@@ -54,7 +54,7 @@
                                 </div>
                             </div>
 
-                            <span class="my-name">{{ message.senderName }} <span class="message-time">{{
+                            <span class="my-name" (click)="openUserProfile($event)">{{ message.senderName }} <span class="message-time">{{
                                     message.formattedTimestamp }}
                                     Uhr</span></span>
                             <span class="chat-message-sender">{{ message.message }}

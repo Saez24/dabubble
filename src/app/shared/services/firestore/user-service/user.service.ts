@@ -16,6 +16,7 @@ export class UserService {
   public currentUser = this.getUserSignal(); // Change to hold an instance of the User class
   public currentUserID: string | null = null;
   showProfile = signal<boolean>(false);
+  showUserInfo = signal<boolean>(false);
   showProfileEditor = signal<boolean>(false);
   showOverlay = signal<boolean>(false);
   users: User[] = [];
@@ -98,8 +99,10 @@ export class UserService {
   }
 
   async getUserById(userId: string): Promise<User | null> {
+    this.selectedUser = new User();
     const userRef = this.getUserDocReference(userId);
     const userDoc = await getDoc(userRef);
+    this.selectedUser = new User({ ...userDoc.data(), id: userDoc.id });
 
     if (userDoc.exists()) {
       return new User({ ...userDoc.data(), id: userDoc.id });
@@ -109,8 +112,13 @@ export class UserService {
   }
 
 
-  showUserProfile(selectedUser: string | null) {
-    console.log('selectedUser: ', selectedUser);
-  }
+  // async getUserInfo(selectedUserId: string | null) {
+  //   const userRef = doc(this.firestore, `users/${selectedUserId}`);
+  //   const user = (await getDoc(userRef)).data() as User;
+  //   this.selectedUser = { ...user, id: user.id };
+  //   console.log('user', this.selectedUser);
+    
+  //   return { ...user, id: user.id };
+  // }
 
 }

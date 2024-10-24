@@ -313,4 +313,17 @@ export class DirectMessageComponent implements OnInit {
     return fileName || 'Datei'; // Wenn kein Dateiname gefunden wird, 'Datei' als Fallback anzeigen
   }
 
+
+  async getSelectedUserInfo(selectedUserId: string | null) {
+    this.userService.showUserInfo.set(true);
+    await this.userService.getUserById(selectedUserId as string);
+  }
+
+
+  openUserProfile(event: Event) {
+    event.stopPropagation();
+    this.userService.showProfile.set(true);
+    this.userService.showOverlay.set(true);
+  }
+
 }

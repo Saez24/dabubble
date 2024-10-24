@@ -27,10 +27,10 @@
                         <div class="profil-menu-links" (click)="openUserProfile($event)">Profil</div>
                         <div class="profil-menu-links" (click)="authService.logout()">Log Out</div>
                     </div>
-                    <app-profile-dialog class="profil-details"
-                        *ngIf="this.userService.showProfile()"></app-profile-dialog>
-                    <app-profile-editor-dialog class="profil-editor"
-                        *ngIf="this.userService.showProfileEditor()"></app-profile-editor-dialog>
+                    <app-profile-dialog class="profil-details" *ngIf="this.userService.showProfile()">
+                    </app-profile-dialog>
+                    <app-profile-editor-dialog class="profil-editor" *ngIf="this.userService.showProfileEditor()">
+                    </app-profile-editor-dialog>
                 </div>
             </div>
         </div>
@@ -75,4 +75,10 @@
         <mat-icon class="icon" svgIcon="open-menu" aria-hidden="false" aria-label="Workspace icon"></mat-icon>
         <span>Workspace-Menü öffnen</span>
     </div>
+
+    <div class="userInfoOverlay" *ngIf="this.userService.showUserInfo()">
+        <app-user-info-dialog class="profil-details user-info">
+        </app-user-info-dialog>
+    </div>
+
 </div>
