@@ -8,7 +8,7 @@ export class Message {
     senderID: string | null;
     senderName: string | null;
     message: string | null;
-    reactions: { emoji: string; senderName: string; count: number }[] = [];
+    reactions: { emoji: string; senderID: string, senderName: string; count: number }[] = [];
     answers: Message[];
     formattedTimestamp: string;
     isOwnMessage: boolean = false;

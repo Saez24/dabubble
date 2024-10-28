@@ -7,6 +7,7 @@ import { Message } from '../../../shared/models/message.class';
 import { doc, Firestore, updateDoc } from '@angular/fire/firestore';
 import { getDoc } from 'firebase/firestore';
 import { SendMessageService } from '../../../shared/services/messages/send-message.service';
+import { AuthService } from '../../../shared/services/authentication/auth-service/auth.service';
 
 @Component({
   selector: 'app-thread-messages',
@@ -28,9 +29,10 @@ export class ThreadMessagesComponent {
   @Input() messages: Message[] = [];
 
   senderName: string | null = null;
+  senderID: string | null = null;
   selectedFile: File | null = null;
   filePreviewUrl: string | null = null;
-  reactions: { emoji: string, senderName: string, count: number }[] = [];
+  reactions: { emoji: string, senderID: string, senderName: string, count: number }[] = [];
   selectedMessageId: string | null = null;
   showEmojiPicker = false;
   showMessageEdit = false;
@@ -38,7 +40,19 @@ export class ThreadMessagesComponent {
   editingMessageId: string | null = null;
   editingMessage: string | null = null;
 
-  constructor(private firestore: Firestore, private cd: ChangeDetectorRef, public sendMessageService: SendMessageService) { }
+  constructor(private firestore: Firestore, private cd: ChangeDetectorRef, private authService: AuthService, public sendMessageService: SendMessageService) { }
+
+  ngOnInit(): void {
+    const userSignal = this.authService.getUserSignal();
+
+    if (userSignal) {
+      const user = userSignal();
+      this.senderName = user ? user.name : null;
+      this.senderID = user ? user.id : null;
+    } else {
+      console.error('Fehler: Benutzer-Signal ist null oder undefined');
+    }
+  }
 
   toggleEditBtn() {
     this.showMessageEdit = !this.showMessageEdit;
@@ -130,14 +144,16 @@ export class ThreadMessagesComponent {
 
   addOrUpdateReaction(message: Message, emoji: string): void {
     this.selectedMessageId = message.messageId;
-    const senderName = this.senderName || '';
+    const senderID = this.senderID || '';
     const emojiReaction = message.reactions.find(r => r.emoji === emoji);
 
     if (emojiReaction) {
+      const senderIDs = emojiReaction.senderID.split(', ');
       const senderNames = emojiReaction.senderName.split(', ');
-      const currentUserIndex = senderNames.indexOf(senderName);
+      const currentUserIndex = senderIDs.indexOf(senderID);
 
       if (currentUserIndex > -1) {
+        senderIDs.splice(currentUserIndex, 1);
         senderNames.splice(currentUserIndex, 1);
         emojiReaction.count -= 1;
 
@@ -145,26 +161,33 @@ export class ThreadMessagesComponent {
           const emojiIndex = message.reactions.indexOf(emojiReaction);
           message.reactions.splice(emojiIndex, 1);
         } else {
+          emojiReaction.senderID = senderIDs.join(', ');
           emojiReaction.senderName = senderNames.join(', ');
         }
       } else {
         emojiReaction.count += 1;
-        emojiReaction.senderName += (emojiReaction.senderName ? ', ' : '') + senderName;
+        emojiReaction.senderID += (emojiReaction.senderID ? ', ' : '') + senderID;
+        emojiReaction.senderName += (emojiReaction.senderName ? ', ' : '') + this.senderName;
       }
     } else {
       message.reactions.push({
         emoji: emoji,
-        senderName: senderName,
+        senderID: senderID,
+        senderName: this.senderName || '',
         count: 1
       });
     }
+
     this.updateMessageReactions(message);
   }
 
-  formatSenderNames(senderNames: string): string {
+  formatSenderNames(senderNames: string, senderIDs: string): string {
+    const senderIDList = senderIDs.split(', ');
     const senderNameList = senderNames.split(', ');
-    const currentUser = this.senderName || '';
-    const formattedNames = senderNameList.map(name => name === currentUser ? 'Du' : name);
+    const currentUserID = this.senderID || '';
+    const formattedNames = senderNameList.map((name, index) => {
+      return senderIDList[index] === currentUserID ? 'Du' : name;
+    });
 
     if (formattedNames.length > 1) {
       const lastSender = formattedNames.pop();
@@ -173,10 +196,13 @@ export class ThreadMessagesComponent {
     return formattedNames[0];
   }
 
-  getReactionVerb(senderNames: string): string {
+  getReactionVerb(senderNames: string, senderIDs: string): string {
+    const senderIDList = senderIDs.split(', ');
     const senderNameList = senderNames.split(', ');
-    const currentUser = this.senderName || '';
-    const formattedNames = senderNameList.map(name => name === currentUser ? 'Du' : name);
+    const currentUserID = this.senderID || '';
+    const formattedNames = senderNameList.map((name, index) => {
+      return senderIDList[index] === currentUserID ? 'Du' : name;
+    });
 
     if (formattedNames.length === 1 && formattedNames[0] === 'Du') {
       return 'hast reagiert';
@@ -186,6 +212,7 @@ export class ThreadMessagesComponent {
     }
     return 'haben reagiert';
   }
+
 
   async updateMessageReactions(message: Message) {
     if (!this.selectedMessageId) {

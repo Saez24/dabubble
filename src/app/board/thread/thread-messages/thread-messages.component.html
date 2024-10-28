@@ -47,8 +47,8 @@
         >
           <div class="thread-reaction-name-popup">
             <span>{{ reaction.emoji }}</span>
-            <h3>{{ formatSenderNames(reaction.senderName) }}</h3>
-            <span>{{ getReactionVerb(reaction.senderName) }}</span>
+            <h3>{{ formatSenderNames(reaction.senderName, reaction.senderID) }}</h3>
+            <span>{{ getReactionVerb(reaction.senderName, reaction.senderID) }}</span>
           </div>
           <span>{{ reaction.emoji }}</span>
           {{ reaction.count }}
@@ -124,8 +124,8 @@
           >
             <div class="thread-reaction-name-popup">
               <span>{{ reaction.emoji }}</span>
-              <h3>{{ formatSenderNames(reaction.senderName) }}</h3>
-              <span>{{ getReactionVerb(reaction.senderName) }}</span>
+              <h3>{{ formatSenderNames(reaction.senderName, reaction.senderID) }}</h3>
+              <span>{{ getReactionVerb(reaction.senderName, reaction.senderID) }}</span>
             </div>
             <span>{{ reaction.emoji }}</span>
             {{ reaction.count }}
@@ -215,8 +215,8 @@
           >
             <div class="thread-reaction-name-popup">
               <span>{{ reaction.emoji }}</span>
-              <h3>{{ formatSenderNames(reaction.senderName) }}</h3>
-              <span>{{ getReactionVerb(reaction.senderName) }}</span>
+              <h3>{{ formatSenderNames(reaction.senderName, reaction.senderID) }}</h3>
+              <span>{{ getReactionVerb(reaction.senderName, reaction.senderID) }}</span>
             </div>
             <span>{{ reaction.emoji }}</span>
             {{ reaction.count }}
@@ -281,8 +281,8 @@
           >
             <div class="thread-reaction-name-popup">
               <span>{{ reaction.emoji }}</span>
-              <h3>{{ formatSenderNames(reaction.senderName) }}</h3>
-              <span>{{ getReactionVerb(reaction.senderName) }}</span>
+              <h3>{{ formatSenderNames(reaction.senderName, reaction.senderID) }}</h3>
+              <span>{{ getReactionVerb(reaction.senderName, reaction.senderID) }}</span>
             </div>
             <span>{{ reaction.emoji }}</span>
             {{ reaction.count }}
