@@ -1,14 +1,10 @@
-
 export class Message {
-    timestamp(timestamp: any): string {
-        throw new Error('Method not implemented.');
-    }
     messageId: string;
     channelId: string | null;
     senderID: string | null;
     senderName: string | null;
     message: string | null;
-    reactions: { emoji: string; senderID: string, senderName: string; count: number }[] = [];
+    reactions: { emoji: string; senderID: string; senderName: string; count: number }[] = [];
     answers: Message[];
     formattedTimestamp: string;
     isOwnMessage: boolean = false;
@@ -17,7 +13,6 @@ export class Message {
     parentMessageId: string | null;
     fileURL: string | null;
     lastAnswer: string | null;
-
 
     constructor(obj?: any, currentUserUid?: string | null) {
         this.messageId = obj ? obj.messageId : null;
@@ -29,14 +24,11 @@ export class Message {
         this.answers = obj && obj.answers ? obj.answers.map((answer: any) => new Message(answer)) : [];
         this.formattedTimestamp = '';
         this.displayDate = null;
-        this.parentMessageId = obj ? obj.parentMessageId : null; //Um ThreadNachricht dem ausgewaehlten Kommentar zuzuweisen!
+        this.parentMessageId = obj ? obj.parentMessageId : null;
         this.fileURL = obj ? obj.fileURL : null;
-        this.lastAnswer = obj ? obj.lastAnswer : null;
 
-
-
-
-
+        // Setze lastAnswer, wenn Antworten existieren
+        this.lastAnswer = this.answers.length > 0 ? this.answers[this.answers.length - 1].message : null;
 
         // Typensicherer Vergleich, um sowohl null als auch undefined abzudecken
         if (currentUserUid && this.senderID) {

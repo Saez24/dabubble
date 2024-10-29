@@ -8,7 +8,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule } from '@angular/forms';
 import { CommonModule, NgFor, NgIf } from '@angular/common';
 import { PickerComponent } from '@ctrl/ngx-emoji-mart';
-import { addDoc, collection, doc, Firestore, onSnapshot, orderBy, query, updateDoc } from '@angular/fire/firestore';
+import { addDoc, collection, doc, Firestore, getDoc, onSnapshot, orderBy, query, updateDoc } from '@angular/fire/firestore';
 import { Auth } from '@angular/fire/auth';
 import { MatDialog } from '@angular/material/dialog';
 import { User } from '../../../../shared/models/user.class';
@@ -36,14 +36,15 @@ import { Message } from '../../../../shared/models/message.class';
   encapsulation: ViewEncapsulation.None,
 })
 export class ChannelMessageComponent {
-  messages = this.messageService.messages;
+  @Output() showThreadEvent = new EventEmitter<Message>();
+  messages: Message[] = [];
+  selectedMessage: Message | null = null;
   users: User[] = [];
   channels: Channel[] = [];
   currentUser = this.authService.getUserSignal();
   showEmojiPicker = false;
   showMessageEdit = false;
   showMessageEditArea = false;
-
   channelChatMessage = '';
   messageArea = true;
   editedMessage = '';
@@ -151,10 +152,13 @@ export class ChannelMessageComponent {
     return this.editingMessageId === docId; // Prüfe gegen die Firestore-Dokument-ID
   }
 
-  @Output() showThreadEvent = new EventEmitter<Message>();
   showThread(message: Message) {
-    this.showThreadEvent.emit(message);
+    this.selectedMessage = message;
+    this.showThreadEvent.emit(message); // Lade Antworten nach Auswahl der Nachricht
+    console.log(message);
   }
+
+
 
   showError() {
     console.error("Kein Kanal ausgewählt.");

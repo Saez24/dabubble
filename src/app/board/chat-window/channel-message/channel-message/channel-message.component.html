@@ -39,7 +39,8 @@
                         <div (click)="showThread(message)" class="reaction-icon"><mat-icon
                                 fontIcon="comment"></mat-icon></div>
                     </div>
-                    <span class="sender-name" (click)="this.getSelectedUserInfo(message.senderID)">{{ message.senderName }}
+                    <span class="sender-name" (click)="this.getSelectedUserInfo(message.senderID)">{{ message.senderName
+                        }}
                         <span class="message-time">{{ message.formattedTimestamp }}</span>
                     </span>
                     <span class="message-recieved">{{ message.message }}
@@ -59,7 +60,7 @@
                         class="answers-block">
                         {{ message.answers.length }} Antworten
                         <span class="message-time">Letzte Antwort
-                            <span class="message-time">14:25</span>
+                            <span class="message-time">{{ message.lastAnswer }}</span>
                         </span>
                     </span>
 
