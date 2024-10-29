@@ -1,6 +1,6 @@
 <div class="chat-container max-width">
     <div class="chat-header">
-        <div class="selected-user"><img [src]="selectedUser?.avatarPath" alt=""> {{ selectedUser?.name}}</div>
+        <div class="selected-user" (click)="this.getSelectedUserInfo(selectedUser?.id)"><img [src]="selectedUser?.avatarPath" alt=""> {{ selectedUser?.name}}</div>
     </div>
     <div #chatWindow class="chat-content">
 
@@ -18,7 +18,10 @@
                             <div class="reaction-icon"><mat-icon fontIcon="add_reaction"></mat-icon></div>
                             <div class="reaction-icon"><mat-icon fontIcon="comment"></mat-icon></div>
                         </div>
-                        <span class="sender-name" (click)="this.getSelectedUserInfo(message.senderId)">{{ message.senderName }}
+                        <span class="message-infos-sender">
+                            <span class="sender-name" (click)="this.getSelectedUserInfo(message.senderId)">
+                                {{message.senderName }}
+                            </span>
                             <span class="message-time">{{ message.formattedTimestamp }}</span>
                         </span>
                         <span class="message-recieved">{{ message.message }}
@@ -54,9 +57,15 @@
                                 </div>
                             </div>
 
-                            <span class="my-name" (click)="openUserProfile($event)">{{ message.senderName }} <span class="message-time">{{
+                            <span class="message-infos-reciever">
+                                <span class="my-name" (click)="openUserProfile($event)">
+                                    {{ message.senderName }}
+                                </span>
+                                <span class="message-time">{{
                                     message.formattedTimestamp }}
-                                    Uhr</span></span>
+                                    Uhr
+                                </span>
+                            </span>
                             <span class="chat-message-sender">{{ message.message }}
                                 <!-- Bildvorschau für URLs, die Bilddateien sind -->
                                 <a *ngIf="isImageFile(message.fileURL)" [href]="message.fileURL" target="_blank">

@@ -173,6 +173,10 @@ export class BoardComponent implements OnInit {
     this.userService.showProfile.set(false);
   }
 
+  closeUserInfoDialog() {
+    this.userService.showUserInfo.set(false);
+  }
+
 
   stopPropagation(event: Event) {
     event.stopPropagation();

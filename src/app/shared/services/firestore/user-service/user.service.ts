@@ -26,6 +26,7 @@ export class UserService {
   constructor(private firestore: Firestore) {
   }
 
+
   async loadUsers() {
     let usersRef = collection(this.firestore, 'users');
     let usersQuery = query(usersRef, orderBy('name'));
@@ -98,14 +99,34 @@ export class UserService {
     });
   }
 
-  async getUserById(userId: string): Promise<User | null> {
+
+  // async getUserById(userId: string): Promise<User | null> {
+  //   const userRef = this.getUserDocReference(userId);
+  //   const userDoc = await getDoc(userRef);    
+
+  //   if (userDoc.exists()) {
+  //     return new User({ ...userDoc.data(), id: userDoc.id });
+  //   } else {
+  //     return null;
+  //   }
+  // }
+
+
+  async getSelectedUserById(userId: string): Promise<User | null> {
     this.selectedUser = new User();
     const userRef = this.getUserDocReference(userId);
     const userDoc = await getDoc(userRef);
-    this.selectedUser = new User({ ...userDoc.data(), id: userDoc.id });
 
     if (userDoc.exists()) {
-      return new User({ ...userDoc.data(), id: userDoc.id });
+      const userData = userDoc.data() as User; // Access document data
+  
+      this.selectedUser = new User({
+        ...userData,
+        id: userDoc.id,
+        loginState: userData?.loginState // Use optional chaining to safely access loginState
+      });
+
+      return this.selectedUser;
     } else {
       return null;
     }

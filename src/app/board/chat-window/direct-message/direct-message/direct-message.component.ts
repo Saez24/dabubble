@@ -314,9 +314,11 @@ export class DirectMessageComponent implements OnInit {
   }
 
 
-  async getSelectedUserInfo(selectedUserId: string | null) {
+  async getSelectedUserInfo(selectedUserId: string | null | undefined) {
+    console.log('Selected User ID:', selectedUserId);
+    
     this.userService.showUserInfo.set(true);
-    await this.userService.getUserById(selectedUserId as string);
+    await this.userService.getSelectedUserById(selectedUserId as string);
   }
 
 

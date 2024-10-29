@@ -287,8 +287,17 @@ export class ChannelMessageComponent {
   }
 
   async getSelectedUserInfo(selectedUserId: string | null) {
+    console.log('!!!selectedUserId', selectedUserId);
+    
     this.userService.showUserInfo.set(true);
-    await this.userService.getUserById(selectedUserId as string);
+    await this.userService.getSelectedUserById(selectedUserId as string);
+  }
+
+
+  openUserProfile(event: Event) {
+    event.stopPropagation();
+    this.userService.showProfile.set(true);
+    this.userService.showOverlay.set(true);
   }
 
 }

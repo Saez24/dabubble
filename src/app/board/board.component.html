@@ -76,7 +76,7 @@
         <span>Workspace-Menü öffnen</span>
     </div>
 
-    <div class="userInfoOverlay" *ngIf="this.userService.showUserInfo()">
+    <div class="userInfoOverlay" *ngIf="this.userService.showUserInfo()" (click)="closeUserInfoDialog()">
         <app-user-info-dialog class="profil-details user-info">
         </app-user-info-dialog>
     </div>

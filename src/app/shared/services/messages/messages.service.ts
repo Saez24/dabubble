@@ -101,7 +101,7 @@ export class MessagesService {
 
     }
 
-    async loadMessages(currentUserUid: string | undefined, channelId: string) {
+    async loadMessages(currentUserUid: string | null | undefined, channelId: string) {
         const messagesQuery = this.createMessageQuery(channelId);
 
         onSnapshot(messagesQuery, async (snapshot) => {
@@ -141,7 +141,7 @@ export class MessagesService {
                 const answerMessage = new Message(answerData, this.currentUserUid);
 
                 if (answerMessage.senderID) {
-                    const senderUser = await this.userService.getUserById(answerMessage.senderID);
+                    const senderUser = await this.userService.getSelectedUserById(answerMessage.senderID);
                     answerMessage.senderAvatar = senderUser?.avatarPath || './assets/images/avatars/avatar5.svg';
                 } else {
                     answerMessage.senderAvatar = './assets/images/avatars/avatar5.svg'; // Standard-Avatar
@@ -168,7 +168,7 @@ export class MessagesService {
         );
     }
 
-    private async processSnapshot(snapshot: any, currentUserUid: string | undefined) {
+    private async processSnapshot(snapshot: any, currentUserUid: string | null | undefined) {
         let lastDisplayedDate: string | null = null;
 
         return Promise.all(snapshot.docs.map(async (doc: DocumentSnapshot) => {
@@ -192,7 +192,7 @@ export class MessagesService {
         }));
     }
 
-    private async mapMessageData(doc: DocumentSnapshot, currentUserUid: string | undefined) {
+    private async mapMessageData(doc: DocumentSnapshot, currentUserUid: string | null | undefined) {
         const messageData = doc.data();
 
         // Sicherstellen, dass messageData definiert ist
@@ -205,7 +205,7 @@ export class MessagesService {
         message.isOwnMessage = message.senderID === currentUserUid;
 
         if (message.senderID) {
-            const senderUser = await this.userService.getUserById(message.senderID);
+            const senderUser = await this.userService.getSelectedUserById(message.senderID);
             message.senderAvatar = senderUser?.avatarPath || './assets/images/avatars/avatar5.svg';
         } else {
             message.senderAvatar = './assets/images/avatars/avatar5.svg';
@@ -218,7 +218,7 @@ export class MessagesService {
         return message;
     }
 
-    async loadDirectMessages(currentUserUid: string | undefined, targetUserId: string | undefined) {
+    async loadDirectMessages(currentUserUid: string | undefined, targetUserId: string | null | undefined) {
         if (targetUserId) {
             // Lade den Benutzer basierend auf der targetUserId und setze selectedUser
             this.chatUtilityService.directMessageUser = await this.loadSelectedUser(targetUserId);
@@ -239,10 +239,10 @@ export class MessagesService {
     }
 
     private async loadSelectedUser(targetUserId: string) {
-        return await this.userService.getUserById(targetUserId);
+        return await this.userService.getSelectedUserById(targetUserId);
     }
 
-    private createSentMessagesQuery(messagesRef: any, currentUserUid: string | undefined, targetUserId: string | undefined) {
+    private createSentMessagesQuery(messagesRef: any, currentUserUid: string | undefined, targetUserId: string | null | undefined) {
         return query(
             messagesRef,
             where('senderId', '==', currentUserUid),
@@ -251,7 +251,7 @@ export class MessagesService {
         );
     }
 
-    private createReceivedMessagesQuery(messagesRef: any, currentUserUid: string | undefined, targetUserId: string | undefined) {
+    private createReceivedMessagesQuery(messagesRef: any, currentUserUid: string | undefined, targetUserId: string | null | undefined) {
         return query(
             messagesRef,
             where('receiverId', '==', currentUserUid),
@@ -298,7 +298,7 @@ export class MessagesService {
 
     private async loadSenderAvatar(msg: DirectMessage) {
         if (msg.senderId) {
-            const senderUser = await this.userService.getUserById(msg.senderId);
+            const senderUser = await this.userService.getSelectedUserById(msg.senderId);
             msg.senderAvatar = senderUser?.avatarPath || './assets/images/avatars/avatar5.svg';
         } else {
             msg.senderAvatar = './assets/images/avatars/avatar5.svg';

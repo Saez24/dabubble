@@ -30,19 +30,17 @@ export class UserInfoDialogComponent {
   }
 
 
-  closeUserProfile() {
+  closeUserInfoDialog() {
     this.userService.showUserInfo.set(false);
   }
 
 
-  message(selectedUserId: string | undefined) {
+  message(selectedUserId: string | null | undefined) {
     this.userService.showUserInfo.set(false);
     this.messagesService.loadDirectMessages(this.authService.currentUser()?.id as string, selectedUserId as string);
     this.chatUtilityService.openDirectMessage();
     console.log('selectedUserId', selectedUserId);
     console.log('this.userService.currentUserID', this.authService.currentUser()?.id);
-
-
     this.chatUtilityService.setMessageId(null);
   }
 }

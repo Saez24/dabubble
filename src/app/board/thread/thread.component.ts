@@ -122,7 +122,7 @@ export class ThreadComponent implements OnInit {
     const message = new Message(answer, this.currentUserUid);
 
     if (message.senderID) {
-      const senderUser = await this.userService.getUserById(message.senderID);
+      const senderUser = await this.userService.getSelectedUserById(message.senderID);
       message.senderAvatar = senderUser?.avatarPath || './assets/images/avatars/avatar5.svg';
     } else {
       message.senderAvatar = './assets/images/avatars/avatar5.svg';
