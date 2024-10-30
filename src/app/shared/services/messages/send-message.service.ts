@@ -310,25 +310,27 @@ export class SendMessageService {
   }
 
 
-  async getThreadFromCurrentUser() {
-    const q = query(collection(this.firestore, 'direct_messages'));
+  async getThreadsFromCurrentUser() {
+    const q = query(collection(this.firestore, 'direct_messages'), where('senderID', '==', this.authService.currentUserUid));
     const querySnapshot = await getDocs(q);
-
     querySnapshot.forEach(async (doc) => {
-      const message = doc.data() as DirectMessage;
-
-      for (let index = 0; index < message.conversation.length; index++) {
-        const element = message.conversation[index];
-        if (element.receiverId === this.authService.currentUserUid) {
-          console.log('Empfangen: ', element);
-          this.updateSendernameOfThread(doc.id, 'receiverName');
-        }
-        if (element.senderId === this.authService.currentUserUid) {
-          console.log('Gesendet: ', element);
-          this.updateSendernameOfThread(doc.id, 'senderName');
-        }
-      }
+      const message = doc.data() as Message;
+      console.log('!!!SENT:', message);
+      this.updateSendernameOfThread(doc.id, this.authService.currentUser()?.name as string);
     });
+
+
+    // for (let index = 0; index < message.conversation.length; index++) {
+    //   const element = message.conversation[index];
+    //   if (element.receiverId === this.authService.currentUserUid) {
+    //     console.log('Empfangen: ', element);
+    //     this.updateSendernameOfThread(doc.id, 'receiverName');
+    //   }
+    //   if (element.senderId === this.authService.currentUserUid) {
+    //     console.log('Gesendet: ', element);
+    //     this.updateSendernameOfThread(doc.id, 'senderName');
+    //   }
+    // }
   }
 
 

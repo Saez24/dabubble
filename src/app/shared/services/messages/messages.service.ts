@@ -351,6 +351,22 @@ export class MessagesService {
     }
 
 
+    // async getMessagesFromCurrentUser() {
+    //     const q = query(collection(this.firestore, 'messages'), where('senderID', '==', this.authService.currentUserUid));
+    //     const querySnapshot = await getDocs(q);
+    //     querySnapshot.forEach(async (doc) => {
+    //         const message = doc.data() as Message;
+    //         this.updateSendernameOfMessage(doc.id, this.authService.currentUser()?.name as string);
+
+    //         if (message.answers) {
+    //             const answers = [];
+    //             answers.push(message);
+    //             console.log('!!!SENT:', answers);
+    //         }
+    //     });
+    // }
+
+
     async getMessagesFromCurrentUser() {
         const q = query(collection(this.firestore, 'messages'), where('senderID', '==', this.authService.currentUserUid));
         const querySnapshot = await getDocs(q);
@@ -367,4 +383,10 @@ export class MessagesService {
         const messageRef = doc(this.firestore, 'messages', messageId);
         updateDoc(messageRef, { senderName: senderName });
     }
+
+
+    // updateSendernameOfAnswer(messageId: string, senderName: string, answerIndex: number) {
+    //     const messageRef = doc(this.firestore, 'messages', messageId);
+
+    // }
 }

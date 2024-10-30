@@ -82,7 +82,7 @@ export class ProfileEditorDialogComponent {
 
 
   updateCurrentUserThreads() {
-    this.threadService.getThreadFromCurrentUser();
+    this.threadService.getThreadsFromCurrentUser();
   }
 
 
