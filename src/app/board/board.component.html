@@ -57,13 +57,14 @@
                         <app-direct-message [selectedUser]="chatUtilityService.directMessageUser"></app-direct-message>
                     </ng-container>
                 </mat-card-content>
-            </mat-card>
-            <mat-card class="thread-container" appearance="outlined" *ngIf="showThreadComponent">
-                <mat-card-content>
-                    <app-thread [selectedMessage]="selectedMessage" (closeThreadEvent)="closeThread()"></app-thread>
-                </mat-card-content>
-            </mat-card>
+            </mat-card> 
         </div>
+            <mat-drawer class="thread-drawer" #threadDrawer mode="side" position="end" [opened]="showThreadComponent">
+                <mat-card class="thread-container" appearance="outlined">
+                    <app-thread [selectedMessage]="selectedMessage" (closeThreadEvent)="closeThread()"></app-thread>
+                </mat-card>
+            </mat-drawer>
+
     </mat-drawer-container>
     <div class="navigation-toggle-btn" (click)="toggleWorkspace()"
         [ngStyle]="{ 'display': workspaceOpen ? 'flex' : 'none' }">
