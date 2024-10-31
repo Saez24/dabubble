@@ -59,10 +59,10 @@
                 </mat-card-content>
             </mat-card> 
         </div>
-            <mat-drawer class="thread-drawer" #threadDrawer mode="side" position="end" [opened]="showThreadComponent">
-                <mat-card class="thread-container" appearance="outlined">
+            <mat-drawer class="thread-drawer" mode="side" position="end" [opened]="showThreadComponent">
+                <mat-card-content appearance="outlined">
                     <app-thread [selectedMessage]="selectedMessage" (closeThreadEvent)="closeThread()"></app-thread>
-                </mat-card>
+                </mat-card-content>
             </mat-drawer>
 
     </mat-drawer-container>
