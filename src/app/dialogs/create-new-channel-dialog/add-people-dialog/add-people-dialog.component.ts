@@ -173,6 +173,7 @@ getMemberUids(): string[] {
   let memberUids: (string | null)[];
 
   if (this.selectedValue === 'addAll') {
+      this.selectedUsers = [...this.users];
       memberUids = this.users.map(user => user.id);
   } else if (this.selectedValue === 'specific') {
       memberUids = this.selectedUsers.map(selectedUser => selectedUser.id);

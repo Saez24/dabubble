@@ -14,6 +14,7 @@ import { User } from '../../shared/models/user.class';
 import { MessagesService } from '../../shared/services/messages/messages.service';
 import { AuthService } from '../../shared/services/authentication/auth-service/auth.service';
 import { ChatUtilityService } from '../../shared/services/messages/chat-utility.service';
+import { Overlay } from '@angular/cdk/overlay';
 
 @Component({
   selector: 'app-workspace',
@@ -58,7 +59,8 @@ export class WorkspaceComponent implements OnInit {
     private firestore: Firestore,
     private auth: Auth,
     private messagesService: MessagesService,
-    private chatUtilityService: ChatUtilityService
+    private chatUtilityService: ChatUtilityService,
+    private overlay: Overlay
   ) {
   }
 
@@ -131,7 +133,11 @@ export class WorkspaceComponent implements OnInit {
 
   // helper method to toggle the clickContainer method
   openDialog() {
-    this.dialog.open(CreateNewChannelDialog)
+    this.dialog.open(CreateNewChannelDialog, {
+      disableClose: false,
+      hasBackdrop: true,
+      scrollStrategy: this.overlay.scrollStrategies.noop()
+    });
   }
 
   clickUserContainer(user: User, i: number) {

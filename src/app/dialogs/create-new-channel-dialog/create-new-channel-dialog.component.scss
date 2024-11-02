@@ -1,5 +1,11 @@
 @import '../../../mixin.scss';
 
+.cdk-global-scrollblock{
+    position: static !important;
+    width: initial !important;
+    overflow-y: inherit !important;
+}
+
 .dialog-content {
     padding: 40px;
     background-color: white;
