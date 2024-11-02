@@ -39,7 +39,10 @@
                         <div (click)="showThread(message)" class="reaction-icon"><mat-icon
                                 fontIcon="comment"></mat-icon></div>
                     </div>
-                    <span class="sender-name">{{ message.senderName }}
+                    <span class="message-infos-sender">
+                        <span class="sender-name" (click)="this.getSelectedUserInfo(message.senderID)">
+                            {{message.senderName }}
+                        </span>
                         <span class="message-time">{{ message.formattedTimestamp }}</span>
                     </span>
                     <span class="message-recieved">{{ message.message }}
@@ -59,7 +62,7 @@
                         class="answers-block">
                         {{ message.answers.length }} Antworten
                         <span class="message-time">Letzte Antwort
-                            <span class="message-time">14:25</span>
+                            <span class="message-time">{{ message.lastAnswer }}</span>
                         </span>
                     </span>
 
@@ -86,9 +89,15 @@
                             </div>
                         </div>
 
-                        <span class="my-name">{{ message.senderName }} <span class="message-time">{{
+                        <span class="message-infos-reciever">
+                            <span class="my-name" (click)="openUserProfile($event)">
+                                {{ message.senderName }}
+                            </span>
+                            <span class="message-time">{{
                                 message.formattedTimestamp }}
-                                Uhr</span></span>
+                                Uhr
+                            </span>
+                        </span>
                         <span class="chat-message-sender">{{ message.message }}
                             <!-- Bildvorschau für URLs, die Bilddateien sind -->
                             <a *ngIf="isImageFile(message.fileURL)" [href]="message.fileURL" target="_blank">

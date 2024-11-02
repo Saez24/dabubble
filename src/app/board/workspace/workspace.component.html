@@ -69,7 +69,7 @@
                             <div *ngFor="let user of users; let i = index" (click)="clickUserContainer(user, i)"
                                 [ngClass]="channelsService.clickedUsers[i] ? 'clicked' : ''">
                                 <div>
-                                    <img [src]="user.avatarPath" alt="Avatar Image">
+                                    <img class="user-avatar" [src]="user.avatarPath" alt="Avatar Image">
                                     <div [ngStyle]="{ 'background': users[i].loginState === 'loggedIn' ? '#92C83E' : '#686868' }"
                                         class="status"></div>
                                 </div>

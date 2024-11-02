@@ -1,7 +1,7 @@
 type loginState = 'loggedIn' | 'loggedOut' | 'inactive';
 
 export class User {
-    id: string;
+    id: string | null;
     email: string | null;
     name: string;
     avatarPath: string | null;
@@ -13,7 +13,7 @@ export class User {
         this.email = obj ? obj.email : null;
         this.name = obj ? obj.name : null;
         this.avatarPath = obj ? obj.avatarPath : null;
-        this.loginState = obj ? obj.loginStatus : 'loggedOut';
+        this.loginState = obj ? obj.loginState : 'loggedOut';
         this.channels = obj ? obj.channels : null;
     }
 }

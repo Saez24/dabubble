@@ -4,6 +4,7 @@ import { AuthService } from '../../shared/services/authentication/auth-service/a
 import { UserService } from '../../shared/services/firestore/user-service/user.service';
 import { MessagesService } from '../../shared/services/messages/messages.service';
 import { ChannelsService } from '../../shared/services/channels/channels.service';
+import { SendMessageService } from '../../shared/services/messages/send-message.service';
 import { User } from '../../shared/models/user.class';
 
 @Component({
@@ -25,6 +26,7 @@ export class ProfileEditorDialogComponent {
   userService = inject(UserService);
   messagesService = inject(MessagesService);
   channelsService = inject(ChannelsService);
+  threadService = inject(SendMessageService);
 
 
   constructor() {
@@ -50,6 +52,7 @@ export class ProfileEditorDialogComponent {
         await this.authService.updateUserProfile({ displayName: this.fullname, photoURL: this.avatarPath });
         this.updateCurrentUserMessages();
         this.updateCurrentUserChannels();
+        this.updateCurrentUserThreads();
         if (this.mail !== this.authService.currentUser()?.email) {
           // check if email is used
           await this.authService.updateEmail(this.mail!);
@@ -75,6 +78,11 @@ export class ProfileEditorDialogComponent {
 
   updateCurrentUserChannels() {
     this.channelsService.getChannelsFromCurrentUser();
+  }
+
+
+  updateCurrentUserThreads() {
+    this.threadService.getThreadsFromCurrentUser();
   }
 
 

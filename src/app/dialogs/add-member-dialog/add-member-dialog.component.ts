@@ -146,7 +146,7 @@ export class AddMemberDialogComponent implements OnInit {
 //   }
 // }
 
-  deleteUser(userId: string) {
+  deleteUser(userId: string | null) {
     if (userId) {
       let userToDelete = this.selectedUsers.find(user => user.id === userId);
       this.selectedUsers = this.selectedUsers.filter(user => user.id !== userId);

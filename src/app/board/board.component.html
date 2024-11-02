@@ -27,10 +27,10 @@
                         <div class="profil-menu-links" (click)="openUserProfile($event)">Profil</div>
                         <div class="profil-menu-links" (click)="authService.logout()">Log Out</div>
                     </div>
-                    <app-profile-dialog class="profil-details"
-                        *ngIf="this.userService.showProfile()"></app-profile-dialog>
-                    <app-profile-editor-dialog class="profil-editor"
-                        *ngIf="this.userService.showProfileEditor()"></app-profile-editor-dialog>
+                    <app-profile-dialog class="profil-details" *ngIf="this.userService.showProfile()">
+                    </app-profile-dialog>
+                    <app-profile-editor-dialog class="profil-editor" *ngIf="this.userService.showProfileEditor()">
+                    </app-profile-editor-dialog>
                 </div>
             </div>
         </div>
@@ -57,13 +57,14 @@
                         <app-direct-message [selectedUser]="chatUtilityService.directMessageUser"></app-direct-message>
                     </ng-container>
                 </mat-card-content>
-            </mat-card>
-            <mat-card class="thread-container" appearance="outlined" *ngIf="showThreadComponent">
-                <mat-card-content>
+            </mat-card> 
+        </div>
+            <mat-drawer class="thread-drawer" mode="side" position="end" [opened]="showThreadComponent">
+                <mat-card-content appearance="outlined">
                     <app-thread [selectedMessage]="selectedMessage" (closeThreadEvent)="closeThread()"></app-thread>
                 </mat-card-content>
-            </mat-card>
-        </div>
+            </mat-drawer>
+
     </mat-drawer-container>
     <div class="navigation-toggle-btn" (click)="toggleWorkspace()"
         [ngStyle]="{ 'display': workspaceOpen ? 'flex' : 'none' }">
@@ -75,4 +76,10 @@
         <mat-icon class="icon" svgIcon="open-menu" aria-hidden="false" aria-label="Workspace icon"></mat-icon>
         <span>Workspace-Menü öffnen</span>
     </div>
+
+    <div class="userInfoOverlay" *ngIf="this.userService.showUserInfo()" (click)="closeUserInfoDialog()">
+        <app-user-info-dialog class="profil-details user-info">
+        </app-user-info-dialog>
+    </div>
+
 </div>

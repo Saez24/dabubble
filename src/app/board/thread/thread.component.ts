@@ -1,9 +1,6 @@
-
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, SimpleChanges, ViewChild, ViewEncapsulation } from '@angular/core';
-import { MatCardModule } from '@angular/material/card';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, HostListener, Input, OnInit, Output, SimpleChanges, ViewEncapsulation } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatDividerModule } from '@angular/material/divider';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule } from '@angular/forms';
@@ -11,7 +8,7 @@ import { CommonModule, NgFor, NgIf } from '@angular/common';
 import { PickerComponent } from '@ctrl/ngx-emoji-mart';
 import { Message } from '../../shared/models/message.class';
 import { User } from '../../shared/models/user.class';
-import { addDoc, collection, doc, Firestore, onSnapshot, updateDoc } from '@angular/fire/firestore';
+import { collection, doc, Firestore, onSnapshot, updateDoc } from '@angular/fire/firestore';
 import { Auth } from '@angular/fire/auth';
 import { UserService } from '../../shared/services/firestore/user-service/user.service';
 import { AuthService } from '../../shared/services/authentication/auth-service/auth.service';
@@ -20,40 +17,50 @@ import { SafeUrlPipe } from '../../shared/pipes/safe-url.pipe';
 import { arrayUnion, getDoc } from 'firebase/firestore';
 import { ChannelsService } from '../../shared/services/channels/channels.service';
 import { Channel } from '../../shared/models/channel.class';
+import { SendMessageService } from '../../shared/services/messages/send-message.service';
+import { ThreadMessagesComponent } from './thread-messages/thread-messages.component';
 
 @Component({
   selector: 'app-thread',
   standalone: true,
-  imports: [MatCardModule, MatButtonModule, MatIconModule, MatDividerModule, FormsModule,
-    MatFormFieldModule, MatInputModule, CommonModule, PickerComponent, NgIf, NgFor, SafeUrlPipe],
+  imports: [
+    CommonModule,
+    FormsModule,
+    MatIconModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    PickerComponent,
+    NgIf,
+    NgFor,
+    SafeUrlPipe,
+    ThreadMessagesComponent
+  ],
   templateUrl: './thread.component.html',
   styleUrl: './thread.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None
 })
+
 export class ThreadComponent implements OnInit {
+  @Output() closeThreadEvent = new EventEmitter<void>();
+  @Input() selectedMessage: Message | null = null;
+
   messages: Message[] = [];
   users: User[] = [];
   channels: Channel[] = [];
   currentUser = this.authService.getUserSignal();
-  showEmojiPicker = false;
-  showMessageEdit = false;
-  showMessageEditArea = false;
-  threadMessage = '';
   currentUserUid: string | null = null;
-  editingMessageId: string | null = null;
+  showEmojiPicker = false;
+  typedMessage = '';
   senderAvatar: string | null = null;
   senderName: string | null = null;
   selectedFile: File | null = null;
   filePreviewUrl: string | null = null;
-  @Input() selectedMessage: Message | null = null;
-  reactions: { emoji: string, senderName: string, count: number }[] = [];
   selectedMessageId: string | null = null;
-  originalMessage: string | null = null; // Ursprüngliche Nachricht speichern
 
+  constructor(private firestore: Firestore, private auth: Auth, private userService: UserService, private cd: ChangeDetectorRef, private authService: AuthService, private uploadFileService: UploadFileService, public channelsService: ChannelsService, public sendMessageService: SendMessageService) { }
 
-  @ViewChild('cthreadWindow') private threadWindow!: ElementRef;
-  constructor(private firestore: Firestore, private auth: Auth, private userService: UserService, private cd: ChangeDetectorRef, private authService: AuthService, private uploadFileService: UploadFileService, public channelsService: ChannelsService) { }
   ngOnInit() {
     this.getCurrentUser();
     this.loadMessages();
@@ -65,367 +72,114 @@ export class ThreadComponent implements OnInit {
     }
   }
 
-  @Output() closeThreadEvent = new EventEmitter<void>();
   closeThread() {
     this.closeThreadEvent.emit();
   }
 
   getCurrentUser() {
     const userId = this.currentUser()?.id;
-    console.log('Current User Id: ', userId);
-    console.log('Current User Avatar: ', this.currentUser()?.avatarPath);
     if (userId) {
-      this.currentUserUid = userId;  // Speichere die aktuelle Benutzer-ID
+      this.currentUserUid = userId;
       this.loadUserData(this.currentUserUid);
-    } else {
-      console.log('Kein Benutzer angemeldet');
     }
   }
 
   loadUserData(uid: string | null) {
     if (!uid) return;
-
     const userDocRef = doc(this.firestore, `users/${uid}`);
     onSnapshot(userDocRef, (doc) => {
       if (doc.exists()) {
         const data = doc.data() as { name: string; avatarPath: string; };
-        this.senderName = data.name; // Sendername setzen
+        this.senderName = data.name;
         this.senderAvatar = data.avatarPath;
-      } else {
-        console.log('Kein Benutzerdokument gefunden');
       }
     });
   }
 
-  showMessageEditToggle() {
-    this.showMessageEdit = !this.showMessageEdit;
-  }
-
-  editMessage(docId: string, message: Message) {
-    this.editingMessageId = docId;
-    this.originalMessage = message.message;
-    this.showMessageEditArea = true;
-    this.showMessageEdit = false;
-  }
-
-  async saveMessage(message: Message) {
-    if (this.editingMessageId && this.selectedMessage) {
-      const messageRef = doc(this.firestore, `messages/${this.selectedMessage.messageId}`);
-      const docSnap = await getDoc(messageRef);
-
-      if (docSnap.exists()) {
-        const mainMessage = docSnap.data();
-        const answers = mainMessage['answers'] || [];
-        const answerToUpdate = answers.find((answer: any) => answer.messageId === this.editingMessageId);
-
-        if (answerToUpdate) {
-          answerToUpdate.message = message.message;
-          await updateDoc(messageRef, { answers });
-          console.log('Antwort erfolgreich aktualisiert');
-          this.resetEditState();
-          this.cd.detectChanges(); 
-        } else {
-          console.error('Antwort nicht gefunden');
-        }
-      } else {
-        console.error('Hauptnachricht nicht gefunden');
-      }
-    }
-  }
-
-  cancelMessageEdit(message: Message) {
-    // Nachricht auf den ursprünglichen Wert zurücksetzen
-    if (this.originalMessage !== null) {
-      message.message = this.originalMessage;
-    }
-    this.resetEditState();
-  }
-
-  resetEditState() {
-    this.editingMessageId = null;
-    this.showMessageEditArea = false;
-    this.originalMessage = null;
-  }
-
-  isEditing(docId: string): boolean {
-    return this.editingMessageId === docId;
-  }
-
-  showEmoji(messageId: string) {
-    this.selectedMessageId = messageId;
-    this.showEmojiPicker = true;
-  }
-
-  addEmoji(event: any) {
-    const emoji = event.emoji.native;
-
-    // Überprüfen, ob eine Nachricht bearbeitet wird
-    if (this.selectedMessageId && this.isEditing(this.selectedMessageId)) {
-      // Nachricht finden, die bearbeitet wird
-      const messageToUpdate = this.messages.find(
-        (msg) => msg.messageId === this.selectedMessageId
-      );
-
-      if (messageToUpdate) {
-        // Emoji in das bearbeitete Textfeld einfügen
-        messageToUpdate.message += emoji;
-      } else {
-        console.error('Zu bearbeitende Nachricht nicht gefunden.');
-      }
-    } else if (this.selectedMessageId !== this.threadMessage) {
-      const messageToUpdate = this.findMessageToUpdate();
-
-      if (!messageToUpdate) {
-        console.error('Nachricht nicht gefunden oder keine gültige Nachricht ausgewählt.');
-        return;
-      }
-      this.addOrUpdateReaction(messageToUpdate, emoji);
-      this.updateMessageReactions(messageToUpdate);
-
-    } else {
-      this.threadMessage += emoji;
-    }
-    this.showEmojiPicker = false;
-  }
-
-  private findMessageToUpdate(): Message | null {
-    let messageToUpdate = this.messages.find(msg => msg.messageId === this.selectedMessageId) || null;
-    if (!messageToUpdate) {
-      messageToUpdate = this.selectedMessage || null;
-    }
-    return messageToUpdate;
-  }
-
-  addOrUpdateReaction(message: Message, emoji: string): void {
-    this.selectedMessageId = message.messageId;
-  
-    // Stelle sicher, dass senderName niemals null ist
-    const senderName = this.senderName || '';
-  
-    // Suche nach der Reaktion mit dem gleichen Emoji
-    const emojiReaction = message.reactions.find(r => r.emoji === emoji);
-  
-    if (emojiReaction) {
-      // Überprüfe, ob der aktuelle Benutzer bereits auf dieses Emoji reagiert hat
-      const senderNames = emojiReaction.senderName.split(', ');
-      const currentUserIndex = senderNames.indexOf(senderName);
-  
-      if (currentUserIndex > -1) {
-        // Benutzer hat bereits reagiert - Reaktion entfernen
-        senderNames.splice(currentUserIndex, 1); // Benutzer aus der Liste entfernen
-        emojiReaction.count -= 1; // Zähler verringern
-  
-        if (emojiReaction.count === 0) {
-          // Wenn der Zähler auf 0 fällt, die gesamte Reaktion entfernen
-          const emojiIndex = message.reactions.indexOf(emojiReaction);
-          message.reactions.splice(emojiIndex, 1);
-        } else {
-          // Aktualisiere die Liste der Namen
-          emojiReaction.senderName = senderNames.join(', ');
-        }
-  
-        console.log('Reaktion entfernt:', message.reactions);
-      } else {
-        // Benutzer hat noch nicht reagiert - Reaktion hinzufügen
-        emojiReaction.count += 1;
-        emojiReaction.senderName += (emojiReaction.senderName ? ', ' : '') + senderName;
-      }
-    } else {
-      // Neue Reaktion hinzufügen
-      message.reactions.push({
-        emoji: emoji,
-        senderName: senderName,
-        count: 1
-      });
-    }
-  
-    console.log('Aktualisierte Reaktionen:', message.reactions);
-    this.updateMessageReactions(message);
-  }
-  
-
-
-formatSenderNames(senderNames: string): string {
-  const senderNameList = senderNames.split(', ');
-  const currentUser = this.senderName || '';
-
-  // Wenn der aktuelle Nutzer unter den Sendern ist, "Du" hinzufügen
-  const formattedNames = senderNameList.map(name => name === currentUser ? 'Du' : name);
-  
-  // Wenn mehrere Namen vorhanden sind, füge sie korrekt zusammen (mit "und")
-  if (formattedNames.length > 1) {
-    const lastSender = formattedNames.pop();
-    return formattedNames.join(', ') + ' und ' + lastSender;
-  }
-
-  // Falls nur ein Name vorhanden ist
-  return formattedNames[0];
-}
-
-getReactionVerb(senderNames: string): string {
-  const senderNameList = senderNames.split(', ');
-  const currentUser = this.senderName || '';
-  const formattedNames = senderNameList.map(name => name === currentUser ? 'Du' : name);
-
-  // Wenn nur "Du" vorhanden ist, verwende "hast"
-  if (formattedNames.length === 1 && formattedNames[0] === 'Du') {
-    return 'hast reagiert';
-  }
-
-  // Wenn nur ein anderer Name vorhanden ist, verwende "hat"
-  if (formattedNames.length === 1) {
-    return 'hat reagiert';
-  }
-
-  // Andernfalls verwende "haben"
-  return 'haben reagiert';
-}
-
-
-  async updateMessageReactions(message: Message) {
-    if (!this.selectedMessageId) {
-      console.error('Fehlende selectedMessageId.');
+  async loadMessages() {
+    if (!this.selectedMessage) {
+      this.messages = [];
       return;
     }
 
-    try {
-      const messageRef = doc(this.firestore, `messages/${this.selectedMessage?.messageId}`);
-      const docSnap = await getDoc(messageRef);
+    const messageRef = doc(this.firestore, 'messages', this.selectedMessage.messageId);
+    const messageSnap = await getDoc(messageRef);
 
-      if (docSnap.exists()) {
-        const mainMessage = docSnap.data();
-        if (this.isMainMessage()) {
-          await this.updateMainMessageReactions(message, mainMessage, messageRef);
-        } else {
-          await this.updateAnswerMessageReactions(message, mainMessage, messageRef);
-        }
-      } else {
-        console.error('Hauptnachricht nicht gefunden.');
-      }
-    } catch (error) {
-      console.error("Fehler beim Aktualisieren der Reaktionen: ", error);
+    if (messageSnap.exists()) {
+      const selectedMessageData = messageSnap.data();
+      const answers = selectedMessageData['answers'] || [];
+      this.selectedMessage.isOwnMessage = this.selectedMessage.senderID === this.currentUserUid;
+
+      this.messages = await Promise.all(
+        answers.map((answer: any) => this.checkLoadMessagesDetails(answer))
+      );
+
+      this.cd.detectChanges();
     }
   }
 
-  /**
-   * Prüft, ob die zu aktualisierende Nachricht die Hauptnachricht ist.
-   */
-  isMainMessage(): boolean {
-    return this.selectedMessageId === this.selectedMessage?.messageId;
-  }
+  private async checkLoadMessagesDetails(answer: any): Promise<Message> {
+    const message = new Message(answer, this.currentUserUid);
 
-  /**
-   * Aktualisiert die Reaktionen einer Hauptnachricht.
-   */
-  async updateMainMessageReactions(message: Message, mainMessage: any, messageRef: any) {
-    mainMessage['reactions'] = message.reactions;
-
-    await updateDoc(messageRef, {
-      reactions: mainMessage['reactions']
-    });
-    console.log('Reaktionen der Hauptnachricht erfolgreich aktualisiert');
-  }
-
-  /**
-   * Aktualisiert die Reaktionen einer Antwortnachricht im answers Array.
-   */
-  async updateAnswerMessageReactions(message: Message, mainMessage: any, messageRef: any) {
-    const answers = mainMessage['answers'] || [];
-    const answerToUpdate = answers.find((answer: any) => answer.messageId === this.selectedMessageId);
-
-    if (answerToUpdate) {
-      answerToUpdate['reactions'] = message.reactions;
-
-      await updateDoc(messageRef, {
-        answers: answers
-      });
-      console.log('Reaktionen der Antwort erfolgreich aktualisiert');
+    if (message.senderID) {
+      const senderUser = await this.userService.getSelectedUserById(message.senderID);
+      message.senderAvatar = senderUser?.avatarPath || './assets/images/avatars/avatar5.svg';
     } else {
-      console.error('Keine passende Antwort gefunden, um die Reaktionen zu aktualisieren.');
+      message.senderAvatar = './assets/images/avatars/avatar5.svg';
     }
-  }
 
-  @HostListener('document:click', ['$event'])
-  clickOutside(event: Event) {
-    const target = event.target as HTMLElement;
+    const messageDate = new Date(answer.timestamp.seconds * 1000);
+    message.formattedTimestamp = messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-    if (this.showEmojiPicker) {
-      if (!target.closest('.emoji-box') && !target.closest('.message-icon') && !target.closest('.thread-message-icon')&& !target.closest('.emoji-btn')) {
-        console.log('Closing emoji picker');
-        this.showEmojiPicker = false;
-      } else {
-        console.log('Clicked inside emoji box or icon');
-      }
-    }
-  }
-
-  @Output() showThreadEvent = new EventEmitter<Message>();
-  showThread(message: Message) {
-    this.showThreadEvent.emit(message);
-  }
-
-  showError() {
-    console.error("Kein Kanal ausgewählt.");
+    return message;
   }
 
   async sendMessage() {
-    if (this.threadMessage.trim() || this.selectedFile) {
+    if (this.typedMessage.trim() || this.selectedFile) {
       const currentUser = this.authService.currentUser;
 
       if (currentUser()) {
         const newMessageId = doc(collection(this.firestore, 'messages')).id;
-        // Prüfe, ob es sich um eine Antwort handelt
         const newMessage: Message = new Message({
           senderID: this.currentUserUid,
-          senderNames: this.senderName,
-          message: this.threadMessage,
-          reactions: [], // Leeres Array für Reaktionen
+          senderName: this.senderName,
+          message: this.typedMessage,
+          reactions: [],
           parentMessageId: this.selectedMessage ? this.selectedMessage.messageId : null,
           fileURL: '',
           messageId: newMessageId
         });
 
         if (this.selectedMessage) {
-          // Speichere die Antwort im answers-Array der ausgewählten Nachricht
-          await this.saveMessageToDatabase(newMessage, this.selectedMessage);
-        } else {
-          // Ansonsten erstelle eine neue Nachricht in der messages-Sammlung
-          const messagesRef = collection(this.firestore, 'messages');
-          const messageDocRef = await addDoc(messagesRef, {
-            senderID: newMessage.senderID,
-            senderName: newMessage.senderName,
-            message: newMessage.message,
-            reactions: newMessage.reactions, // Füge leeres Array hinzu
-            parentMessageId: newMessage.parentMessageId,
-            timestamp: new Date(),
-          });
-
-          // Datei-Upload, falls vorhanden
-          if (this.selectedFile && this.currentUserUid) {
-            try {
-              const fileURL = await this.uploadFileService.uploadFileWithIds(this.selectedFile, this.currentUserUid, messageDocRef.id);
-              newMessage.fileURL = fileURL;
-              await updateDoc(messageDocRef, { fileURL: newMessage.fileURL });
-            } catch (error) {
-              console.error('Datei-Upload fehlgeschlagen:', error);
-            }
-          }
+          await this.uploadMessage(newMessage, this.selectedMessage);
         }
 
-        // Leere das Eingabefeld und setze die ausgewählte Datei zurück
-        this.threadMessage = '';
+        await this.handleFileUpload(newMessage, newMessageId);
+
+        this.typedMessage = '';
         this.selectedFile = null;
         this.loadMessages();
-        this.scrollToBottom();
-        this.deleteUpload();
+        this.sendMessageService.scrollToBottom();
+        this.sendMessageService.deleteUpload();
       } else {
         console.error('Kein Benutzer angemeldet');
       }
     }
   }
 
+  private async handleFileUpload(newMessage: Message, newMessageId: string) {
+    if (this.selectedFile && this.currentUserUid) {
+      try {
+        const fileURL = await this.uploadFileService.uploadFileWithIds(this.selectedFile, this.currentUserUid, newMessageId);
+        newMessage.fileURL = fileURL;
+        await updateDoc(doc(this.firestore, 'messages', newMessageId), { fileURL: newMessage.fileURL });
+      } catch (error) {
+        console.error('Datei-Upload fehlgeschlagen:', error);
+      }
+    }
+  }
 
-  async saveMessageToDatabase(message: Message, selectedMessage: Message) {
+  async uploadMessage(message: Message, selectedMessage: Message) {
     const messageRef = doc(this.firestore, 'messages', selectedMessage.messageId);
 
     await updateDoc(messageRef, {
@@ -440,129 +194,25 @@ getReactionVerb(senderNames: string): string {
     });
   }
 
-  async loadMessages() {
-    if (!this.selectedMessage) {
-      this.messages = []; // Wenn keine Nachricht ausgewählt ist, leere die Nachrichten
-      return;
-    }
-
-    const messageRef = doc(this.firestore, 'messages', this.selectedMessage.messageId);
-    const messageSnap = await getDoc(messageRef);
-
-    if (messageSnap.exists()) {
-      const selectedMessageData = messageSnap.data();
-      const answers = selectedMessageData['answers'] || []; // Verwende Index-Signatur für den Zugriff
-
-      // Bestimme, ob die ausgewählte Nachricht eine eigene Nachricht ist
-      this.selectedMessage.isOwnMessage = this.selectedMessage.senderID === this.currentUserUid;
-
-      // Lade nur die Nachrichten, die im answers-Array sind
-      this.messages = await Promise.all(answers.map(async (answer: any) => {
-        const message = new Message(answer, this.currentUserUid);
-
-        if (message.senderID) {
-          const senderUser = await this.userService.getUserById(message.senderID);
-          message.senderAvatar = senderUser?.avatarPath || './assets/images/avatars/avatar5.svg';
-        } else {
-          message.senderAvatar = './assets/images/avatars/avatar5.svg'; // Standard-Avatar
-        }
-
-        const messageDate = new Date(answer.timestamp.seconds * 1000);
-        message.formattedTimestamp = messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-        return message;
-      }));
-
-      this.cd.detectChanges();
-      this.scrollToBottom();
-    } else {
-      console.error('Ausgewählte Nachricht existiert nicht');
-    }
+  showEmoji(messageId: string) {
+    this.selectedMessageId = messageId;
+    this.showEmojiPicker = true;
   }
 
-  scrollToBottom(): void {
-    if (this.threadWindow) {
-      try {
-        this.threadWindow.nativeElement.scrollTop = this.threadWindow.nativeElement.scrollHeight;
-      } catch (err) {
-        console.error('Scroll to bottom failed:', err);
+  addEmoji(event: any): void {
+    const emoji = event.emoji.native;
+    this.typedMessage += emoji;
+    this.showEmojiPicker = false;
+  }
+
+  @HostListener('document:click', ['$event'])
+  clickOutside(event: Event) {
+    const target = event.target as HTMLElement;
+
+    if (this.showEmojiPicker) {
+      if (!target.closest('.thread-message-icon')) {
+        this.showEmojiPicker = false;
       }
     }
-  }
-
-  formatTimestamp(messageDate: Date): string {
-    const today = new Date();
-    const yesterday = new Date();
-    yesterday.setDate(today.getDate() - 1);
-
-    const isToday = messageDate.toDateString() === today.toDateString();
-    const isYesterday = messageDate.toDateString() === yesterday.toDateString();
-
-    if (isToday) {
-      return 'Heute'; // Wenn die Nachricht von heute ist
-    } else if (isYesterday) {
-      return 'Gestern'; // Wenn die Nachricht von gestern ist
-    } else {
-      // Format "13. September"
-      return messageDate.toLocaleDateString('de-DE', { day: 'numeric', month: 'long' });
-    }
-  }
-
-  onFileSelected(event: Event) {
-    const fileInput = event.target as HTMLInputElement;
-    const file = fileInput.files?.[0];
-
-    if (file) {
-      this.selectedFile = file; // Speichere die ausgewählte Datei
-
-      // Datei als base64 speichern, um sie im localStorage zu speichern
-      const reader = new FileReader();
-      reader.onload = () => {
-        const fileData = reader.result as string;
-        this.filePreviewUrl = fileData; // Speichere die Vorschau-URL für die Datei
-        localStorage.setItem('selectedFile', JSON.stringify({ fileName: file.name, fileData }));
-        console.log('File saved to localStorage');
-      };
-      reader.readAsDataURL(file);
-    } else {
-      console.error('No file selected');
-    }
-  }
-
-  deleteUpload() {
-    this.selectedFile = null;
-    this.filePreviewUrl = null;
-    localStorage.removeItem('selectedFile');
-  }
-
-  // Trigger für verstecktes File-Input
-  triggerFileInput() {
-    const fileInput = document.getElementById('fileInput') as HTMLInputElement;
-    fileInput.click();
-  }
-
-  isImageFile(fileURL: string | null): boolean {
-    if (!fileURL) return false;
-
-    // Extrahiere die Datei-Informationen aus der Firebase-URL und prüfe den Dateinamen
-    const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp'];
-    const url = new URL(fileURL);
-    const fileName = url.pathname.split('/').pop(); // Hole den Dateinamen aus dem Pfad
-
-    if (!fileName) return false;
-
-    // Prüfe, ob der Dateiname mit einem der Bildformate endet
-    const fileExtension = fileName.split('.').pop()?.toLowerCase();
-    return imageExtensions.includes(fileExtension || '');
-  }
-
-  getFileNameFromURL(url: string | null): string {
-    if (!url) {
-      return 'Datei'; // Fallback, falls die URL null ist
-    }
-
-    const decodedUrl = decodeURIComponent(url);
-    const fileName = decodedUrl.split('?')[0].split('/').pop();
-    return fileName || 'Datei'; // Wenn kein Dateiname gefunden wird, 'Datei' als Fallback anzeigen
   }
 }

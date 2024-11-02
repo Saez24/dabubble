@@ -170,7 +170,7 @@ async updateUserChannels(userId: string, channelName: string) {
 
 // Only the id of the users is pushed to the firestore
 getMemberUids(): string[] {
-  let memberUids: string[];
+  let memberUids: (string | null)[];
 
   if (this.selectedValue === 'addAll') {
       memberUids = this.users.map(user => user.id);
@@ -180,7 +180,8 @@ getMemberUids(): string[] {
       memberUids = [];
   }
 
-  return memberUids;
+    // Filter out null values
+    return memberUids.filter((uid): uid is string => uid !== null);
 }
 
 
@@ -201,7 +202,7 @@ getMemberUids(): string[] {
     this.userSelected = !this.userSelected;
   }
 
-  deleteUser(userId: string) {
+  deleteUser(userId: string | null) {
   if (userId) {
     let userToDelete = this.selectedUsers.find(user => user.id === userId);
     this.selectedUsers = this.selectedUsers.filter(user => user.id !== userId);

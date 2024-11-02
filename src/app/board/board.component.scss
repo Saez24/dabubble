@@ -116,6 +116,24 @@ header {
     cursor: auto;
 }
 
+.userInfoOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    background-color: #00000033;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.user-info {
+    background-color: #fff;
+    border-radius: 30px;
+}
+
 .profile-menu {
     position: absolute;
     top: 148px;
@@ -156,7 +174,8 @@ header {
     }
 }
 
-.profil-details, .profil-editor {
+.profil-details,
+.profil-editor {
     padding: 45px 40px;
 }
 
@@ -234,8 +253,6 @@ mat-toolbar-row {
     color: rgb(229, 232, 233);
 }
 
-
-
 .mat-expansion-panel-header-description {
     font-weight: 400;
 }
@@ -274,7 +291,12 @@ mat-toolbar-row {
     margin: 0 16px;
 }
 
-.thread-container {
+.thread-drawer {
     min-width: 485px;
     width: 485px;
+
+    .mat-drawer-inner-container {
+        height: -webkit-fill-available !important;
+        overflow: hidden !important;
+    }
 }

@@ -91,6 +91,9 @@
     gap: 15px;
 
     >span {
+        display: flex;
+        align-items: center;
+        justify-content: center;
         gap: 16px;
         color: #92C83E;
         font-size: 20px;
@@ -135,100 +138,29 @@
     }
 }
 
-form {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 20px;
-}
-
-.input-container {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 7px;
-    width: 100%;
-
-    label {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 16px;
-        font-size: 20px;
-        font-weight: 700;
-
-        >img {
-            width: 30px;
-            height: 30px;
-
-        }
-    }
-
-    input {
-        width: 100%;
-        border-radius: 30px;
-        border: 1px solid #ADB0D9;
-        padding: 15px 20px;
-        font-size: 18px;
-        font-weight: 500;
-        color: #686868;
-        &:hover {
-            border: 1px solid black;
-        }
-    
-        &:focus {
-            border-color: #444DF2;
-        }
-    }
-}
-
-.form-actions {
+.send-message-btn {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 32px;
-    width: 100%;
+    cursor: pointer;
     font-weight: 700;
     font-size: 18px;
     line-height: 24.55px;
+    border-radius: 50px;
+    gap: 10px;
+    background-color: #5359F1;
+    border: 1px solid #797EF3;
+    padding: 12px 25px;
+    color: white;
+    transition: all .125s ease-in-out;
 
-    .cancel-btn {
-        border-radius: 50px;
-        border: 1px solid #797EF3;
-        padding: 12px 25px;
-        color: #444DF2;
-        transition: all .125s ease-in-out;
-
-        &:hover {
-            cursor: pointer;
-            background-color: #5359F1;
-            color: white;
-        }
+    >img {
+        width: 24px;
+        height: 24px;
     }
 
-    .submit-btn {
-        font-weight: 700;
-        font-size: 18px;
-        line-height: 24.55px;
-        border-radius: 50px;
-        padding: 12px 25px;
-        border: 1px solid transparent;
-        background-color: #444DF2;
-        color: white;
-        transition: all .125s ease-in-out;
-
-        &:hover {
-            cursor: pointer;
-            background-color: #787EF2;
-        }
+    &:hover {
+        cursor: pointer;
+        background-color: #797EF3;
     }
-}
-
-.error-message {
-    font-size: 14px;
-    color: #ED1E79;
-    text-align: center;
 }

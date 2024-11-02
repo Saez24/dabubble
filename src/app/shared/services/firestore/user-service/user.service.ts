@@ -16,6 +16,7 @@ export class UserService {
   public currentUser = this.getUserSignal(); // Change to hold an instance of the User class
   public currentUserID: string | null = null;
   showProfile = signal<boolean>(false);
+  showUserInfo = signal<boolean>(false);
   showProfileEditor = signal<boolean>(false);
   showOverlay = signal<boolean>(false);
   users: User[] = [];
@@ -24,6 +25,7 @@ export class UserService {
 
   constructor(private firestore: Firestore) {
   }
+
 
   async loadUsers() {
     let usersRef = collection(this.firestore, 'users');
@@ -97,15 +99,47 @@ export class UserService {
     });
   }
 
-  async getUserById(userId: string): Promise<User | null> {
+
+  // async getUserById(userId: string): Promise<User | null> {
+  //   const userRef = this.getUserDocReference(userId);
+  //   const userDoc = await getDoc(userRef);    
+
+  //   if (userDoc.exists()) {
+  //     return new User({ ...userDoc.data(), id: userDoc.id });
+  //   } else {
+  //     return null;
+  //   }
+  // }
+
+
+  async getSelectedUserById(userId: string): Promise<User | null> {
+    this.selectedUser = new User();
     const userRef = this.getUserDocReference(userId);
     const userDoc = await getDoc(userRef);
 
     if (userDoc.exists()) {
-      return new User({ ...userDoc.data(), id: userDoc.id });
+      const userData = userDoc.data() as User; // Access document data
+  
+      this.selectedUser = new User({
+        ...userData,
+        id: userDoc.id,
+        loginState: userData?.loginState // Use optional chaining to safely access loginState
+      });
+
+      return this.selectedUser;
     } else {
       return null;
     }
   }
+
+
+  // async getUserInfo(selectedUserId: string | null) {
+  //   const userRef = doc(this.firestore, `users/${selectedUserId}`);
+  //   const user = (await getDoc(userRef)).data() as User;
+  //   this.selectedUser = { ...user, id: user.id };
+  //   console.log('user', this.selectedUser);
+    
+  //   return { ...user, id: user.id };
+  // }
 
 }
