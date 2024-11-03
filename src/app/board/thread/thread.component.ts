@@ -14,7 +14,7 @@ import { UserService } from '../../shared/services/firestore/user-service/user.s
 import { AuthService } from '../../shared/services/authentication/auth-service/auth.service';
 import { UploadFileService } from '../../shared/services/firestore/storage-service/upload-file.service';
 import { SafeUrlPipe } from '../../shared/pipes/safe-url.pipe';
-import { arrayUnion, getDoc } from 'firebase/firestore';
+import { arrayUnion, getDoc, getDocs } from 'firebase/firestore';
 import { ChannelsService } from '../../shared/services/channels/channels.service';
 import { Channel } from '../../shared/models/channel.class';
 import { SendMessageService } from '../../shared/services/messages/send-message.service';
@@ -58,12 +58,14 @@ export class ThreadComponent implements OnInit {
   selectedFile: File | null = null;
   filePreviewUrl: string | null = null;
   selectedMessageId: string | null = null;
+  showUserList = false;
 
   constructor(private firestore: Firestore, private auth: Auth, private userService: UserService, private cd: ChangeDetectorRef, private authService: AuthService, private uploadFileService: UploadFileService, public channelsService: ChannelsService, public sendMessageService: SendMessageService) { }
 
   ngOnInit() {
     this.getCurrentUser();
     this.loadMessages();
+    this.loadAllUsers()
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -94,6 +96,29 @@ export class ThreadComponent implements OnInit {
         this.senderAvatar = data.avatarPath;
       }
     });
+  }
+
+  async loadAllUsers() {
+    try {
+      const usersCollectionRef = collection(this.firestore, 'users');
+      const usersSnapshot = await getDocs(usersCollectionRef);
+      this.users = usersSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as User[];
+
+    } catch (error) {
+      console.error('Fehler beim Laden der Benutzer:', error);
+    }
+  }
+
+  toggleUserList() {
+    this.showUserList = !this.showUserList;
+  }
+
+  markUser(userName: string) {
+    this.typedMessage += `@${userName} `;
+    this.showUserList = false;
   }
 
   async loadMessages() {
