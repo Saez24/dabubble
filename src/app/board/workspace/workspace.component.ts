@@ -31,6 +31,7 @@ import { Overlay } from '@angular/cdk/overlay';
   templateUrl: './workspace.component.html',
   styleUrl: './workspace.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  encapsulation: ViewEncapsulation.None
 })
 export class WorkspaceComponent implements OnInit {
 

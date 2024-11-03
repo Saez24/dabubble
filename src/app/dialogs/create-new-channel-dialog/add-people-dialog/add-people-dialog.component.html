@@ -1,8 +1,8 @@
 <div class="dialog-content">
-    <header>
+    <section>
         <h1 mat-dialog-title>Leute hinzufügen</h1>
         <a class="close-btn" mat-dialog-close mat-icon-button><mat-icon class="icon">close</mat-icon></a>
-    </header>
+    </section>
     <mat-dialog-content>
         <form #channelForm="ngForm" (ngSubmit)="onSubmit(channelForm)" class="radio-group-container">
             <mat-radio-group [(ngModel)]="selectedValue" (change)="onSelectionChange($event)" name="radioGroup" required>

@@ -16,10 +16,6 @@ h2 {
     font-weight: 700 !important;
 }
 
-span {
-    font-size: 18px !important;
-}
-
 .close-btn {
     @include dFlex();
     height: 40px;
@@ -63,6 +59,11 @@ span {
             }
                
         }
+
+        span {
+            font-size: 18px !important;
+        }
+
 }
 
 .content {
