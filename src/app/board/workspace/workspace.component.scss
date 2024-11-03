@@ -35,7 +35,7 @@ span {
     @include dFlex($fd: column, $ai: flex-start, $g: 24px);
 }
 
-header {
+.header-workspace {
     width: 100%;
     padding: 0;
     height: 60px;
@@ -73,6 +73,16 @@ section {
                 font-size: 20px;
                 font-weight: 700;
             }
+
+            .icon {
+                width: 17.11px !important;
+                height: 16.65px !important;
+            
+                &:hover {
+                    color: $purple;
+                    cursor: pointer;
+                }
+            }
         }
 
         .panel-container-open {
@@ -101,6 +111,16 @@ section {
                 }
             }
 
+            .icon {
+                width: 17.11px !important;
+                height: 16.65px !important;
+            
+                &:hover {
+                    color: $purple;
+                    cursor: pointer;
+                }
+            }
+
         }
 
         .add-channel-container {
@@ -117,6 +137,16 @@ section {
 
                 span {
                     color: $purple;
+                }
+            }
+
+            .icon {
+                width: 17.11px !important;
+                height: 16.65px !important;
+            
+                &:hover {
+                    color: $purple;
+                    cursor: pointer;
                 }
             }
         }
@@ -172,15 +202,6 @@ section {
     }
 }
 
-.icon {
-    width: 17.11px !important;
-    height: 16.65px !important;
-
-    &:hover {
-        color: $purple;
-        cursor: pointer;
-    }
-}
 
 .arrow {
     transform: rotate(0deg) !important;
@@ -261,4 +282,8 @@ section {
 
 .dialog-container .mat-dialog-container {
     border-radius: 30px !important;
+}
+
+.mat-mdc-card {
+    box-shadow: none !important;
 }
