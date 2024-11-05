@@ -29,7 +29,7 @@
             <div *ngIf="message.displayDate" class="posted-date-container">
                 <span class="posted-date">{{ message.displayDate }}</span>
             </div>
-            <div *ngIf="!message.isOwnMessage" class="message-received-container">
+            <div *ngIf="!message.isOwnChatMessage" class="message-received-container">
                 <img class="sender-avatar" [src]="message.senderAvatar" alt="">
                 <div class="message-container">
                     <div class="reaction-container-received">
@@ -71,7 +71,7 @@
             </div>
 
 
-            <div *ngIf="message.isOwnMessage" class="message-sender-container">
+            <div *ngIf="message.isOwnChatMessage" class="message-sender-container">
                 <img class="sender-avatar" [src]="message.senderAvatar" alt="">
 
                 <div class="message-area-container">

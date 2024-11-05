@@ -202,7 +202,7 @@ export class MessagesService {
 
         const message = new Message(messageData, currentUserUid);
         message.messageId = doc.id;
-        message.isOwnMessage = message.senderID === currentUserUid;
+        message.isOwnChatMessage = message.senderID === currentUserUid;
 
         if (message.senderID) {
             const senderUser = await this.userService.getSelectedUserById(message.senderID);
