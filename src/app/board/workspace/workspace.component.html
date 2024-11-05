@@ -2,7 +2,7 @@
 <div class="workspace-content">
     <mat-card>
         <!-- Header of the component -->
-        <section class="header-workspace">
+        <section class="header-workspace section">
             <div>
                 <div>
                     <img src="../../../assets/images/workspace/Group.svg" alt="">
@@ -19,7 +19,7 @@
         <!-- content with channels-container and chats-container         -->
         <mat-card-content>
             <!-- container where you can select and add channels you want to chat in     -->
-            <section id="channels">
+            <section class="section" id="channels">
                 <div class="panel-content">
                     <mat-expansion-panel hideToggle>
                         <mat-expansion-panel-header (click)="rotateArrow(0)">
@@ -52,7 +52,7 @@
                 <div><a (click)="openDialog()" class="add-button"><mat-icon>add</mat-icon></a></div>
             </section>
             <!-- container where you can select people you want to text directly to    -->
-            <section id="messages">
+            <section class="section" id="messages">
                 <div class="panel-content">
                     <mat-expansion-panel hideToggle>
                         <mat-expansion-panel-header (click)="rotateArrow(1)">

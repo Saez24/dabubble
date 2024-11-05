@@ -60,7 +60,7 @@ span {
     }
 }
 
-section {
+.section {
     width: 100%;
     @include dFlex($jc: space-between, $ai: flex-start);
 
@@ -77,7 +77,7 @@ section {
             .icon {
                 width: 17.11px !important;
                 height: 16.65px !important;
-            
+
                 &:hover {
                     color: $purple;
                     cursor: pointer;
@@ -114,7 +114,7 @@ section {
             .icon {
                 width: 17.11px !important;
                 height: 16.65px !important;
-            
+
                 &:hover {
                     color: $purple;
                     cursor: pointer;
@@ -143,7 +143,7 @@ section {
             .icon {
                 width: 17.11px !important;
                 height: 16.65px !important;
-            
+
                 &:hover {
                     color: $purple;
                     cursor: pointer;

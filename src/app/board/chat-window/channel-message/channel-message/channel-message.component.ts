@@ -42,12 +42,13 @@ export class ChannelMessageComponent {
   users: User[] = [];
   channels: Channel[] = [];
   currentUser = this.authService.getUserSignal();
-  showEmojiPicker = false;
+  showEmojiPicker: boolean = false;
+  showEmojiPickerEdit: boolean = false;
   showMessageEdit = false;
   showMessageEditArea = false;
   channelChatMessage = '';
   messageArea = true;
-  editedMessage = '';
+  editedMessage: string = '';
   currentUserUid = '';
   editingMessageId: string | null = null;
   senderAvatar: string | null = null;
@@ -99,11 +100,31 @@ export class ChannelMessageComponent {
   }
 
   showEmoji() {
-    this.messageService.showEmoji();
+    this.showEmojiPickerEdit = false; // Blendet den anderen Picker sofort aus
+
+    // Füge eine Verzögerung hinzu, bevor der aktuelle Picker angezeigt wird
+    setTimeout(() => {
+      this.showEmojiPicker = !this.showEmojiPicker;
+      console.log('showEmojiPicker:', this.showEmojiPicker);
+    }, 200); // 200ms Verzögerung, anpassbar nach Bedarf
+  }
+
+  showEmojiForEdit() {
+    this.showEmojiPicker = false; // Blendet den anderen Picker sofort aus
+
+    // Füge eine Verzögerung hinzu, bevor der aktuelle Picker angezeigt wird
+    setTimeout(() => {
+      this.showEmojiPickerEdit = !this.showEmojiPickerEdit;
+      console.log('showEmojiPickerEdit:', this.showEmojiPickerEdit);
+    }, 200); // 200ms Verzögerung, anpassbar nach Bedarf
   }
 
   addEmoji(event: any) {
     this.channelChatMessage += event.emoji.native;
+  }
+
+  addEmojiForEdit(event: any) {
+    this.editedMessage += event.emoji.native;
   }
 
   toggleEmojiPicker() {
@@ -123,8 +144,9 @@ export class ChannelMessageComponent {
     this.showMessageEdit = !this.showMessageEdit;
   }
 
-  editMessage(docId: string) {
+  editMessage(docId: string, messageText: string | null) {
     this.editingMessageId = docId; // Verwende die Dokument-ID
+    this.editedMessage = messageText || '';
     this.showMessageEditArea = true;
     this.showMessageEdit = false;
   }
@@ -134,7 +156,7 @@ export class ChannelMessageComponent {
     if (this.editingMessageId) { // Nutze die `editingMessageId` (Dokument-ID) anstelle von `message.messageId`
       const messageRef = doc(this.firestore, `messages/${this.editingMessageId}`); // Verweise auf die Dokument-ID
 
-      updateDoc(messageRef, { message: message.message }).then(() => {
+      updateDoc(messageRef, { message: this.editedMessage }).then(() => {
         this.editingMessageId = null;
         this.showMessageEditArea = false;
       }).catch(error => {
@@ -145,6 +167,7 @@ export class ChannelMessageComponent {
 
   cancelMessageEdit() {
     this.editingMessageId = null;
+    this.editedMessage = '';
     this.showMessageEditArea = false;
   }
 
@@ -288,7 +311,7 @@ export class ChannelMessageComponent {
 
   async getSelectedUserInfo(selectedUserId: string | null) {
     console.log('!!!selectedUserId', selectedUserId);
-    
+
     this.userService.showUserInfo.set(true);
     await this.userService.getSelectedUserById(selectedUserId as string);
   }
