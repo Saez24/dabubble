@@ -44,6 +44,7 @@ export class ChannelMessageComponent {
   currentUser = this.authService.getUserSignal();
   showEmojiPicker: boolean = false;
   showEmojiPickerEdit: boolean = false;
+  showEmojiPickerReact: boolean = false;
   showMessageEdit = false;
   showMessageEditArea = false;
   channelChatMessage = '';
@@ -55,6 +56,7 @@ export class ChannelMessageComponent {
   senderName: string | null = null;
   selectedFile: File | null = null;// Service für den Datei-Upload
   filePreviewUrl: string | null = null;
+  reactions: { emoji: string, senderID: string, senderName: string, count: number }[] = [];
 
 
   @ViewChild('chatWindow') private chatWindow!: ElementRef;
@@ -105,7 +107,6 @@ export class ChannelMessageComponent {
     // Füge eine Verzögerung hinzu, bevor der aktuelle Picker angezeigt wird
     setTimeout(() => {
       this.showEmojiPicker = !this.showEmojiPicker;
-      console.log('showEmojiPicker:', this.showEmojiPicker);
     }, 200); // 200ms Verzögerung, anpassbar nach Bedarf
   }
 
@@ -115,7 +116,17 @@ export class ChannelMessageComponent {
     // Füge eine Verzögerung hinzu, bevor der aktuelle Picker angezeigt wird
     setTimeout(() => {
       this.showEmojiPickerEdit = !this.showEmojiPickerEdit;
-      console.log('showEmojiPickerEdit:', this.showEmojiPickerEdit);
+    }, 200); // 200ms Verzögerung, anpassbar nach Bedarf
+  }
+
+  showEmojiForReact() {
+    this.showEmojiPicker = false; // Blendet den anderen Picker sofort aus
+    this.showEmojiPickerEdit = false;
+
+    // Füge eine Verzögerung hinzu, bevor der aktuelle Picker angezeigt wird
+    setTimeout(() => {
+      this.showEmojiPickerReact = !this.showEmojiPickerReact;
+      console.log('showEmojiPickerReact:', this.showEmojiPickerReact);
     }, 200); // 200ms Verzögerung, anpassbar nach Bedarf
   }
 
@@ -127,6 +138,10 @@ export class ChannelMessageComponent {
     this.editedMessage += event.emoji.native;
   }
 
+  addEmojiForReact(event: any) {
+
+  }
+
   toggleEmojiPicker() {
     this.messageService.toggleEmojiPicker();
   }
@@ -135,8 +150,14 @@ export class ChannelMessageComponent {
   clickOutside(event: Event) {
     const target = event.target as HTMLElement;
 
-    if (this.messageService.showEmojiPicker && !target.closest('emoji-mart') && !target.closest('.message-icon')) {
-      this.messageService.showEmojiPicker = false;
+    if (this.showEmojiPicker && !target.closest('emoji-mart') && !target.closest('.message-icon')) {
+      this.showEmojiPicker = false;
+    }
+    if (this.showEmojiPickerEdit && !target.closest('emoji-mart') && !target.closest('.message-icon')) {
+      this.showEmojiPickerEdit = false;
+    }
+    if (this.showEmojiPickerReact && !target.closest('emoji-mart') && !target.closest('.message-icon')) {
+      this.showEmojiPickerReact = false;
     }
   }
 

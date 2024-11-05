@@ -79,7 +79,8 @@
                         <div class="reaction-container-sender">
                             <div class="reaction-icon"><img src="./assets/images/reaction/check_mark.png" alt=""></div>
                             <div class="reaction-icon"><img src="./assets/images/reaction/hands_up.png" alt=""></div>
-                            <div class="reaction-icon"><mat-icon fontIcon="add_reaction"></mat-icon></div>
+                            <div (click)="showEmojiForReact()" class="reaction-icon"><mat-icon
+                                    fontIcon="add_reaction"></mat-icon></div>
                             <div (click)="showThread(message)" class="reaction-icon"><mat-icon
                                     fontIcon="comment"></mat-icon></div>
                             <div (click)="showMessageEditToggle()" class="reaction-icon edit-message-icon"><mat-icon
@@ -127,7 +128,8 @@
                                     <h3>Sofia Müller</h3><span>Hat reagiert</span>
                                 </div><img src="./assets/images/reaction/check_mark.png" alt=""> 1
                             </div>
-                            <div class="reaction-icon"><mat-icon fontIcon="add_reaction"></mat-icon></div>
+                            <div (click)="showEmojiForReact()" class="reaction-icon"><mat-icon
+                                    fontIcon="add_reaction"></mat-icon></div>
                         </div>
 
                     </div>
@@ -189,6 +191,9 @@
             title="Pick your emoji…" emoji="point_up">
         </emoji-mart>
         <emoji-mart class="emoji-mart-chat" *ngIf="showEmojiPickerEdit" (emojiSelect)="addEmojiForEdit($event)"
+            [darkMode]="false" title="Pick your emoji…" emoji="point_up">
+        </emoji-mart>
+        <emoji-mart class="emoji-mart-chat" *ngIf="showEmojiPickerReact" (emojiSelect)="addEmojiForReact($event)"
             [darkMode]="false" title="Pick your emoji…" emoji="point_up">
         </emoji-mart>
     </div>
