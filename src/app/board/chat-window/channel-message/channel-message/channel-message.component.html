@@ -33,9 +33,14 @@
                 <img class="sender-avatar" [src]="message.senderAvatar" alt="">
                 <div class="message-container">
                     <div class="reaction-container-received">
-                        <div class="reaction-icon"><img src="./assets/images/reaction/check_mark.png" alt=""></div>
-                        <div class="reaction-icon"><img src="./assets/images/reaction/hands_up.png" alt=""></div>
-                        <div class="reaction-icon"><mat-icon fontIcon="add_reaction"></mat-icon></div>
+                        <div class="reaction-icon"><img src="./assets/images/reaction/check_mark.png" alt="Check Mark"
+                                (click)="addOrUpdateReaction(message, './assets/images/reaction/check_mark.png')">
+                        </div>
+                        <div class="reaction-icon"><img src="./assets/images/reaction/hands_up.png" alt="Hands Up"
+                                (click)="addOrUpdateReaction(message, './assets/images/reaction/hands_up.png')">
+                        </div>
+                        <div (click)="showEmojiForReact(message)" class="reaction-icon"><mat-icon
+                                fontIcon="add_reaction"></mat-icon></div>
                         <div (click)="showThread(message)" class="reaction-icon"><mat-icon
                                 fontIcon="comment"></mat-icon></div>
                     </div>
@@ -65,7 +70,33 @@
                             <span class="message-time">{{ message.lastAnswer }}</span>
                         </span>
                     </span>
+                    <div class="show-reactions">
+                        <div class="reaction-icon-button" *ngFor="let reaction of message.reactions"
+                            (click)="addOrUpdateReaction(message, reaction.emoji)">
 
+                            <!-- Überprüfung, ob reaction.emoji ein Bildpfad ist -->
+                            <ng-container *ngIf="reaction.emoji.includes('.png'); else emojiText">
+                                <img [src]="reaction.emoji" alt="Reaction Icon" class="reaction-image">
+                            </ng-container>
+                            <ng-template #emojiText>
+                                {{ reaction.emoji }}
+                            </ng-template>
+
+                            <!-- Popup zur Anzeige der Namen und der Reaktionsbeschreibung -->
+                            <div class="reaction-name-popup">
+                                <h3>{{ formatSenderNames(reaction.senderName, reaction.senderID) }}</h3>
+                                <span>{{ getReactionVerb(reaction.senderName, reaction.senderID) }}</span>
+                            </div>
+
+                            <!-- Reaktionsanzahl anzeigen -->
+                            {{ reaction.count }}
+                        </div>
+
+                        <!-- Icon zum Hinzufügen einer neuen Reaktion -->
+                        <div (click)="showEmojiForReact(message)" class="reaction-icon">
+                            <mat-icon fontIcon="add_reaction"></mat-icon> <!-- Emoji hinzufügen -->
+                        </div>
+                    </div>
 
                 </div>
             </div>
@@ -77,9 +108,14 @@
                 <div class="message-area-container">
                     <div *ngIf="!isEditing(message.messageId)" class="message-container">
                         <div class="reaction-container-sender">
-                            <div class="reaction-icon"><img src="./assets/images/reaction/check_mark.png" alt=""></div>
-                            <div class="reaction-icon"><img src="./assets/images/reaction/hands_up.png" alt=""></div>
-                            <div (click)="showEmojiForReact()" class="reaction-icon"><mat-icon
+                            <div class="reaction-icon"><img src="./assets/images/reaction/check_mark.png"
+                                    alt="Check Mark"
+                                    (click)="addOrUpdateReaction(message, './assets/images/reaction/check_mark.png')">
+                            </div>
+                            <div class="reaction-icon"><img src="./assets/images/reaction/hands_up.png" alt="Hands Up"
+                                    (click)="addOrUpdateReaction(message, './assets/images/reaction/hands_up.png')">
+                            </div>
+                            <div (click)="showEmojiForReact(message)" class="reaction-icon"><mat-icon
                                     fontIcon="add_reaction"></mat-icon></div>
                             <div (click)="showThread(message)" class="reaction-icon"><mat-icon
                                     fontIcon="comment"></mat-icon></div>
@@ -122,15 +158,35 @@
                         </span>
 
                         <div class="show-reactions">
-                            <div class="reaction-icon-button">
+                            <div class="reaction-icon-button" *ngFor="let reaction of message.reactions"
+                                (click)="addOrUpdateReaction(message, reaction.emoji)">
+
+                                <!-- Überprüfung, ob reaction.emoji ein Bildpfad ist -->
+                                <ng-container *ngIf="reaction.emoji.includes('.png'); else emojiText">
+                                    <img [src]="reaction.emoji" alt="Reaction Icon" class="reaction-image">
+                                </ng-container>
+                                <ng-template #emojiText>
+                                    {{ reaction.emoji }}
+                                </ng-template>
+
+                                <!-- Popup zur Anzeige der Namen und der Reaktionsbeschreibung -->
                                 <div class="reaction-name-popup">
-                                    <img src="./assets/images/reaction/rocket.png" alt="">
-                                    <h3>Sofia Müller</h3><span>Hat reagiert</span>
-                                </div><img src="./assets/images/reaction/check_mark.png" alt=""> 1
+                                    <h3>{{ formatSenderNames(reaction.senderName, reaction.senderID) }}</h3>
+                                    <span>{{ getReactionVerb(reaction.senderName, reaction.senderID) }}</span>
+                                </div>
+
+                                <!-- Reaktionsanzahl anzeigen -->
+                                {{ reaction.count }}
                             </div>
-                            <div (click)="showEmojiForReact()" class="reaction-icon"><mat-icon
-                                    fontIcon="add_reaction"></mat-icon></div>
+
+                            <!-- Icon zum Hinzufügen einer neuen Reaktion -->
+                            <div (click)="showEmojiForReact(message)" class="reaction-icon">
+                                <mat-icon fontIcon="add_reaction"></mat-icon> <!-- Emoji hinzufügen -->
+                            </div>
                         </div>
+
+
+
 
                     </div>
                     <div *ngIf="isEditing(message.messageId)" class="message-edit-container">

@@ -325,6 +325,7 @@
     transform: translateX(80px);
     visibility: hidden;
     transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
+
 }
 
 .show-reactions {
@@ -349,6 +350,8 @@
                 opacity: 1;
                 visibility: visible;
                 transform: translateX(0);
+                padding: 5px 20px 5px 20px;
+                box-sizing: unset;
             }
         }
     }
