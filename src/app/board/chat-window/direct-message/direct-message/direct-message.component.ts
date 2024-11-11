@@ -8,7 +8,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule } from '@angular/forms';
 import { CommonModule, NgFor, NgIf } from '@angular/common';
 import { PickerComponent } from '@ctrl/ngx-emoji-mart';
-import { addDoc, arrayUnion, collection, doc, Firestore, onSnapshot, orderBy, query, updateDoc } from '@angular/fire/firestore';
+import { addDoc, arrayUnion, collection, doc, Firestore, getDoc, onSnapshot, orderBy, query, updateDoc } from '@angular/fire/firestore';
 import { Auth } from '@angular/fire/auth';
 import { MatDialog } from '@angular/material/dialog';
 import { ChannelsService } from '../../../../shared/services/channels/channels.service';
@@ -21,6 +21,8 @@ import { Channel } from '../../../../shared/models/channel.class';
 import { Message } from '../../../../shared/models/message.class';
 import { DirectMessage } from '../../../../shared/models/direct.message.class';
 import { ChatUtilityService } from '../../../../shared/services/messages/chat-utility.service';
+import { v4 as uuidv4 } from 'uuid';
+
 
 
 @Component({
@@ -34,12 +36,14 @@ import { ChatUtilityService } from '../../../../shared/services/messages/chat-ut
   encapsulation: ViewEncapsulation.None,
 })
 export class DirectMessageComponent implements OnInit {
-
-  messages = this.messageService.messages;
+  message: DirectMessage | null = null;
+  messages = this.messagesService.messages;
   users: User[] = [];
   channels: Channel[] = [];
   currentUser = this.authService.getUserSignal();
   showEmojiPicker = false;
+  showEmojiPickerEdit: boolean = false;
+  showEmojiPickerReact: boolean = false;
   showMessageEdit = false;
   showMessageEditArea = false;
   directChatMessage = '';
@@ -53,14 +57,14 @@ export class DirectMessageComponent implements OnInit {
   filePreviewUrl: string | null = null;
   @Input() selectedUser = this.chatUtilityService.directMessageUser;
   messageId: string | null = null;
-
+  conversationId = '';
 
 
   @ViewChild('chatWindow') private chatWindow!: ElementRef;
   constructor(private firestore: Firestore, private auth: Auth,
     private userService: UserService, private cd: ChangeDetectorRef,
     private authService: AuthService, private uploadFileService: UploadFileService,
-    public channelsService: ChannelsService, public dialog: MatDialog, public messageService: MessagesService, private chatUtilityService: ChatUtilityService) {
+    public channelsService: ChannelsService, public dialog: MatDialog, public messagesService: MessagesService, private chatUtilityService: ChatUtilityService) {
 
   }
 
@@ -69,6 +73,8 @@ export class DirectMessageComponent implements OnInit {
       this.messageId = id;
       // console.log('Aktuelle Message ID:', this.messageId);
     });
+
+
   }
 
   async loadData() {
@@ -94,64 +100,250 @@ export class DirectMessageComponent implements OnInit {
     });
   }
 
-  showEmoji() {
-    this.messageService.showEmoji();
+  loadConversation(message: DirectMessage): void {
+    if (message) {
+      this.messagesService.loadConversations(message);
+    } else {
+      console.error('Keine Nachricht zum Laden verfügbar');
+    }
   }
+
+  testLoadConversation(): void {
+    this.message = {
+      messageId: 'deineMessageId'  // Setze die tatsächliche messageId
+    } as DirectMessage;
+
+    this.loadConversation(this.message);
+  }
+
+
+  showEmoji() {
+    this.showEmojiPickerEdit = false; // Blendet den anderen Picker sofort aus
+
+    // Füge eine Verzögerung hinzu, bevor der aktuelle Picker angezeigt wird
+    setTimeout(() => {
+      this.showEmojiPicker = !this.showEmojiPicker;
+    }, 200); // 200ms Verzögerung, anpassbar nach Bedarf
+  }
+
+  showEmojiForEdit() {
+    this.showEmojiPicker = false; // Blendet den anderen Picker sofort aus
+
+    // Füge eine Verzögerung hinzu, bevor der aktuelle Picker angezeigt wird
+    setTimeout(() => {
+      this.showEmojiPickerEdit = !this.showEmojiPickerEdit;
+    }, 200); // 200ms Verzögerung, anpassbar nach Bedarf
+  }
+
+  showEmojiForReact(message: DirectMessage) {
+    this.showEmojiPicker = false; // Blendet den anderen Picker sofort aus
+    this.showEmojiPickerEdit = false;
+    this.message = message;
+    console.log(this.message);
+    // Füge eine Verzögerung hinzu, bevor der aktuelle Picker angezeigt wird
+    setTimeout(() => {
+      this.showEmojiPickerReact = !this.showEmojiPickerReact;
+      console.log('showEmojiPickerReact:', this.showEmojiPickerReact);
+    }, 200); // 200ms Verzögerung, anpassbar nach Bedarf
+  }
+
+
 
   addEmoji(event: any) {
     this.directChatMessage += event.emoji.native;
   }
 
+  addEmojiForEdit(event: any) {
+    this.editedMessage += event.emoji.native;
+  }
+
+  addOrUpdateReaction(message: DirectMessage, emoji: string): void {
+    const currentUser = this.currentUser();
+    if (!currentUser) {
+      console.warn('Kein Benutzer gefunden!');
+      return;
+    }
+
+    const senderID = currentUser.id;
+    const senderName = currentUser.name || '';
+    const emojiReaction = message.reactions.find(r => r.emoji === emoji);
+
+    // Sicherstellen, dass senderID immer ein string ist
+    const safeSenderID = senderID ?? '';  // Fällt auf einen leeren String zurück, wenn senderID null oder undefined ist
+
+    if (emojiReaction) {
+      // Sicherstellen, dass senderID immer ein Array von Strings ist, auch wenn es null ist
+      const senderIDs = emojiReaction.senderID ? emojiReaction.senderID.split(', ') : [];
+      const senderNames = emojiReaction.senderName ? emojiReaction.senderName.split(', ') : [];
+      const currentUserIndex = senderIDs.indexOf(safeSenderID);
+
+      if (currentUserIndex > -1) {
+        // Reaktion entfernen
+        senderIDs.splice(currentUserIndex, 1);
+        senderNames.splice(currentUserIndex, 1);
+        emojiReaction.count -= 1;
+
+        if (emojiReaction.count === 0) {
+          const emojiIndex = message.reactions.indexOf(emojiReaction);
+          message.reactions.splice(emojiIndex, 1);
+        } else {
+          emojiReaction.senderID = senderIDs.join(', ');
+          emojiReaction.senderName = senderNames.join(', ');
+        }
+      } else {
+        // Reaktion hinzufügen
+        emojiReaction.count += 1;
+        emojiReaction.senderID += (emojiReaction.senderID ? ', ' : '') + safeSenderID;
+        emojiReaction.senderName += (emojiReaction.senderName ? ', ' : '') + senderName;
+      }
+    } else {
+      // Neue Reaktion hinzufügen
+      message.reactions.push({
+        emoji: emoji,
+        senderID: safeSenderID,
+        senderName: senderName,
+        count: 1
+      });
+    }
+
+    this.updateMessageReactions(message); // Aktualisiere die Reaktionen in Firestore
+  }
+
+
+  updateMessageReactions(message: DirectMessage): void {
+    const messageDocRef = doc(this.firestore, `messages/${message.messageId}`);
+    updateDoc(messageDocRef, { reactions: message.reactions })
+      .then(() => {
+        console.log('Reaktionen erfolgreich aktualisiert.');
+        this.cd.markForCheck(); // Komponenten-Update anstoßen
+      })
+      .catch(error => {
+        console.error('Fehler beim Aktualisieren der Reaktionen: ', error);
+      });
+  }
+
+  addEmojiForReact(event: any): void {
+    const emoji = event.emoji.native; // Emoji aus dem Event extrahieren
+    if (this.message) {
+      this.addOrUpdateReaction(this.message, emoji); // Nutzung der bestehenden Funktion zum Hinzufügen oder Aktualisieren von Reaktionen
+      this.showEmojiPickerReact = false; // Emoji-Picker schließen, falls er geöffnet ist
+    }
+  }
+
+
   toggleEmojiPicker() {
-    this.messageService.toggleEmojiPicker();
+    this.messagesService.toggleEmojiPicker();
   }
 
   @HostListener('document:click', ['$event'])
   clickOutside(event: Event) {
     const target = event.target as HTMLElement;
 
-    if (this.messageService.showEmojiPicker && !target.closest('emoji-mart') && !target.closest('.message-icon')) {
-      this.messageService.showEmojiPicker = false;
+    if (this.showEmojiPicker && !target.closest('emoji-mart') && !target.closest('.message-icon')) {
+      this.showEmojiPicker = false;
     }
+    if (this.showEmojiPickerEdit && !target.closest('emoji-mart') && !target.closest('.message-icon')) {
+      this.showEmojiPickerEdit = false;
+    }
+    if (this.showEmojiPickerReact && !target.closest('emoji-mart') && !target.closest('.message-icon')) {
+      this.showEmojiPickerReact = false;
+    }
+  }
+
+  formatSenderNames(senderNames: string, senderIDs: string): string {
+    const senderIDList = senderIDs.split(', ');
+    const senderNameList = senderNames.split(', ');
+    const currentUserID = this.currentUser()?.id;
+    const formattedNames = senderNameList.map((name, index) => {
+      return senderIDList[index] === currentUserID ? 'Du' : name;
+    });
+
+    if (formattedNames.length > 2) {
+      const otherCount = formattedNames.length - 1;
+      return `Du und ${otherCount} weitere Personen`;
+    } else if (formattedNames.length === 3) {
+      return `${formattedNames[0]}, ${formattedNames[1]} und ${formattedNames[2]}`;
+    } else if (formattedNames.length === 2) {
+      return `${formattedNames[0]} und ${formattedNames[1]}`;
+    }
+    return formattedNames[0];
+  }
+
+
+  getReactionVerb(senderNames: string, senderIDs: string): string {
+    const senderIDList = senderIDs.split(', ');
+    const senderNameList = senderNames.split(', ');
+    const currentUserID = this.currentUser()?.id;
+    const formattedNames = senderNameList.map((name, index) => {
+      return senderIDList[index] === currentUserID ? 'Du' : name;
+    });
+
+    if (formattedNames.length === 1 && formattedNames[0] === 'Du') {
+      return 'hast reagiert';
+    }
+    if (formattedNames.length === 1) {
+      return 'hat reagiert';
+    }
+    return 'haben reagiert';
   }
 
   showMessageEditToggle() {
     this.showMessageEdit = !this.showMessageEdit;
+    console.log(this.showMessageEdit);
+
+
   }
 
-  editMessage(docId: string) {
-    this.editingMessageId = docId; // Verwende die Dokument-ID
-    this.showMessageEditArea = true;
-    this.showMessageEdit = false;
+  editMessage(conversationId: string) {
+    this.editingMessageId = conversationId;  // Dokument-ID speichern
+    this.showMessageEditArea = true;         // Bearbeitungsbereich anzeigen
+    this.showMessageEdit = false;            // Toggle zurücksetzen
+    this.conversationId = conversationId;   // conversationId mit dem übergebenen Wert füllen
+    console.log(this.showMessageEditArea);   // Konsolenausgabe des Status
+    console.log(this.conversationId);       // Konsolenausgabe der conversationId
   }
 
-  saveMessage(message: DirectMessage) {
-    if (this.editingMessageId) { // Nutze die `editingMessageId` (Dokument-ID) anstelle von `message.messageId`
-      const messageRef = doc(this.firestore, `direct_messages/${this.editingMessageId}`); // Verweise auf die Dokument-ID
+  saveMessage(message: DirectMessage, conversationId: string) {
+    console.log(this.conversationId);
 
-      updateDoc(messageRef, { message: message.message }).then(() => {
-        this.editingMessageId = null;
-        this.showMessageEditArea = false;
-      }).catch(error => {
-        console.error("Fehler beim Speichern der Nachricht: ", error);
+    if (message && this.messageId) {
+      const messageRef = doc(this.firestore, `direct_messages/${this.messageId}`);
+
+      const updatedConversation = (message.conversation || []).map(convo => {
+        if (convo.conversationId === conversationId) {
+          return {
+            ...convo,
+            message: convo.message // Aktualisiere nur das `message`-Feld
+          };
+        }
+        return convo;
       });
+
+      updateDoc(messageRef, { conversation: updatedConversation })
+        .then(() => {
+          this.closeMessageEdit();
+          console.log("Nachricht erfolgreich aktualisiert.");
+        })
+        .catch(error => {
+          console.error("Fehler beim Speichern der Nachricht:", error);
+        });
+    } else {
+      console.error("Ungültige Nachricht oder Conversation-ID.");
     }
   }
 
-  cancelMessageEdit() {
+
+  closeMessageEdit() {
     this.editingMessageId = null;
+    this.conversationId = '';
+    this.editedMessage = '';
     this.showMessageEditArea = false;
   }
 
-  isEditing(docId: string): boolean {
-    return this.editingMessageId === docId; // Prüfe gegen die Firestore-Dokument-ID
+  isEditing(conversationId: string): boolean {
+    return this.conversationId === conversationId; // Prüfe gegen die Firestore-Dokument-ID
   }
 
-
-  @Output() showThreadEvent = new EventEmitter<Message>();
-  showThread(message: Message) {
-    this.showThreadEvent.emit(message);
-  }
 
   showError() {
     console.error("Kein Kanal ausgewählt.");
@@ -163,6 +355,7 @@ export class DirectMessageComponent implements OnInit {
 
       if (currentUser()) {
         const messagesRef = collection(this.firestore, 'direct_messages');
+        const conversationId = uuidv4();
 
         if (this.messageId) {
           // Konversation existiert, also aktualisiere sie
@@ -171,6 +364,7 @@ export class DirectMessageComponent implements OnInit {
           // Füge die neue Nachricht zur bestehenden Konversation hinzu
           await updateDoc(messageDocRef, {
             conversation: arrayUnion({
+              conversationId: conversationId,
               senderName: currentUser()?.name,
               message: this.directChatMessage,
               reaction: [],
@@ -178,6 +372,7 @@ export class DirectMessageComponent implements OnInit {
               receiverName: this.selectedUser?.name,
               senderId: currentUser()?.id,
               receiverId: this.selectedUser?.id,
+              fileURL: '',
             })
           });
 
@@ -210,6 +405,7 @@ export class DirectMessageComponent implements OnInit {
             timestamp: new Date(),
             conversation: [
               {
+                conversationId: conversationId,
                 senderName: newMessage.senderName,
                 message: newMessage.message,
                 reaction: newMessage.reactions,
@@ -217,6 +413,7 @@ export class DirectMessageComponent implements OnInit {
                 receiverName: newMessage.receiverName,
                 senderId: newMessage.senderId,
                 receiverId: newMessage.receiverId,
+                fileURL: '',
               }
             ]
           });
@@ -316,7 +513,7 @@ export class DirectMessageComponent implements OnInit {
 
   async getSelectedUserInfo(selectedUserId: string | null | undefined) {
     console.log('Selected User ID:', selectedUserId);
-    
+
     this.userService.showUserInfo.set(true);
     await this.userService.getSelectedUserById(selectedUserId as string);
   }

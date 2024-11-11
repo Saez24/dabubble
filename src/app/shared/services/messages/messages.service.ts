@@ -389,4 +389,31 @@ export class MessagesService {
     //     const messageRef = doc(this.firestore, 'messages', messageId);
 
     // }
+
+    async loadConversations(message: DirectMessage): Promise<void> {
+        const messageDocRef = doc(this.firestore, `direct_messages/${message.messageId}`);
+
+        try {
+            // Hole das Dokument mit der angegebenen messageId
+            const docSnapshot = await getDoc(messageDocRef);
+
+            if (docSnapshot.exists()) {
+                // Extrahiere die Konversationen
+                const data = docSnapshot.data();
+                const conversations = data?.['conversation'] || []; // Default auf leeres Array, falls keine Konversationen vorhanden sind
+
+                // Verarbeite die Konversationen
+                console.log(conversations);
+
+                // Beispiel: Jede Nachricht in der Konversation ausgeben
+                conversations.forEach((conv: any) => {
+                    console.log(`Sender: ${conv.senderName}, Nachricht: ${conv.message}`);
+                });
+            } else {
+                console.error('Dokument nicht gefunden!');
+            }
+        } catch (error) {
+            console.error('Fehler beim Laden der Konversationen:', error);
+        }
+    }
 }
