@@ -22,6 +22,8 @@ import { Message } from '../../../../shared/models/message.class';
 import { DirectMessage } from '../../../../shared/models/direct.message.class';
 import { ChatUtilityService } from '../../../../shared/services/messages/chat-utility.service';
 import { v4 as uuidv4 } from 'uuid';
+import { EmojiReaction } from '../../../../shared/models/emoji-reaction.model';
+
 
 
 
@@ -34,9 +36,12 @@ import { v4 as uuidv4 } from 'uuid';
   styleUrl: './direct-message.component.scss',
   changeDetection: ChangeDetectionStrategy.Default,
   encapsulation: ViewEncapsulation.None,
+
+
 })
 export class DirectMessageComponent implements OnInit {
-  message: DirectMessage | null = null;
+  message: DirectMessage[] = [];
+  selectedMessage: DirectMessage | null = null;
   messages = this.messagesService.messages;
   users: User[] = [];
   channels: Channel[] = [];
@@ -58,6 +63,8 @@ export class DirectMessageComponent implements OnInit {
   @Input() selectedUser = this.chatUtilityService.directMessageUser;
   messageId: string | null = null;
   conversationId = '';
+  editingConversationId: string | null = null;
+
 
 
   @ViewChild('chatWindow') private chatWindow!: ElementRef;
@@ -100,27 +107,25 @@ export class DirectMessageComponent implements OnInit {
     });
   }
 
-  loadConversation(message: DirectMessage): void {
-    if (message) {
-      this.messagesService.loadConversations(message);
-    } else {
-      console.error('Keine Nachricht zum Laden verfügbar');
-    }
-  }
+  // loadConversation(message: DirectMessage): void {
+  //   if (message) {
+  //     this.messagesService.loadConversations(message);
+  //   } else {
+  //     console.error('Keine Nachricht zum Laden verfügbar');
+  //   }
+  // }
 
-  testLoadConversation(): void {
-    this.message = {
-      messageId: 'deineMessageId'  // Setze die tatsächliche messageId
-    } as DirectMessage;
+  // testLoadConversation(): void {
+  //   this.message = {
+  //     messageId: 'deineMessageId'  // Setze die tatsächliche messageId
+  //   } as DirectMessage;
 
-    this.loadConversation(this.message);
-  }
+  //   this.loadConversation(this.message);
+  // }
 
 
   showEmoji() {
     this.showEmojiPickerEdit = false; // Blendet den anderen Picker sofort aus
-
-    // Füge eine Verzögerung hinzu, bevor der aktuelle Picker angezeigt wird
     setTimeout(() => {
       this.showEmojiPicker = !this.showEmojiPicker;
     }, 200); // 200ms Verzögerung, anpassbar nach Bedarf
@@ -128,25 +133,27 @@ export class DirectMessageComponent implements OnInit {
 
   showEmojiForEdit() {
     this.showEmojiPicker = false; // Blendet den anderen Picker sofort aus
-
-    // Füge eine Verzögerung hinzu, bevor der aktuelle Picker angezeigt wird
     setTimeout(() => {
       this.showEmojiPickerEdit = !this.showEmojiPickerEdit;
     }, 200); // 200ms Verzögerung, anpassbar nach Bedarf
   }
 
-  showEmojiForReact(message: DirectMessage) {
-    this.showEmojiPicker = false; // Blendet den anderen Picker sofort aus
+  showEmojiForReact(message: DirectMessage, conversationId: string) {
+    this.showEmojiPicker = false;
     this.showEmojiPickerEdit = false;
-    this.message = message;
-    console.log(this.message);
-    // Füge eine Verzögerung hinzu, bevor der aktuelle Picker angezeigt wird
+    this.conversationId = conversationId;
+    this.selectedMessage = message;
+    // console.log('showEmojiForReact aufgerufen');
+    // console.log('conversationId in showEmojiForReact:', this.conversationId);
+    // console.log(this.selectedMessage);
+
+
     setTimeout(() => {
       this.showEmojiPickerReact = !this.showEmojiPickerReact;
-      console.log('showEmojiPickerReact:', this.showEmojiPickerReact);
-    }, 200); // 200ms Verzögerung, anpassbar nach Bedarf
+      this.cd.markForCheck(); // Komponenten-Update anstoßen
+      // console.log('showEmojiPickerReact nach setTimeout:', this.showEmojiPickerReact);
+    }, 200);
   }
-
 
 
   addEmoji(event: any) {
@@ -157,6 +164,19 @@ export class DirectMessageComponent implements OnInit {
     this.editedMessage += event.emoji.native;
   }
 
+  findConversation(conversations: any[], targetId: string): any | null {
+    for (const convo of conversations) {
+      if (convo.conversationId === targetId) {
+        return convo;
+      } else if (Array.isArray(convo.subConversations)) {
+        const result = this.findConversation(convo.subConversations, targetId);
+        if (result) return result;
+      }
+    }
+    return null;
+  }
+
+
   addOrUpdateReaction(message: DirectMessage, emoji: string): void {
     const currentUser = this.currentUser();
     if (!currentUser) {
@@ -164,28 +184,40 @@ export class DirectMessageComponent implements OnInit {
       return;
     }
 
-    const senderID = currentUser.id;
+    const senderID = currentUser.id ?? '';
     const senderName = currentUser.name || '';
-    const emojiReaction = message.reactions.find(r => r.emoji === emoji);
 
-    // Sicherstellen, dass senderID immer ein string ist
-    const safeSenderID = senderID ?? '';  // Fällt auf einen leeren String zurück, wenn senderID null oder undefined ist
+    if (!Array.isArray(message.conversation)) {
+      console.log(message.conversation);
 
+      console.warn('message.conversation ist undefined oder kein Array!');
+      return;
+    }
+
+    // Suche nach der passenden Konversation anhand der conversationId
+    const conversation = this.findConversation(message.conversation, this.conversationId);
+
+    if (!conversation) {
+      console.warn(`Konversation mit der ID ${this.conversationId} nicht gefunden!`);
+      return;
+    }
+
+    // Emoji-Reaktion verarbeiten
+    let emojiReaction = conversation.reactions?.find((r: EmojiReaction) => r.emoji === emoji);
     if (emojiReaction) {
-      // Sicherstellen, dass senderID immer ein Array von Strings ist, auch wenn es null ist
       const senderIDs = emojiReaction.senderID ? emojiReaction.senderID.split(', ') : [];
       const senderNames = emojiReaction.senderName ? emojiReaction.senderName.split(', ') : [];
-      const currentUserIndex = senderIDs.indexOf(safeSenderID);
+      const currentUserIndex = senderIDs.indexOf(senderID);
 
       if (currentUserIndex > -1) {
-        // Reaktion entfernen
+        // Benutzer hat bereits reagiert – Reaktion entfernen
         senderIDs.splice(currentUserIndex, 1);
         senderNames.splice(currentUserIndex, 1);
         emojiReaction.count -= 1;
 
+        // Reaktion entfernen, wenn der Zähler auf 0 sinkt
         if (emojiReaction.count === 0) {
-          const emojiIndex = message.reactions.indexOf(emojiReaction);
-          message.reactions.splice(emojiIndex, 1);
+          conversation.reactions = conversation.reactions?.find((r: EmojiReaction) => r.emoji === emoji);
         } else {
           emojiReaction.senderID = senderIDs.join(', ');
           emojiReaction.senderName = senderNames.join(', ');
@@ -193,26 +225,44 @@ export class DirectMessageComponent implements OnInit {
       } else {
         // Reaktion hinzufügen
         emojiReaction.count += 1;
-        emojiReaction.senderID += (emojiReaction.senderID ? ', ' : '') + safeSenderID;
+        emojiReaction.senderID += (emojiReaction.senderID ? ', ' : '') + senderID;
         emojiReaction.senderName += (emojiReaction.senderName ? ', ' : '') + senderName;
       }
     } else {
-      // Neue Reaktion hinzufügen
-      message.reactions.push({
+      // Eine neue Emoji-Reaktion hinzufügen
+      if (!conversation.reactions) {
+        conversation.reactions = [];
+      }
+      conversation.reactions.push({
         emoji: emoji,
-        senderID: safeSenderID,
+        senderID: senderID,
         senderName: senderName,
         count: 1
       });
     }
 
-    this.updateMessageReactions(message); // Aktualisiere die Reaktionen in Firestore
+    // Aktualisierung der Reaktionen für die spezifische Nachricht in Firestore
+    this.updateMessageReactions(message);
   }
 
 
+
+
   updateMessageReactions(message: DirectMessage): void {
-    const messageDocRef = doc(this.firestore, `messages/${message.messageId}`);
-    updateDoc(messageDocRef, { reactions: message.reactions })
+    const messageDocRef = doc(this.firestore, `direct_messages/${this.messageId}`);
+
+    // Nur die aktualisierte Konversation finden
+    const updatedConversations = (message.conversation || []).map(convo => {
+      if (convo.conversationId) {
+        return {
+          ...convo,
+          reactions: convo.reactions // Aktualisiere nur die Reaktionen in der Ziel-Konversation
+        };
+      }
+      return convo;
+    });
+
+    updateDoc(messageDocRef, { conversation: updatedConversations })
       .then(() => {
         console.log('Reaktionen erfolgreich aktualisiert.');
         this.cd.markForCheck(); // Komponenten-Update anstoßen
@@ -222,13 +272,28 @@ export class DirectMessageComponent implements OnInit {
       });
   }
 
+
   addEmojiForReact(event: any): void {
-    const emoji = event.emoji.native; // Emoji aus dem Event extrahieren
-    if (this.message) {
-      this.addOrUpdateReaction(this.message, emoji); // Nutzung der bestehenden Funktion zum Hinzufügen oder Aktualisieren von Reaktionen
-      this.showEmojiPickerReact = false; // Emoji-Picker schließen, falls er geöffnet ist
+    const emoji = event.emoji.native;
+    // Überprüfe, ob selectedMessage nicht null ist
+    if (this.selectedMessage !== null) {
+      // Überprüfe, ob selectedMessage die KonversationId enthält
+      if (this.selectedMessage.conversationId) {
+        // Konversation gefunden, füge oder aktualisiere die Reaktion
+        this.addOrUpdateReaction(this.selectedMessage, emoji,);
+        this.showEmojiPickerReact = false;
+        console.log(this.selectedMessage);
+        console.log(this.conversationId);
+      } else {
+        console.warn('Konversation mit der ID nicht gefunden!');
+      }
+    } else {
+      console.warn('Nachricht oder Konversation ist null oder leer!');
     }
   }
+
+
+
 
 
   toggleEmojiPicker() {
@@ -290,18 +355,20 @@ export class DirectMessageComponent implements OnInit {
   showMessageEditToggle() {
     this.showMessageEdit = !this.showMessageEdit;
     console.log(this.showMessageEdit);
-
-
   }
+
+
 
   editMessage(conversationId: string) {
-    this.editingMessageId = conversationId;  // Dokument-ID speichern
+    this.editingMessageId = conversationId;
     this.showMessageEditArea = true;         // Bearbeitungsbereich anzeigen
     this.showMessageEdit = false;            // Toggle zurücksetzen
-    this.conversationId = conversationId;   // conversationId mit dem übergebenen Wert füllen
-    console.log(this.showMessageEditArea);   // Konsolenausgabe des Status
-    console.log(this.conversationId);       // Konsolenausgabe der conversationId
+    this.editingConversationId = conversationId;
+    console.log('editMessage aufgerufen');
+    console.log('showMessageEditArea:', this.showMessageEditArea);
+    console.log('conversationId:', this.editingConversationId);
   }
+
 
   saveMessage(message: DirectMessage, conversationId: string) {
     console.log(this.conversationId);
@@ -338,10 +405,11 @@ export class DirectMessageComponent implements OnInit {
     this.conversationId = '';
     this.editedMessage = '';
     this.showMessageEditArea = false;
+    this.editingConversationId = null;
   }
 
   isEditing(conversationId: string): boolean {
-    return this.conversationId === conversationId; // Prüfe gegen die Firestore-Dokument-ID
+    return this.editingConversationId === conversationId; // Prüfe gegen die Firestore-Dokument-ID
   }
 
 

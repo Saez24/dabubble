@@ -21,7 +21,7 @@ export class DirectMessage {
         senderName: string | null;
         message: string | null;
         messageId: string;
-        reactions: { emoji: string; senderName: string; count: number }[];
+        reactions: { emoji: string; senderName: string; senderID: string; count: number }[];
         timestamp: any; // Anpassen des Typs je nach Bedarf
         receiverName: string | null;
         receiverId: string | null;

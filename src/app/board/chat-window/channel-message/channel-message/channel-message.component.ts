@@ -207,6 +207,8 @@ export class ChannelMessageComponent {
   }
 
   addEmojiForReact(event: any): void {
+    console.log(this.selectedMessage);
+
     const emoji = event.emoji.native; // Emoji aus dem Event extrahieren
     if (this.selectedMessage) {
       this.addOrUpdateReaction(this.selectedMessage, emoji); // Nutzung der bestehenden Funktion zum Hinzufügen oder Aktualisieren von Reaktionen
