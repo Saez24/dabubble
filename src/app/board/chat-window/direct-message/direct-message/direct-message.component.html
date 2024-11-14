@@ -16,10 +16,10 @@
                         <div class="reaction-container-received">
                             <div class="reaction-icon"><img src="./assets/images/reaction/check_mark.png"
                                     alt="Check Mark"
-                                    (click)="addOrUpdateReaction(messages, './assets/images/reaction/check_mark.png')">
+                                    (click)="addOrUpdateReaction(message, './assets/images/reaction/check_mark.png', message.conversationId || '')">
                             </div>
                             <div class="reaction-icon"><img src="./assets/images/reaction/hands_up.png" alt="Hands Up"
-                                    (click)="addOrUpdateReaction(messages, './assets/images/reaction/hands_up.png')">
+                                    (click)="addOrUpdateReaction(message, './assets/images/reaction/hands_up.png', message.conversationId || '')">
                             </div>
                             <div (click)="showEmojiForReact(message, message.conversationId || '')"
                                 class="reaction-icon">
@@ -46,7 +46,7 @@
 
                         <div class="show-reactions">
                             <div class="reaction-icon-button" *ngFor="let reaction of message.reactions"
-                                (click)="addOrUpdateReaction(messages, reaction.emoji)">
+                                (click)="addOrUpdateReaction(messages, reaction.emoji, message.conversationId || '')">
 
                                 <!-- Überprüfung, ob reaction.emoji ein Bildpfad ist -->
                                 <ng-container *ngIf="reaction.emoji.includes('.png'); else emojiText">
@@ -78,11 +78,11 @@
                             <div class="reaction-container-sender">
                                 <div class="reaction-icon"><img src="./assets/images/reaction/check_mark.png"
                                         alt="Check Mark"
-                                        (click)="addOrUpdateReaction(messages, './assets/images/reaction/check_mark.png')">
+                                        (click)="addOrUpdateReaction(message, './assets/images/reaction/check_mark.png', message.conversationId || '')">
                                 </div>
                                 <div class="reaction-icon"><img src="./assets/images/reaction/hands_up.png"
                                         alt="Hands Up"
-                                        (click)="addOrUpdateReaction(messages, './assets/images/reaction/hands_up.png')">
+                                        (click)="addOrUpdateReaction(message, './assets/images/reaction/hands_up.png', message.conversationId || '')">
                                 </div>
                                 <div (click)="showEmojiForReact(message, message.conversationId || '')"
                                     class="reaction-icon">
@@ -120,7 +120,7 @@
 
                             <div class="show-reactions">
                                 <div class="reaction-icon-button" *ngFor="let reaction of message.reactions"
-                                    (click)="addOrUpdateReaction(message, reaction.emoji)">
+                                    (click)="addOrUpdateReaction(message, reaction.emoji, message.conversationId || '')">
 
                                     <!-- Überprüfung, ob reaction.emoji ein Bildpfad ist -->
                                     <ng-container *ngIf="reaction.emoji.includes('.png'); else emojiText">

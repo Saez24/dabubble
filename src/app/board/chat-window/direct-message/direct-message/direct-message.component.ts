@@ -167,7 +167,6 @@ export class DirectMessageComponent implements OnInit {
   }
 
 
-
   addEmoji(event: any) {
     this.directChatMessage += event.emoji.native;
   }
@@ -176,64 +175,28 @@ export class DirectMessageComponent implements OnInit {
     this.editedMessage += event.emoji.native;
   }
 
-  // async findConversation(message: DirectMessage, conversationId: string): Promise<{ conversation: any, index: number } | null> {
-  //   console.log("Message:", message);
-  //   console.log("Gesuchte ConversationId:", conversationId);
 
-  //   try {
-  //     // Hole die Referenz zum Dokument
-  //     const messageDocRef = doc(this.firestore, `direct_messages/${this.messageId}`);
-
-  //     // Hole die Daten des Dokuments
-  //     const docSnapshot = await getDoc(messageDocRef);
-
-  //     // Überprüfe, ob das Dokument existiert
-  //     if (!docSnapshot.exists()) {
-  //       console.warn(`Dokument mit ID ${this.messageId} existiert nicht.`);
-  //       return null;
-  //     }
-
-  //     // Hole das Array der Konversationen aus dem Dokument
-  //     const data = docSnapshot.data();
-  //     const conversations = data['conversation'];
-
-  //     if (!Array.isArray(conversations)) {
-  //       console.warn('message.conversation ist entweder nicht definiert oder kein Array.');
-  //       return null;
-  //     }
-
-  //     // Durchlaufe die Konversationen, um die gesuchte Konversation zu finden
-  //     for (let index = 0; index < conversations.length; index++) {
-  //       const convo = conversations[index];
-
-  //       // Überprüfe, ob die conversationId übereinstimmt
-  //       if (convo.conversationId === conversationId) {
-  //         return { conversation: convo, index: index };  // Rückgabe der Konversation und des Index
-  //       }
-  //     }
-
-  //     console.warn(`Keine Konversation mit der ID ${conversationId} gefunden.`);
-  //     return null;  // Rückgabe null, falls keine Konversation gefunden wurde
-
-  //   } catch (error) {
-  //     console.error("Fehler beim Abrufen des Dokuments:", error);
-  //     return null;
-  //   }
-  // }
-
-
-  addOrUpdateReaction(message: DirectMessage, emoji: string): void {
+  addOrUpdateReaction(message: DirectMessage, emoji: string, conversationId: string): void {
     const currentUser = this.currentUser();
     if (!currentUser) {
       console.warn('Kein Benutzer gefunden!');
       return;
     }
 
+    this.conversationId = conversationId;
+    this.selectedMessage = message;
+    const conversation = this.selectedMessage
     const senderID = currentUser.id ?? '';
     const senderName = currentUser.name || '';
+    const safeSenderID = senderID ?? '';
+    const emojiReaction = this.selectedMessage?.reactions.find(
+      (r: EmojiReaction) => r.emoji === emoji
+    );
 
     // Überprüfe, ob selectedMessage vorhanden ist
-    if (!this.selectedMessage) {
+    if (conversation) {
+      console.log('Gefundene Konversation:', conversation);
+    } else {
       console.warn('selectedMessage ist null oder nicht definiert!');
       return;
     }
@@ -244,27 +207,35 @@ export class DirectMessageComponent implements OnInit {
       this.selectedMessage.reactions = [];
     }
 
-    // Suche nach der bestehenden Reaktion für das gegebene Emoji
-    let emojiReaction = this.selectedMessage?.reactions.find(
-      (r: EmojiReaction) => r.emoji === emoji
-    );
 
     if (emojiReaction) {
       // Überprüfe, ob der Benutzer bereits reagiert hat
       const senderIDs = emojiReaction.senderID ? emojiReaction.senderID.split(', ') : [];
       const senderNames = emojiReaction.senderName ? emojiReaction.senderName.split(', ') : [];
+      const currentUserIndex = senderIDs.indexOf(safeSenderID);
 
-      if (!senderIDs.includes(senderID)) {
-        // Benutzer hat noch nicht reagiert, also Reaktion hinzufügen
+      if (currentUserIndex > -1) {
+        // Reaktion entfernen
+        senderIDs.splice(currentUserIndex, 1);
+        senderNames.splice(currentUserIndex, 1);
+        emojiReaction.count -= 1;
+
+        if (emojiReaction.count === 0) {
+          const emojiIndex = this.selectedMessage.reactions.indexOf(emojiReaction);
+          this.selectedMessage.reactions.splice(emojiIndex, 1);
+        } else {
+          emojiReaction.senderID = senderIDs.join(', ');
+          emojiReaction.senderName = senderNames.join(', ');
+        }
+      } else {
+        // Reaktion hinzufügen
         emojiReaction.count += 1;
-        senderIDs.push(senderID);
-        senderNames.push(senderName);
-        emojiReaction.senderID = senderIDs.join(', ');
-        emojiReaction.senderName = senderNames.join(', ');
+        emojiReaction.senderID += (emojiReaction.senderID ? ', ' : '') + safeSenderID;
+        emojiReaction.senderName += (emojiReaction.senderName ? ', ' : '') + senderName;
       }
     } else {
       // Neue Reaktion hinzufügen, wenn sie noch nicht existiert
-      this.selectedMessage?.reactions.push({
+      this.selectedMessage.reactions.push({
         emoji: emoji,
         senderID: senderID,
         senderName: senderName,
@@ -277,11 +248,9 @@ export class DirectMessageComponent implements OnInit {
   }
 
 
-
-
   async updateMessageReactions(message: DirectMessage): Promise<void> {
     const messageDocRef = doc(this.firestore, `direct_messages/${this.messageId}`);
-    console.log(messageDocRef);
+    // console.log(messageDocRef);
 
     // Hole das aktuelle conversation-Array aus Firestore
     const messageSnapshot = await getDoc(messageDocRef);
@@ -332,7 +301,7 @@ export class DirectMessageComponent implements OnInit {
       // Überprüfe, ob selectedMessage die KonversationId enthält
       if (this.selectedMessage.conversationId) {
         // Konversation gefunden, füge oder aktualisiere die Reaktion
-        this.addOrUpdateReaction(this.selectedMessage, emoji);
+        this.addOrUpdateReaction(this.selectedMessage, emoji, this.conversationId);
         this.showEmojiPickerReact = false;
         console.log(this.selectedMessage);
         console.log(this.conversationId);
