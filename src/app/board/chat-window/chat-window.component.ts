@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -8,26 +8,17 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule } from '@angular/forms';
 import { CommonModule, NgFor, NgIf } from '@angular/common';
 import { PickerComponent } from '@ctrl/ngx-emoji-mart';
-import { Message } from '../../shared/models/message.class';
 import { User } from '../../shared/models/user.class';
 import { Channel } from '../../shared/models/channel.class';
-import { addDoc, arrayUnion, collection, doc, Firestore, getDocs, onSnapshot, orderBy, query, updateDoc, where } from '@angular/fire/firestore';
-import { Auth, user } from '@angular/fire/auth';
+import { collection, Firestore, onSnapshot, orderBy, query, } from '@angular/fire/firestore';
+import { Auth, } from '@angular/fire/auth';
 import { UserService } from '../../shared/services/firestore/user-service/user.service';
 import { AuthService } from '../../shared/services/authentication/auth-service/auth.service';
 import { UploadFileService } from '../../shared/services/firestore/storage-service/upload-file.service';
-import { SafeUrlPipe } from '../../shared/pipes/safe-url.pipe';
 import { ChannelsService } from '../../shared/services/channels/channels.service';
-import { ChannelDescriptionDialogComponent } from '../../dialogs/channel-description-dialog/channel-description-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { MessagesService } from '../../shared/services/messages/messages.service';
-import { AddMemberDialogComponent } from '../../dialogs/add-member-dialog/add-member-dialog.component';
-import { DirectMessageComponent } from './direct-message/direct-message/direct-message.component';
-import { ChannelMessageComponent } from './channel-message/channel-message/channel-message.component';
-import { DirectMessage } from '../../shared/models/direct.message.class';
-import { WorkspaceComponent } from '../workspace/workspace.component';
 import { SendMessageService } from '../../shared/services/messages/send-message.service';
-import { BehaviorSubject } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 
@@ -36,7 +27,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   selector: 'app-chat-window',
   standalone: true,
   imports: [MatCardModule, MatButtonModule, MatIconModule, MatDividerModule, FormsModule,
-    MatFormFieldModule, MatInputModule, CommonModule, PickerComponent, NgIf, NgFor, SafeUrlPipe, AddMemberDialogComponent, DirectMessageComponent, ChannelMessageComponent],
+    MatFormFieldModule, MatInputModule, CommonModule, PickerComponent, NgIf, NgFor],
   templateUrl: './chat-window.component.html',
   styleUrl: './chat-window.component.scss',
   changeDetection: ChangeDetectionStrategy.Default,

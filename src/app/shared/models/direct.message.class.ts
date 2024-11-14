@@ -31,6 +31,8 @@ export class DirectMessage {
         displayDate: string | null;
         senderAvatar: string | null | undefined;
         fileURL: string | null;
+        markedUser?: { userName: string; UserID: string; }[];
+        readedMessage: boolean;
     }[];
 
 

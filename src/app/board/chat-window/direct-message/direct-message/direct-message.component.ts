@@ -44,6 +44,7 @@ export class DirectMessageComponent implements OnInit {
   selectedMessage: DirectMessage | null = null;
   messages = this.messagesService.messages;
   users: User[] = [];
+  filteredUsers: User[] = [];
   channels: Channel[] = [];
   currentUser = this.authService.getUserSignal();
   showEmojiPicker = false;
@@ -64,7 +65,9 @@ export class DirectMessageComponent implements OnInit {
   messageId: string | null = null;
   conversationId = '';
   editingConversationId: string | null = null;
-
+  searchQuery: string = '';
+  isSearching: boolean = false;
+  markedUser: { id: string; name: string }[] = [];
 
 
   @ViewChild('chatWindow') private chatWindow!: ElementRef;
@@ -80,8 +83,7 @@ export class DirectMessageComponent implements OnInit {
       this.messageId = id;
       // console.log('Aktuelle Message ID:', this.messageId);
     });
-
-
+    this.loadData();
   }
 
   async loadData() {
@@ -107,21 +109,60 @@ export class DirectMessageComponent implements OnInit {
     });
   }
 
-  // loadConversation(message: DirectMessage): void {
-  //   if (message) {
-  //     this.messagesService.loadConversations(message);
-  //   } else {
-  //     console.error('Keine Nachricht zum Laden verfügbar');
-  //   }
-  // }
+  updateSearchQuery(event: Event): void {
+    const target = event.target as HTMLTextAreaElement;
+    const fullText = target.value;
 
-  // testLoadConversation(): void {
-  //   this.message = {
-  //     messageId: 'deineMessageId'  // Setze die tatsächliche messageId
-  //   } as DirectMessage;
+    // Suche nach dem letzten `@`-Symbol und extrahiere den Teil danach
+    const lastAtIndex = fullText.lastIndexOf('@');
+    this.searchQuery = lastAtIndex !== -1 ? fullText.slice(lastAtIndex + 1).trim().toLowerCase() : '';
 
-  //   this.loadConversation(this.message);
-  // }
+    // Aktivieren der Suche, falls es eine Eingabe nach dem `@` gibt
+    this.isSearching = this.searchQuery.length > 0;
+    if (this.isSearching) {
+      this.onSearch();
+    } else {
+      this.filteredUsers = []; // Gefilterte Liste zurücksetzen, wenn keine Suche aktiv ist
+    }
+  }
+
+  selectUser(user: User) {
+    if (user && user.id) {
+      // Entferne das letzte '@' und füge den vollständigen Benutzernamen hinzu
+      this.directChatMessage = this.directChatMessage.trim(); // Leerzeichen am Ende entfernen
+      const lastAtIndex = this.directChatMessage.lastIndexOf('@');
+      if (lastAtIndex !== -1) {
+        // Entferne den '@' und alles dahinter (einschließlich des letzten Benutzernamens)
+        this.directChatMessage = this.directChatMessage.slice(0, lastAtIndex);
+      }
+
+      // Füge den neuen Benutzernamen hinzu
+      this.directChatMessage += ` @${user.name} `;
+
+      // Benutzer zu `markedUser` hinzufügen, falls noch nicht vorhanden
+      if (!this.markedUser.some(u => u.id === user.id)) {
+        this.markedUser.push({ id: user.id, name: user.name });
+        console.log(this.markedUser);
+
+      }
+
+      // Suche zurücksetzen
+      this.isSearching = false;
+      this.searchQuery = '';
+      this.filteredUsers = [];
+    } else {
+      console.error("Ungültiger Benutzer:", user);
+    }
+  }
+
+
+  onSearch(): void {
+    this.filteredUsers = this.users.filter(user =>
+      user.name.toLowerCase().startsWith(this.searchQuery) ||
+      (user.email && user.email.toLowerCase().startsWith(this.searchQuery))
+    );
+  }
+
 
 
   showEmoji() {
@@ -443,6 +484,13 @@ export class DirectMessageComponent implements OnInit {
         const messagesRef = collection(this.firestore, 'direct_messages');
         const conversationId = uuidv4();
 
+        const markedUserDetails = this.markedUser.map(user => ({
+          id: user.id,
+          name: user.name
+        }));
+
+        // const cleanedMessage = this.cleanMessage(this.directChatMessage);
+
         if (this.messageId) {
           // Konversation existiert, also aktualisiere sie
           const messageDocRef = doc(messagesRef, this.messageId);
@@ -459,6 +507,8 @@ export class DirectMessageComponent implements OnInit {
               senderId: currentUser()?.id,
               receiverId: this.selectedUser?.id,
               fileURL: '',
+              markedUser: markedUserDetails,
+              readedMessage: false,
             })
           });
 
@@ -500,6 +550,8 @@ export class DirectMessageComponent implements OnInit {
                 senderId: newMessage.senderId,
                 receiverId: newMessage.receiverId,
                 fileURL: '',
+                markedUser: markedUserDetails,
+                readedMessage: false,
               }
             ]
           });
@@ -519,13 +571,29 @@ export class DirectMessageComponent implements OnInit {
         // Eingabefelder bereinigen und Scrollen
         this.directChatMessage = '';
         this.selectedFile = null;
-        this.scrollToBottom();
         this.deleteUpload();
       } else {
         console.error('Kein Benutzer angemeldet');
       }
     }
   }
+
+  // // Funktion zum Bereinigen der Nachricht und Entfernen der @Benutzername
+  // cleanMessage(message: string): string {
+  //   // Durchlaufe alle markierten Benutzer und entferne jede `@Benutzername`-Markierung
+  //   this.markedUser.forEach(user => {
+  //     const userTag = `@${user.name}`;
+  //     const userTagIndex = message.indexOf(userTag);
+
+  //     if (userTagIndex !== -1) {
+  //       // Entfernt die `@Benutzername`-Markierung aus der Nachricht
+  //       message = message.replace(userTag, '').trim();
+  //     }
+  //   });
+
+  //   return message; // Bereinigte Nachricht wird zurückgegeben
+  // }
+
 
 
   scrollToBottom(): void {

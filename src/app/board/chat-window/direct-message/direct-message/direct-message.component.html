@@ -170,8 +170,10 @@
 
     </div>
     <div class="chat-message-input-container">
-        <textarea class="message-input" id="directChatMessage" [(ngModel)]="directChatMessage" type="text"
-            placeholder="Schreiben Sie Ihre Nachricht"></textarea>
+        <textarea class="message-input" id="directChatMessage" [(ngModel)]="directChatMessage"
+            (input)="updateSearchQuery($event)" type="text" placeholder="Schreiben Sie Ihre Nachricht">
+        </textarea>
+
 
         <!-- Datei-Vorschau -->
 
@@ -213,5 +215,13 @@
         <emoji-mart class="emoji-mart-chat" *ngIf="showEmojiPickerReact" (emojiSelect)="addEmojiForReact($event)"
             [darkMode]="false" title="Pick your emoji…" emoji="point_up">
         </emoji-mart>
+    </div>
+
+    <div class="search-block" *ngIf="isSearching && filteredUsers.length > 0">
+        <div class="found-block">
+            <div class="found-users" *ngFor="let user of filteredUsers" (click)="selectUser(user)"><img
+                    [src]="user.avatarPath" alt="">{{
+                user.name }}</div>
+        </div>
     </div>
 </div>
