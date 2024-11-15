@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -8,7 +8,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule } from '@angular/forms';
 import { CommonModule, NgFor, NgIf } from '@angular/common';
 import { PickerComponent } from '@ctrl/ngx-emoji-mart';
-import { addDoc, collection, doc, Firestore, getDoc, onSnapshot, orderBy, query, updateDoc } from '@angular/fire/firestore';
+import { addDoc, collection, doc, Firestore, onSnapshot, orderBy, query, updateDoc } from '@angular/fire/firestore';
 import { Auth } from '@angular/fire/auth';
 import { MatDialog } from '@angular/material/dialog';
 import { User } from '../../../../shared/models/user.class';
@@ -18,7 +18,6 @@ import { AuthService } from '../../../../shared/services/authentication/auth-ser
 import { UploadFileService } from '../../../../shared/services/firestore/storage-service/upload-file.service';
 import { ChannelsService } from '../../../../shared/services/channels/channels.service';
 import { MessagesService } from '../../../../shared/services/messages/messages.service';
-import { SafeUrlPipe } from '../../../../shared/pipes/safe-url.pipe';
 import { AddMemberDialogComponent } from '../../../../dialogs/add-member-dialog/add-member-dialog.component';
 import { ChannelDescriptionDialogComponent } from '../../../../dialogs/channel-description-dialog/channel-description-dialog.component';
 import { Message } from '../../../../shared/models/message.class';
@@ -29,7 +28,7 @@ import { Message } from '../../../../shared/models/message.class';
   selector: 'app-channel-message',
   standalone: true,
   imports: [MatCardModule, MatButtonModule, MatIconModule, MatDividerModule, FormsModule,
-    MatFormFieldModule, MatInputModule, CommonModule, PickerComponent, NgIf, NgFor, SafeUrlPipe, AddMemberDialogComponent],
+    MatFormFieldModule, MatInputModule, CommonModule, PickerComponent, NgIf, NgFor],
   templateUrl: './channel-message.component.html',
   styleUrl: './channel-message.component.scss',
   changeDetection: ChangeDetectionStrategy.Default,
