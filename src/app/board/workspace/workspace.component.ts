@@ -8,7 +8,7 @@ import { ChannelsService } from '../../shared/services/channels/channels.service
 import { MatDialog } from '@angular/material/dialog';
 import { CreateNewChannelDialog } from '../../dialogs/create-new-channel-dialog/create-new-channel-dialog.component';
 import { Channel } from '../../shared/models/channel.class';
-import { collection, Firestore, onSnapshot, orderBy, query } from '@angular/fire/firestore';
+import { collection, doc, Firestore, getDocs, onSnapshot, orderBy, query } from '@angular/fire/firestore';
 import { Auth, User as FirebaseUser } from '@angular/fire/auth';
 import { User } from '../../shared/models/user.class';
 import { MessagesService } from '../../shared/services/messages/messages.service';
@@ -16,6 +16,8 @@ import { AuthService } from '../../shared/services/authentication/auth-service/a
 import { ChatUtilityService } from '../../shared/services/messages/chat-utility.service';
 import { Overlay } from '@angular/cdk/overlay';
 import { MatBadgeModule } from '@angular/material/badge';
+import { Message } from '../../shared/models/message.class';
+import { DirectMessage } from '../../shared/models/direct.message.class';
 
 @Component({
   selector: 'app-workspace',
@@ -36,7 +38,7 @@ import { MatBadgeModule } from '@angular/material/badge';
   encapsulation: ViewEncapsulation.None
 })
 export class WorkspaceComponent implements OnInit {
-  directMessages = this.messagesService.directMessages;
+  directMessages: DirectMessage[] = [];
   channels: Channel[] = [];
   users: User[] = [];
   clickedChannels: boolean[] = [];
@@ -44,9 +46,11 @@ export class WorkspaceComponent implements OnInit {
   icons: string[] = [];
   panelOpenState = false;
   arrowRotated: boolean[] = [false, false];
-  isDirectmessage: boolean = false;
+  isUnread: boolean = false;
   currentUserUid: string | null = null;
   currentUserChannels: Channel[] = [];
+  userConversationCount: number = 0;
+  unreadMessagesCount: number = 0;
   @Input() openChatWindow!: () => void;
   @Output() openChannelEvent = new EventEmitter<void>();
   @Output() clickUserEvent = new EventEmitter<void>();
@@ -64,7 +68,7 @@ export class WorkspaceComponent implements OnInit {
     private auth: Auth,
     private messagesService: MessagesService,
     private chatUtilityService: ChatUtilityService,
-    private overlay: Overlay
+    private overlay: Overlay,
   ) {
   }
 
@@ -85,7 +89,63 @@ export class WorkspaceComponent implements OnInit {
     this.chatUtilityService.openChannelMessageEvent.subscribe(({ selectedChannel, index }) => {
       this.openChannel(selectedChannel, index);
     });
+
+    this.loadAllConversations();
   }
+
+  async loadAllConversations(): Promise<void> {
+    try {
+      // Referenz zur gesamten Sammlung `direct_messages`
+      const messagesCollectionRef = collection(this.firestore, 'direct_messages');
+
+      // Abrufen aller Dokumente innerhalb der Sammlung
+      const querySnapshot = await getDocs(messagesCollectionRef);
+
+      let userConversationCount = 0; // Variable zum Zählen der Konversationen des aktuellen Benutzers
+      let unreadMessagesCount = 0;
+
+      // Durchlaufe jedes Dokument in der Sammlung
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        const conversations = data['conversation'] || []; // Falls keine Konversationen vorhanden sind, leeres Array verwenden
+
+        // Filtere Konversationen, bei denen der `currentUserUid` der Empfänger ist
+        const userConversations = conversations.filter((conv: any) =>
+          conv.receiverId === this.currentUserUid && conv.readedMessage === false
+        );
+
+        // Addiere die Anzahl der ungelesenen Konversationen des aktuellen Benutzers
+        unreadMessagesCount += userConversations.length;
+
+        // Speichere alle Nachrichten
+        this.directMessages.push({ messageId: doc.id, ...data } as DirectMessage);
+
+        // Wenn der Sender eine ungelesene Nachricht an den aktuellen Benutzer geschickt hat
+        const senderConversations = conversations.filter((conv: any) =>
+          conv.senderId === this.currentUserUid && conv.readedMessage === false
+        );
+
+        // Falls ungelesene Nachrichten des Senders existieren
+        if (senderConversations.length > 0) {
+          // Setze für den Sender den Badge (z.B. um anzuzeigen, dass es ungelesene Nachrichten gibt)
+          // Für jeden Sender können wir hier eine Zählung der ungelesenen Nachrichten vornehmen
+          // Dies könnte in einer zusätzlichen Eigenschaft für den Sender gespeichert werden
+          this.unreadMessagesCount += senderConversations.length;
+        }
+      });
+
+      // Wenn ungelesene Nachrichten vorhanden sind, setze `isUnread` auf true
+      this.isUnread = unreadMessagesCount > 0;
+
+      console.log(`Anzahl der ungelesenen Nachrichten: ${this.unreadMessagesCount}`);
+
+    } catch (error) {
+      console.error('Fehler beim Laden der Konversationen:', error);
+    }
+  }
+
+
+
 
   async loadData(user: FirebaseUser) {
     this.currentUserUid = user.uid; // Setze die currentUserUid hier
