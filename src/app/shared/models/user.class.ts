@@ -1,12 +1,14 @@
 type loginState = 'loggedIn' | 'loggedOut' | 'inactive';
 
 export class User {
-    id: string | null;
+    id: string;
     email: string | null;
     name: string;
     avatarPath: string | null;
     loginState: loginState;
     channels: string[] = [];
+    unreadMessagesCount: number = 0;
+
 
     constructor(obj?: any) {
         this.id = obj ? obj.id : null;

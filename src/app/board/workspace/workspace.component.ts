@@ -101,8 +101,8 @@ export class WorkspaceComponent implements OnInit {
       // Abrufen aller Dokumente innerhalb der Sammlung
       const querySnapshot = await getDocs(messagesCollectionRef);
 
-      let userConversationCount = 0; // Variable zum Zählen der Konversationen des aktuellen Benutzers
-      let unreadMessagesCount = 0;
+      // Initialisiere ein Mapping, um ungelesene Nachrichten pro Sender zu speichern
+      const unreadMessagesBySender: { [key: string]: number } = {};
 
       // Durchlaufe jedes Dokument in der Sammlung
       querySnapshot.forEach((doc) => {
@@ -111,39 +111,34 @@ export class WorkspaceComponent implements OnInit {
 
         // Filtere Konversationen, bei denen der `currentUserUid` der Empfänger ist
         const userConversations = conversations.filter((conv: any) =>
-          conv.receiverId === this.currentUserUid && conv.readedMessage === false
+          conv.receiverId === this.currentUserUid && !conv.readedMessage
         );
 
-        // Addiere die Anzahl der ungelesenen Konversationen des aktuellen Benutzers
-        unreadMessagesCount += userConversations.length;
+        // Für jede gefundene ungelesene Nachricht: Zähle die Nachrichten pro Sender
+        userConversations.forEach((conv: any) => {
+          if (!unreadMessagesBySender[conv.senderId]) {
+            unreadMessagesBySender[conv.senderId] = 0;
+          }
+          unreadMessagesBySender[conv.senderId]++;
+        });
 
         // Speichere alle Nachrichten
         this.directMessages.push({ messageId: doc.id, ...data } as DirectMessage);
-
-        // Wenn der Sender eine ungelesene Nachricht an den aktuellen Benutzer geschickt hat
-        const senderConversations = conversations.filter((conv: any) =>
-          conv.senderId === this.currentUserUid && conv.readedMessage === false
-        );
-
-        // Falls ungelesene Nachrichten des Senders existieren
-        if (senderConversations.length > 0) {
-          // Setze für den Sender den Badge (z.B. um anzuzeigen, dass es ungelesene Nachrichten gibt)
-          // Für jeden Sender können wir hier eine Zählung der ungelesenen Nachrichten vornehmen
-          // Dies könnte in einer zusätzlichen Eigenschaft für den Sender gespeichert werden
-          this.unreadMessagesCount += senderConversations.length;
-        }
       });
 
-      // Wenn ungelesene Nachrichten vorhanden sind, setze `isUnread` auf true
-      this.isUnread = unreadMessagesCount > 0;
+      // Weise den Benutzern in der Benutzerliste die ungelesenen Nachrichten zu
+      this.users = this.users.map((user) => {
+        return {
+          ...user,
+          unreadMessagesCount: unreadMessagesBySender[user.id] || 0, // Standardwert: 0
+        };
+      });
 
-      console.log(`Anzahl der ungelesenen Nachrichten: ${this.unreadMessagesCount}`);
-
+      console.log('Ungelesene Nachrichten pro Sender:', unreadMessagesBySender);
     } catch (error) {
       console.error('Fehler beim Laden der Konversationen:', error);
     }
   }
-
 
 
 
