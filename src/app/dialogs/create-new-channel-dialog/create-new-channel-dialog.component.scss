@@ -1,5 +1,11 @@
 @import '../../../mixin.scss';
 
+.cdk-global-scrollblock{
+    position: static !important;
+    width: initial !important;
+    overflow-y: inherit !important;
+}
+
 .dialog-content {
     padding: 40px;
     background-color: white;
@@ -39,7 +45,7 @@ span {
     color: black;
 }
 
-header {
+.header {
     width: 100%;
     padding: 0;
     height: 40px;
@@ -64,6 +70,11 @@ form {
 .channel-name {
     width: 100%;
     @include dFlex($g: 20px, $fd: column, $ai: flex-start);
+
+    .icon {
+        height: 15.79px !important;
+        width: 15.33px !important;
+    }
 }
 
 .channel-description {
@@ -97,11 +108,6 @@ form {
 
 .mdc-text-field--outlined .mat-mdc-form-field-infix, .mdc-text-field--no-label .mat-mdc-form-field-infix {
     @include dFlex($g: 15px, $ai: center)
-}
-
-.icon {
-    height: 15.79px !important;
-    width: 15.33px !important;
 }
 
 .mdc-text-field--outlined {

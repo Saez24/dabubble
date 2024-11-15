@@ -8,6 +8,7 @@ export class Message {
     answers: Message[];
     formattedTimestamp: string;
     isOwnMessage: boolean = false;
+    isOwnChatMessage: boolean = false;
     displayDate: string | null;
     senderAvatar: string | null | undefined;
     parentMessageId: string | null;
@@ -33,6 +34,10 @@ export class Message {
         // Typensicherer Vergleich, um sowohl null als auch undefined abzudecken
         if (currentUserUid && this.senderID) {
             this.isOwnMessage = this.senderID === currentUserUid;
+        }
+
+        if (currentUserUid && this.senderID) {
+            this.isOwnChatMessage = this.senderID === currentUserUid;
         }
     }
 }

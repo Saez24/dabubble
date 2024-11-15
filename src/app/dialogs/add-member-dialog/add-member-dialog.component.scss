@@ -9,7 +9,7 @@
     flex-direction: column;
     position: absolute;
     background: white;
-    top: 150px;
+    top: 215px;
     left: 80px;
     width: 320px;
     gap: 15px;
@@ -28,3 +28,20 @@
         font-size: 18px;
     }
 }
+
+.header-add-people-dialog {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.add-people-dialog-content {
+    padding: 40px;
+    @include dFlex($g: 24px, $fd: column, $jc: flex-start, $ai: flex-start);
+
+    .icon {
+        width: 20.59px !important;
+        height: 20px !important;
+    }
+}
+

@@ -106,7 +106,7 @@ export class SendMessageService {
               conversation: arrayUnion({
                 senderName: currentUser()?.name,
                 message: this.chatMessage,
-                reaction: [],
+                reactions: [],
                 timestamp: new Date(),
                 receiverName: this.selectedUser?.name, // Zugriff auf den Namen des ausgewählten Benutzers
                 senderId: currentUser()?.id,
@@ -144,7 +144,7 @@ export class SendMessageService {
               conversation: [{
                 senderName: newMessage.senderName,
                 message: newMessage.message,
-                reaction: newMessage.reactions,
+                reactions: newMessage.reactions,
                 timestamp: new Date(),
                 receiverName: newMessage.receiverName,
                 senderId: newMessage.senderId,
@@ -198,7 +198,7 @@ export class SendMessageService {
             senderName: newMessage.senderName,
             message: newMessage.message,
             channelId: newMessage.channelId,
-            reaction: newMessage.reactions,
+            reactions: newMessage.reactions,
             answers: newMessage.answers,
             timestamp: new Date(),
           });

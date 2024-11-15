@@ -42,18 +42,21 @@ export class ChannelMessageComponent {
   users: User[] = [];
   channels: Channel[] = [];
   currentUser = this.authService.getUserSignal();
-  showEmojiPicker = false;
+  showEmojiPicker: boolean = false;
+  showEmojiPickerEdit: boolean = false;
+  showEmojiPickerReact: boolean = false;
   showMessageEdit = false;
   showMessageEditArea = false;
   channelChatMessage = '';
   messageArea = true;
-  editedMessage = '';
+  editedMessage: string = '';
   currentUserUid = '';
   editingMessageId: string | null = null;
   senderAvatar: string | null = null;
   senderName: string | null = null;
   selectedFile: File | null = null;// Service für den Datei-Upload
   filePreviewUrl: string | null = null;
+
 
 
   @ViewChild('chatWindow') private chatWindow!: ElementRef;
@@ -99,12 +102,154 @@ export class ChannelMessageComponent {
   }
 
   showEmoji() {
-    this.messageService.showEmoji();
+    this.showEmojiPickerEdit = false; // Blendet den anderen Picker sofort aus
+
+    // Füge eine Verzögerung hinzu, bevor der aktuelle Picker angezeigt wird
+    setTimeout(() => {
+      this.showEmojiPicker = !this.showEmojiPicker;
+    }, 200); // 200ms Verzögerung, anpassbar nach Bedarf
   }
+
+  showEmojiForEdit() {
+    this.showEmojiPicker = false; // Blendet den anderen Picker sofort aus
+
+    // Füge eine Verzögerung hinzu, bevor der aktuelle Picker angezeigt wird
+    setTimeout(() => {
+      this.showEmojiPickerEdit = !this.showEmojiPickerEdit;
+    }, 200); // 200ms Verzögerung, anpassbar nach Bedarf
+  }
+
+  showEmojiForReact(message: Message) {
+    this.showEmojiPicker = false; // Blendet den anderen Picker sofort aus
+    this.showEmojiPickerEdit = false;
+    this.selectedMessage = message;
+    console.log(this.selectedMessage);
+    // Füge eine Verzögerung hinzu, bevor der aktuelle Picker angezeigt wird
+    setTimeout(() => {
+      this.showEmojiPickerReact = !this.showEmojiPickerReact;
+      console.log('showEmojiPickerReact:', this.showEmojiPickerReact);
+    }, 200); // 200ms Verzögerung, anpassbar nach Bedarf
+  }
+
+
 
   addEmoji(event: any) {
     this.channelChatMessage += event.emoji.native;
   }
+
+  addEmojiForEdit(event: any) {
+    this.editedMessage += event.emoji.native;
+  }
+
+  addOrUpdateReaction(message: Message, emoji: string): void {
+    const currentUser = this.currentUser();
+    if (!currentUser) {
+      console.warn('Kein Benutzer gefunden!');
+      return;
+    }
+
+    const senderID = currentUser.id;
+    const senderName = currentUser.name || '';
+    const emojiReaction = message.reactions.find(r => r.emoji === emoji);
+
+    // Sicherstellen, dass senderID immer ein string ist
+    const safeSenderID = senderID ?? '';  // Fällt auf einen leeren String zurück, wenn senderID null oder undefined ist
+
+    if (emojiReaction) {
+      // Sicherstellen, dass senderID immer ein Array von Strings ist, auch wenn es null ist
+      const senderIDs = emojiReaction.senderID ? emojiReaction.senderID.split(', ') : [];
+      const senderNames = emojiReaction.senderName ? emojiReaction.senderName.split(', ') : [];
+      const currentUserIndex = senderIDs.indexOf(safeSenderID);
+
+      if (currentUserIndex > -1) {
+        // Reaktion entfernen
+        senderIDs.splice(currentUserIndex, 1);
+        senderNames.splice(currentUserIndex, 1);
+        emojiReaction.count -= 1;
+
+        if (emojiReaction.count === 0) {
+          const emojiIndex = message.reactions.indexOf(emojiReaction);
+          message.reactions.splice(emojiIndex, 1);
+        } else {
+          emojiReaction.senderID = senderIDs.join(', ');
+          emojiReaction.senderName = senderNames.join(', ');
+        }
+      } else {
+        // Reaktion hinzufügen
+        emojiReaction.count += 1;
+        emojiReaction.senderID += (emojiReaction.senderID ? ', ' : '') + safeSenderID;
+        emojiReaction.senderName += (emojiReaction.senderName ? ', ' : '') + senderName;
+      }
+    } else {
+      // Neue Reaktion hinzufügen
+      message.reactions.push({
+        emoji: emoji,
+        senderID: safeSenderID,
+        senderName: senderName,
+        count: 1
+      });
+    }
+
+    this.updateMessageReactions(message); // Aktualisiere die Reaktionen in Firestore
+  }
+
+
+  updateMessageReactions(message: Message): void {
+    const messageDocRef = doc(this.firestore, `messages/${message.messageId}`);
+    updateDoc(messageDocRef, { reactions: message.reactions })
+      .then(() => {
+        console.log('Reaktionen erfolgreich aktualisiert.');
+        this.cd.markForCheck(); // Komponenten-Update anstoßen
+      })
+      .catch(error => {
+        console.error('Fehler beim Aktualisieren der Reaktionen: ', error);
+      });
+  }
+
+  addEmojiForReact(event: any): void {
+    console.log(this.selectedMessage);
+
+    const emoji = event.emoji.native; // Emoji aus dem Event extrahieren
+    if (this.selectedMessage) {
+      this.addOrUpdateReaction(this.selectedMessage, emoji); // Nutzung der bestehenden Funktion zum Hinzufügen oder Aktualisieren von Reaktionen
+      this.showEmojiPickerReact = false; // Emoji-Picker schließen, falls er geöffnet ist
+    }
+  }
+
+  // addEmojiForReact(event: any): void {
+  //   const emoji = event.emoji.native;
+
+  //   if (this.selectedMessage) {
+  //     this.appendEmojiToEditedMessage(this.selectedMessage, emoji);
+  //   } else if (this.selectedMessage) {
+  //     const messageToUpdate = this.findMessageToUpdate(this.selectedMessage);
+
+  //     if (!messageToUpdate) {
+  //       return;
+  //     }
+  //     this.addOrUpdateReaction(messageToUpdate, emoji);
+  //     this.updateMessageReactions(messageToUpdate);
+
+  //   }
+
+  //   this.showEmojiPicker = false;
+  // }
+
+  // private appendEmojiToEditedMessage(message: Message, emoji: string): void {
+  //   const messageToUpdate = this.messages.find((msg) => message.messageId === msg.messageId);
+
+  //   if (messageToUpdate) {
+  //     messageToUpdate.message += emoji;
+  //   }
+  // }
+
+  // private findMessageToUpdate(message: Message): Message | null {
+  //   let messageToUpdate = this.messages.find(msg => message.messageId === msg.messageId) || null;
+  //   if (!messageToUpdate) {
+  //     messageToUpdate = this.selectedMessage || null;
+  //   }
+  //   return messageToUpdate;
+  // }
 
   toggleEmojiPicker() {
     this.messageService.toggleEmojiPicker();
@@ -114,8 +259,14 @@ export class ChannelMessageComponent {
   clickOutside(event: Event) {
     const target = event.target as HTMLElement;
 
-    if (this.messageService.showEmojiPicker && !target.closest('emoji-mart') && !target.closest('.message-icon')) {
-      this.messageService.showEmojiPicker = false;
+    if (this.showEmojiPicker && !target.closest('emoji-mart') && !target.closest('.message-icon')) {
+      this.showEmojiPicker = false;
+    }
+    if (this.showEmojiPickerEdit && !target.closest('emoji-mart') && !target.closest('.message-icon')) {
+      this.showEmojiPickerEdit = false;
+    }
+    if (this.showEmojiPickerReact && !target.closest('emoji-mart') && !target.closest('.message-icon')) {
+      this.showEmojiPickerReact = false;
     }
   }
 
@@ -123,8 +274,9 @@ export class ChannelMessageComponent {
     this.showMessageEdit = !this.showMessageEdit;
   }
 
-  editMessage(docId: string) {
+  editMessage(docId: string, messageText: string | null) {
     this.editingMessageId = docId; // Verwende die Dokument-ID
+    this.editedMessage = messageText || '';
     this.showMessageEditArea = true;
     this.showMessageEdit = false;
   }
@@ -134,7 +286,7 @@ export class ChannelMessageComponent {
     if (this.editingMessageId) { // Nutze die `editingMessageId` (Dokument-ID) anstelle von `message.messageId`
       const messageRef = doc(this.firestore, `messages/${this.editingMessageId}`); // Verweise auf die Dokument-ID
 
-      updateDoc(messageRef, { message: message.message }).then(() => {
+      updateDoc(messageRef, { message: this.editedMessage }).then(() => {
         this.editingMessageId = null;
         this.showMessageEditArea = false;
       }).catch(error => {
@@ -145,6 +297,7 @@ export class ChannelMessageComponent {
 
   cancelMessageEdit() {
     this.editingMessageId = null;
+    this.editedMessage = '';
     this.showMessageEditArea = false;
   }
 
@@ -157,8 +310,6 @@ export class ChannelMessageComponent {
     this.showThreadEvent.emit(message); // Lade Antworten nach Auswahl der Nachricht
     console.log(message);
   }
-
-
 
   showError() {
     console.error("Kein Kanal ausgewählt.");
@@ -217,6 +368,44 @@ export class ChannelMessageComponent {
       }
     }
   }
+
+  formatSenderNames(senderNames: string, senderIDs: string): string {
+    const senderIDList = senderIDs.split(', ');
+    const senderNameList = senderNames.split(', ');
+    const currentUserID = this.currentUser()?.id;
+    const formattedNames = senderNameList.map((name, index) => {
+      return senderIDList[index] === currentUserID ? 'Du' : name;
+    });
+
+    if (formattedNames.length > 2) {
+      const otherCount = formattedNames.length - 1;
+      return `Du und ${otherCount} weitere Personen`;
+    } else if (formattedNames.length === 3) {
+      return `${formattedNames[0]}, ${formattedNames[1]} und ${formattedNames[2]}`;
+    } else if (formattedNames.length === 2) {
+      return `${formattedNames[0]} und ${formattedNames[1]}`;
+    }
+    return formattedNames[0];
+  }
+
+
+  getReactionVerb(senderNames: string, senderIDs: string): string {
+    const senderIDList = senderIDs.split(', ');
+    const senderNameList = senderNames.split(', ');
+    const currentUserID = this.currentUser()?.id;
+    const formattedNames = senderNameList.map((name, index) => {
+      return senderIDList[index] === currentUserID ? 'Du' : name;
+    });
+
+    if (formattedNames.length === 1 && formattedNames[0] === 'Du') {
+      return 'hast reagiert';
+    }
+    if (formattedNames.length === 1) {
+      return 'hat reagiert';
+    }
+    return 'haben reagiert';
+  }
+
 
   scrollToBottom(): void {
     if (this.chatWindow) {
@@ -288,7 +477,7 @@ export class ChannelMessageComponent {
 
   async getSelectedUserInfo(selectedUserId: string | null) {
     console.log('!!!selectedUserId', selectedUserId);
-    
+
     this.userService.showUserInfo.set(true);
     await this.userService.getSelectedUserById(selectedUserId as string);
   }

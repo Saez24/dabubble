@@ -7,7 +7,7 @@ export class DirectMessage {
     senderId: string | null;
     senderName: string | null;
     message: string | null;
-    reactions: { emoji: string; senderName: string; count: number }[] = [];
+    reactions: { emoji: string; senderID: string; senderName: string; count: number }[] = [];
     formattedTimestamp: string;
     isOwnMessage: boolean = false;
     displayDate: string | null;
@@ -15,11 +15,13 @@ export class DirectMessage {
     fileURL: string | null;
     receiverId: string | null;
     receiverName: string | null;
-    conversation: { // Jede Nachricht in der Konversation
+    conversationId: string | null;
+    conversation?: { // Jede Nachricht in der Konversation
+        conversationId: string | null;
         senderName: string | null;
         message: string | null;
         messageId: string;
-        reactions: { emoji: string; senderName: string; count: number }[];
+        reactions: { emoji: string; senderName: string; senderID: string; count: number }[];
         timestamp: any; // Anpassen des Typs je nach Bedarf
         receiverName: string | null;
         receiverId: string | null;
@@ -29,6 +31,8 @@ export class DirectMessage {
         displayDate: string | null;
         senderAvatar: string | null | undefined;
         fileURL: string | null;
+        markedUser?: { userName: string; UserID: string; }[];
+        readedMessage: boolean;
     }[];
 
 
@@ -43,7 +47,9 @@ export class DirectMessage {
         this.fileURL = obj ? obj.fileURL : null;
         this.receiverId = obj ? obj.receiverId : null;
         this.receiverName = obj ? obj.receiverName : null;
-        this.conversation = obj ? obj.conversation : [];
+        this.conversation = Array.isArray(obj?.conversation) ? obj.conversation : [];
+        this.conversationId = obj ? obj.conversationId : null;
+
 
 
         // Typensicherer Vergleich, um sowohl null als auch undefined abzudecken

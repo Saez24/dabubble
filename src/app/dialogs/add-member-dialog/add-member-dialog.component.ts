@@ -62,6 +62,7 @@ export class AddMemberDialogComponent implements OnInit {
     this.currentChannel = this.channelsService.channel;
     this.currentChannelName = this.channelsService.currentChannelName
     this.currentChannelId = this.channelsService.currentChannelId
+    console.log(this.selectedUsers);
   }
 
   async loadData() {

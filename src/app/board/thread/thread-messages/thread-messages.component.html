@@ -46,11 +46,21 @@
           (click)="addOrUpdateReaction(selectedMessage, reaction.emoji)"
         >
           <div class="thread-reaction-name-popup">
-            <span>{{ reaction.emoji }}</span>
+            <ng-container *ngIf="reaction.emoji.includes('.png'); else emojiText">
+              <img [src]="reaction.emoji" alt="Reaction Icon" class="reaction-image">
+          </ng-container>
+          <ng-template #emojiText>
+              {{ reaction.emoji }}
+          </ng-template>
             <h3>{{ formatSenderNames(reaction.senderName, reaction.senderID) }}</h3>
             <span>{{ getReactionVerb(reaction.senderName, reaction.senderID) }}</span>
           </div>
-          <span>{{ reaction.emoji }}</span>
+          <ng-container *ngIf="reaction.emoji.includes('.png'); else emojiText">
+            <img [src]="reaction.emoji" alt="Reaction Icon" class="reaction-image">
+        </ng-container>
+        <ng-template #emojiText>
+            {{ reaction.emoji }}
+        </ng-template>
           {{ reaction.count }}
         </div>
       </div>
@@ -123,11 +133,21 @@
             (click)="addOrUpdateReaction(selectedMessage, reaction.emoji)"
           >
             <div class="thread-reaction-name-popup">
-              <span>{{ reaction.emoji }}</span>
+              <ng-container *ngIf="reaction.emoji.includes('.png'); else emojiText">
+                <img [src]="reaction.emoji" alt="Reaction Icon" class="reaction-image">
+            </ng-container>
+            <ng-template #emojiText>
+                {{ reaction.emoji }}
+            </ng-template>
               <h3>{{ formatSenderNames(reaction.senderName, reaction.senderID) }}</h3>
               <span>{{ getReactionVerb(reaction.senderName, reaction.senderID) }}</span>
             </div>
-            <span>{{ reaction.emoji }}</span>
+            <ng-container *ngIf="reaction.emoji.includes('.png'); else emojiText">
+              <img [src]="reaction.emoji" alt="Reaction Icon" class="reaction-image">
+          </ng-container>
+          <ng-template #emojiText>
+              {{ reaction.emoji }}
+          </ng-template>
             {{ reaction.count }}
           </div>
           <div>

@@ -105,8 +105,8 @@
     display: flex !important;
     flex-direction: column;
     align-items: center;
-    margin-top: 82px;
-    margin-bottom: 68px;
+    margin-top: 130px;
+    margin-bottom: 12px;
     overflow-y: auto;
     overflow-x: hidden;
 }
@@ -349,6 +349,8 @@
                 opacity: 1;
                 visibility: visible;
                 transform: translateX(0);
+                padding: 5px 20px 5px 20px;
+                box-sizing: unset;
             }
         }
     }
@@ -481,7 +483,7 @@
 
 .chat-message-input-container {
     position: relative;
-    bottom: 68px;
+    bottom: 24px;
     height: 175px;
     width: 100%;
     padding: 20px;
@@ -707,6 +709,73 @@
         color: red;
         border-radius: 50%;
         cursor: pointer;
+    }
+}
+
+.search-block {
+    position: absolute;
+    height: auto;
+    max-height: 220px;
+    overflow-y: scroll !important;
+    bottom: 110px;
+    margin: 40px;
+    left: 0;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    background: white;
+    padding: 20px;
+    border-radius: 20px;
+    border: 1px solid #ADB0D9;
+    z-index: 999;
+
+}
+
+/* Anpassung der Scrollbar */
+.search-block::-webkit-scrollbar {
+    display: block !important;
+    width: 10px;
+    /* Breite der Scrollbar */
+}
+
+.search-block::-webkit-scrollbar-thumb {
+    background: #535AF1;
+    /* Farbe des Scrollbalkens */
+    border-radius: 5px;
+    /* Runde Ecken */
+}
+
+.search-block::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    /* Farbe des Scrolltrack */
+}
+
+.found-block {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-height: 100%;
+    scrollbar-width: thin !important;
+    /* Schmale Scrollbar */
+    scrollbar-color: #535AF1 #f1f1f1;
+    /* Farbe Scrollbar und Track */
+    overflow-y: scroll;
+}
+
+.found-users {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-sizing: border-box;
+    font-size: 18px;
+    cursor: pointer;
+    font-weight: 400;
+
+    >img {
+        height: 50px;
+        width: 50px;
+        border-radius: 50%;
     }
 }
 

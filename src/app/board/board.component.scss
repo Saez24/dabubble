@@ -174,7 +174,8 @@ header {
     }
 }
 
-.profil-details, .profil-editor {
+.profil-details,
+.profil-editor {
     padding: 45px 40px;
 }
 
@@ -244,6 +245,7 @@ header {
             font-weight: 700;
             color: #535AF1;
         }
+
     }
 }
 
@@ -251,8 +253,6 @@ mat-toolbar-row {
     background-color: transparent;
     color: rgb(229, 232, 233);
 }
-
-
 
 .mat-expansion-panel-header-description {
     font-weight: 400;
@@ -284,6 +284,7 @@ mat-toolbar-row {
     >mat-card {
         height: 100%;
         border-radius: 30px;
+        width: 100%;
     }
 }
 
@@ -292,7 +293,12 @@ mat-toolbar-row {
     margin: 0 16px;
 }
 
-.thread-container {
+.thread-drawer {
     min-width: 485px;
     width: 485px;
+
+    .mat-drawer-inner-container {
+        height: -webkit-fill-available !important;
+        overflow: hidden !important;
+    }
 }

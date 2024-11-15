@@ -65,8 +65,14 @@ export class SignInComponent {
   }
 
 
-  guestLogin(): void {
-    this.router.navigateByUrl('board');
+  async guestLogin(): Promise<void> {
+    try {
+      await this.authService.guestLogin();
+      this.router.navigateByUrl('board');
+    }
+    catch (error) {
+      console.error('Google login error:', error);
+    }
   }
 
 

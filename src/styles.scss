@@ -73,3 +73,9 @@ input {
     transform: translateX(-50%) !important;
     z-index: 10 !important;
 }
+
+.cdk-global-scrollblock{
+    position: static !important;
+    width: initial !important;
+    overflow-y: inherit !important;
+}

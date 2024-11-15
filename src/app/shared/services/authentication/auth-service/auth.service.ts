@@ -1,13 +1,13 @@
 import { inject, Injectable, signal, EventEmitter, Output } from '@angular/core';
 import { Router } from '@angular/router';
-import { confirmPasswordReset, sendPasswordResetEmail, signInWithEmailAndPassword, signOut, updateProfile, verifyBeforeUpdateEmail } from "firebase/auth";
+import { confirmPasswordReset, sendPasswordResetEmail, signInWithEmailAndPassword, signOut, updateProfile, verifyBeforeUpdateEmail, getAuth, signInAnonymously, onAuthStateChanged } from "firebase/auth";
 import { UserCredential } from "firebase/auth";
 import { UserService } from '../../firestore/user-service/user.service';
 import { Auth, user, User as AuthUser } from '@angular/fire/auth';
 import { User } from '../../../models/user.class';
 import { Subscription } from 'rxjs';
-import { doc, Firestore, onSnapshot } from '@angular/fire/firestore';
-
+import { doc, Firestore, getDoc, getFirestore, onSnapshot, setDoc, updateDoc } from '@angular/fire/firestore';
+import { FirebaseError } from 'firebase/app';
 
 @Injectable({
   providedIn: 'root'
@@ -22,6 +22,7 @@ export class AuthService {
   errorCode: string | null = null
   currentUserUid: string | null | undefined = null;
   currentUser = this.getUserSignal(); // Change to hold an instance of the User class
+  // GUEST_UID = 'RRRUP6BVCtgXTpni8cgrh9rW56D3';
 
   @Output() userUpdated: EventEmitter<User | null | undefined> = new EventEmitter();
 
@@ -109,6 +110,7 @@ export class AuthService {
   }
 
 
+
   async logout(): Promise<void> {
     try {
       if (this.auth.currentUser) {
@@ -125,9 +127,47 @@ export class AuthService {
     }
   }
 
-  async guestLogin() {
-
+  async guestLogin(): Promise<void> {
+    const guestEmail = 'guest@test.de';
+    const guestPassword = 'gastuser';
+    let result: UserCredential = await signInWithEmailAndPassword(this.auth, guestEmail, guestPassword);
+    await this.userService.updateUserLoginState(result.user.uid, 'loggedIn');
   }
+
+
+  // async guestLogin() {
+  //   const db = getFirestore();
+  //   const guestRef = doc(db, 'users', this.GUEST_UID);
+
+  //   // Erstelle ein Gastbenutzer-Objekt mit setCurrentUserObject
+  //   const guestUserObject = {
+  //     uid: this.GUEST_UID,
+  //     email: '', // Gastbenutzer haben normalerweise keine E-Mail
+  //     name: 'Gast',
+  //     avatarPath: './assets/images/avatars/avatar1.svg', // Hier kannst du einen Pfad zu einem Standard-Avatar setzen
+  //     loginState: 'loggedOut',
+  //     channels: [] // Optional: Falls der Gastbenutzer keine Kanäle haben soll, bleibt dies leer
+  //   };
+
+  //   // Überprüfen, ob der Gastbenutzer-Datensatz existiert
+  //   const guestSnapshot = await getDoc(guestRef);
+  //   if (!guestSnapshot.exists()) {
+  //     // Falls kein Gastbenutzer existiert, neuen Gastbenutzer-Datensatz erstellen
+  //     await setDoc(guestRef, guestUserObject);
+  //     console.log('Gastbenutzer erstellt mit UID:', this.GUEST_UID);
+  //   } else {
+  //     console.log('Gastbenutzer existiert bereits mit UID:', this.GUEST_UID);
+
+  //     // Falls der Gastbenutzer bereits existiert, den loginState auf 'loggedIn' ändern
+  //     await updateDoc(guestRef, {
+  //       loginState: 'loggedIn'
+  //     });
+  //     console.log('loginState auf "loggedIn" gesetzt');
+  //   }
+
+  //   // "Anmeldung" simulieren, indem du die UID speicherst
+  //   // localStorage.setItem('guestUID', this.GUEST_UID);
+  // }
 
 
   async updateUserProfile(changes: {}): Promise<void> {

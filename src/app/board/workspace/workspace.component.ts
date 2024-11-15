@@ -3,17 +3,19 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { IconsService } from '../../shared/services/icons/icons.service';
-import { NgClass, NgFor, NgStyle } from '@angular/common';
+import { NgClass, NgFor, NgIf, NgStyle } from '@angular/common';
 import { ChannelsService } from '../../shared/services/channels/channels.service';
 import { MatDialog } from '@angular/material/dialog';
 import { CreateNewChannelDialog } from '../../dialogs/create-new-channel-dialog/create-new-channel-dialog.component';
 import { Channel } from '../../shared/models/channel.class';
-import { collection, doc, documentId, Firestore, getDoc, getDocs, onSnapshot, orderBy, query, where } from '@angular/fire/firestore';
+import { collection, Firestore, onSnapshot, orderBy, query } from '@angular/fire/firestore';
 import { Auth, User as FirebaseUser } from '@angular/fire/auth';
 import { User } from '../../shared/models/user.class';
 import { MessagesService } from '../../shared/services/messages/messages.service';
 import { AuthService } from '../../shared/services/authentication/auth-service/auth.service';
 import { ChatUtilityService } from '../../shared/services/messages/chat-utility.service';
+import { Overlay } from '@angular/cdk/overlay';
+import { MatBadgeModule } from '@angular/material/badge';
 
 @Component({
   selector: 'app-workspace',
@@ -25,14 +27,16 @@ import { ChatUtilityService } from '../../shared/services/messages/chat-utility.
     NgFor,
     NgClass,
     NgStyle,
-    CreateNewChannelDialog
+    MatBadgeModule,
+    NgIf
   ],
   templateUrl: './workspace.component.html',
   styleUrl: './workspace.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  encapsulation: ViewEncapsulation.None
 })
 export class WorkspaceComponent implements OnInit {
-
+  directMessages = this.messagesService.directMessages;
   channels: Channel[] = [];
   users: User[] = [];
   clickedChannels: boolean[] = [];
@@ -40,6 +44,7 @@ export class WorkspaceComponent implements OnInit {
   icons: string[] = [];
   panelOpenState = false;
   arrowRotated: boolean[] = [false, false];
+  isDirectmessage: boolean = false;
   currentUserUid: string | null = null;
   currentUserChannels: Channel[] = [];
   @Input() openChatWindow!: () => void;
@@ -58,7 +63,8 @@ export class WorkspaceComponent implements OnInit {
     private firestore: Firestore,
     private auth: Auth,
     private messagesService: MessagesService,
-    private chatUtilityService: ChatUtilityService
+    private chatUtilityService: ChatUtilityService,
+    private overlay: Overlay
   ) {
   }
 
@@ -131,7 +137,11 @@ export class WorkspaceComponent implements OnInit {
 
   // helper method to toggle the clickContainer method
   openDialog() {
-    this.dialog.open(CreateNewChannelDialog)
+    this.dialog.open(CreateNewChannelDialog, {
+      disableClose: false,
+      hasBackdrop: true,
+      scrollStrategy: this.overlay.scrollStrategies.noop()
+    });
   }
 
   clickUserContainer(user: User, i: number) {
