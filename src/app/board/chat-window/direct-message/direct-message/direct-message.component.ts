@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -39,7 +39,7 @@ import { EmojiReaction } from '../../../../shared/models/emoji-reaction.model';
 
 
 })
-export class DirectMessageComponent implements OnInit {
+export class DirectMessageComponent implements OnInit, AfterViewInit {
   message: DirectMessage[] = [];
   selectedMessage: DirectMessage | null = null;
   messages = this.messagesService.messages;
@@ -86,6 +86,13 @@ export class DirectMessageComponent implements OnInit {
     this.loadData();
   }
 
+  ngAfterViewInit() {
+    debugger
+    this.messagesService.scrollToBottom$.subscribe(() => {
+      this.scrollToBottom();
+    });
+  }
+
   async loadData() {
     this.auth.onAuthStateChanged(async (user) => {
       if (user) {
@@ -107,6 +114,19 @@ export class DirectMessageComponent implements OnInit {
       }));
 
     });
+  }
+
+  scrollToBottom(): void {
+    debugger
+    if (this.chatWindow) {
+      try {
+        this.chatWindow.nativeElement.scrollTop = this.chatWindow.nativeElement.scrollHeight;
+        console.log(this.chatWindow.nativeElement.scrollHeight);
+
+      } catch (err) {
+        console.error('Scroll to bottom failed:', err);
+      }
+    }
   }
 
   updateSearchQuery(event: Event): void {
@@ -593,18 +613,6 @@ export class DirectMessageComponent implements OnInit {
 
   //   return message; // Bereinigte Nachricht wird zurückgegeben
   // }
-
-
-
-  scrollToBottom(): void {
-    if (this.chatWindow) {
-      try {
-        this.chatWindow.nativeElement.scrollTop = this.chatWindow.nativeElement.scrollHeight;
-      } catch (err) {
-        console.error('Scroll to bottom failed:', err);
-      }
-    }
-  }
 
   onFileSelected(event: Event) {
     const fileInput = event.target as HTMLInputElement;

@@ -12,6 +12,7 @@ import { User } from '../../models/user.class';
 import { WorkspaceComponent } from '../../../board/workspace/workspace.component';
 import { ChatUtilityService } from './chat-utility.service';
 import { getDocs, updateDoc } from 'firebase/firestore';
+import { Subject } from 'rxjs';
 
 
 @Injectable({
@@ -35,7 +36,8 @@ export class MessagesService {
     filePreviewUrl: string | null = null;
     lastAnswer: string = '';
     selectedMessage: Message | null = null;
-
+    private scrollToBottomTrigger = new Subject<void>();
+    scrollToBottom$ = this.scrollToBottomTrigger.asObservable();
 
     @Output() showThreadEvent = new EventEmitter<void>();
     @ViewChild(WorkspaceComponent) workspaceComponent!: WorkspaceComponent;
@@ -50,6 +52,10 @@ export class MessagesService {
         private chatUtilityService: ChatUtilityService
     ) {
 
+    }
+
+    triggerScrollToBottom() {
+        this.scrollToBottomTrigger.next();
     }
 
 
