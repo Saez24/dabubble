@@ -57,6 +57,7 @@ export class ChatUtilityService {
     this.directMessageUser = null;
     this.selectedChannel = null;
     this.selectedUser = null;
+    this.userService.selectedUser = null;
   }
 
   setMessageId(messageId: string | null) {

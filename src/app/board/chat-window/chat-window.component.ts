@@ -193,6 +193,7 @@ export class ChatWindowComponent implements OnInit {
   }
 
   selectUser(user: User) {
+
     if (user && user.id) {
       this.isSearching = false; // Suche beenden
       this.users = []; // Gefilterte Benutzer zurücksetzen
