@@ -21,6 +21,7 @@ import { MessagesService } from '../../../../shared/services/messages/messages.s
 import { AddMemberDialogComponent } from '../../../../dialogs/add-member-dialog/add-member-dialog.component';
 import { ChannelDescriptionDialogComponent } from '../../../../dialogs/channel-description-dialog/channel-description-dialog.component';
 import { Message } from '../../../../shared/models/message.class';
+import { SafeUrlPipe } from '../../../../shared/pipes/safe-url.pipe';
 
 
 
@@ -28,7 +29,7 @@ import { Message } from '../../../../shared/models/message.class';
   selector: 'app-channel-message',
   standalone: true,
   imports: [MatCardModule, MatButtonModule, MatIconModule, MatDividerModule, FormsModule,
-    MatFormFieldModule, MatInputModule, CommonModule, PickerComponent, NgIf, NgFor],
+    MatFormFieldModule, MatInputModule, CommonModule, PickerComponent, SafeUrlPipe, NgIf, NgFor,],
   templateUrl: './channel-message.component.html',
   styleUrl: './channel-message.component.scss',
   changeDetection: ChangeDetectionStrategy.Default,
@@ -431,6 +432,7 @@ export class ChannelMessageComponent implements OnInit, AfterViewInit {
         });
 
         if (this.selectedFile && this.currentUserUid) {
+          debugger
           try {
             const fileURL = await this.uploadFileService.uploadFileWithIds(this.selectedFile, this.currentUserUid, messageDocRef.id); // Verwende die ID des neuen Dokuments
             newMessage.fileURL = fileURL; // Setze die Download-URL in der Nachricht

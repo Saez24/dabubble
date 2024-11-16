@@ -97,6 +97,7 @@ export class DirectMessageComponent implements OnInit, AfterViewInit {
     observer.observe(this.chatWindow.nativeElement, { childList: true, subtree: true });
   }
 
+
   scrollToBottom() {
     if (this.chatWindow && this.chatWindow.nativeElement) {
       this.chatWindow.nativeElement.scrollTop = this.chatWindow.nativeElement.scrollHeight;
@@ -260,13 +261,13 @@ export class DirectMessageComponent implements OnInit, AfterViewInit {
       (r: EmojiReaction) => r.emoji === emoji
     );
 
-    // Überprüfe, ob selectedMessage vorhanden ist
-    if (conversation) {
-      console.log('Gefundene Konversation:', conversation);
-    } else {
-      console.warn('selectedMessage ist null oder nicht definiert!');
-      return;
-    }
+    // // Überprüfe, ob selectedMessage vorhanden ist
+    // if (conversation) {
+    //   console.log('Gefundene Konversation:', conversation);
+    // } else {
+    //   console.warn('selectedMessage ist null oder nicht definiert!');
+    //   return;
+    // }
 
     // Überprüfe, ob `reactions` ein Array ist
     if (!Array.isArray(this.selectedMessage?.reactions)) {
