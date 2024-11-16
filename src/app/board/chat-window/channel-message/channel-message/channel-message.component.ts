@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, Output, ViewChild, ViewEncapsulation } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -34,7 +34,7 @@ import { Message } from '../../../../shared/models/message.class';
   changeDetection: ChangeDetectionStrategy.Default,
   encapsulation: ViewEncapsulation.None,
 })
-export class ChannelMessageComponent {
+export class ChannelMessageComponent implements AfterViewInit {
   @Output() showThreadEvent = new EventEmitter<Message>();
   messages: Message[] = [];
   selectedMessage: Message | null = null;
@@ -58,14 +58,19 @@ export class ChannelMessageComponent {
 
 
 
-  @ViewChild('chatWindow') private chatWindow!: ElementRef;
+  @ViewChild('chatWindow', { static: false }) chatWindow!: ElementRef;
   constructor(private firestore: Firestore, private auth: Auth,
     public userService: UserService, private cd: ChangeDetectorRef,
     private authService: AuthService, private uploadFileService: UploadFileService,
     public channelsService: ChannelsService, public dialog: MatDialog, public messageService: MessagesService) { }
 
-  ngOnInit() {
+  ngAfterViewInit() {
+    const observer = new MutationObserver(() => {
+      // console.log('Mutation detected');
+      this.scrollToBottom();
+    });
 
+    observer.observe(this.chatWindow.nativeElement, { childList: true, subtree: true });
   }
 
   async loadData() {
@@ -90,6 +95,12 @@ export class ChannelMessageComponent {
       }));
 
     });
+  }
+
+  scrollToBottom() {
+    if (this.chatWindow && this.chatWindow.nativeElement) {
+      this.chatWindow.nativeElement.scrollTop = this.chatWindow.nativeElement.scrollHeight;
+    }
   }
 
   openChannelDescriptionDialog() {
@@ -405,16 +416,6 @@ export class ChannelMessageComponent {
     return 'haben reagiert';
   }
 
-
-  scrollToBottom(): void {
-    if (this.chatWindow) {
-      try {
-        this.chatWindow.nativeElement.scrollTop = this.chatWindow.nativeElement.scrollHeight;
-      } catch (err) {
-        console.error('Scroll to bottom failed:', err);
-      }
-    }
-  }
 
   onFileSelected(event: Event) {
     const fileInput = event.target as HTMLInputElement;

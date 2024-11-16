@@ -70,7 +70,8 @@ export class DirectMessageComponent implements OnInit, AfterViewInit {
   markedUser: { id: string; name: string }[] = [];
 
 
-  @ViewChild('chatWindow') private chatWindow!: ElementRef;
+  @ViewChild('chatWindow', { static: false }) chatWindow!: ElementRef;
+
   constructor(private firestore: Firestore, private auth: Auth,
     private userService: UserService, private cd: ChangeDetectorRef,
     private authService: AuthService, private uploadFileService: UploadFileService,
@@ -87,11 +88,24 @@ export class DirectMessageComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    debugger
-    this.messagesService.scrollToBottom$.subscribe(() => {
+    const observer = new MutationObserver(() => {
+      // console.log('Mutation detected');
       this.scrollToBottom();
     });
+
+    observer.observe(this.chatWindow.nativeElement, { childList: true, subtree: true });
   }
+
+
+
+
+  scrollToBottom() {
+    if (this.chatWindow && this.chatWindow.nativeElement) {
+      this.chatWindow.nativeElement.scrollTop = this.chatWindow.nativeElement.scrollHeight;
+    }
+  }
+
+
 
   async loadData() {
     this.auth.onAuthStateChanged(async (user) => {
@@ -114,19 +128,6 @@ export class DirectMessageComponent implements OnInit, AfterViewInit {
       }));
 
     });
-  }
-
-  scrollToBottom(): void {
-    debugger
-    if (this.chatWindow) {
-      try {
-        this.chatWindow.nativeElement.scrollTop = this.chatWindow.nativeElement.scrollHeight;
-        console.log(this.chatWindow.nativeElement.scrollHeight);
-
-      } catch (err) {
-        console.error('Scroll to bottom failed:', err);
-      }
-    }
   }
 
   updateSearchQuery(event: Event): void {
