@@ -134,7 +134,7 @@ export class WorkspaceComponent implements OnInit {
         };
       });
 
-      console.log('Ungelesene Nachrichten pro Sender:', unreadMessagesBySender);
+      // console.log('Ungelesene Nachrichten pro Sender:', unreadMessagesBySender);
     } catch (error) {
       console.error('Fehler beim Laden der Konversationen:', error);
     }
@@ -166,7 +166,7 @@ export class WorkspaceComponent implements OnInit {
         this.listenToConversations()
       }
 
-      console.log('Alle Nachrichten wurden als gelesen markiert.');
+      // console.log('Alle Nachrichten wurden als gelesen markiert.');
     } catch (error) {
       console.error('Fehler beim Aktualisieren der Nachrichten:', error);
     }
@@ -214,7 +214,7 @@ export class WorkspaceComponent implements OnInit {
           };
         });
 
-        console.log('Ungelesene Nachrichten pro Sender:', unreadMessagesBySender);
+        // console.log('Ungelesene Nachrichten pro Sender:', unreadMessagesBySender);
       });
     } catch (error) {
       console.error('Fehler beim Überwachen der Konversationen:', error);
