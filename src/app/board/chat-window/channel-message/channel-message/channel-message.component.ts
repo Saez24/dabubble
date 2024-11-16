@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, Output, ViewChild, ViewEncapsulation } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -34,11 +34,12 @@ import { Message } from '../../../../shared/models/message.class';
   changeDetection: ChangeDetectionStrategy.Default,
   encapsulation: ViewEncapsulation.None,
 })
-export class ChannelMessageComponent implements AfterViewInit {
+export class ChannelMessageComponent implements OnInit, AfterViewInit {
   @Output() showThreadEvent = new EventEmitter<Message>();
   messages: Message[] = [];
   selectedMessage: Message | null = null;
   users: User[] = [];
+  filteredUsers: User[] = [];
   channels: Channel[] = [];
   currentUser = this.authService.getUserSignal();
   showEmojiPicker: boolean = false;
@@ -55,7 +56,10 @@ export class ChannelMessageComponent implements AfterViewInit {
   senderName: string | null = null;
   selectedFile: File | null = null;// Service für den Datei-Upload
   filePreviewUrl: string | null = null;
-
+  searchQuery: string = '';
+  isSearching: boolean = false;
+  isUserSelect: boolean = false;
+  markedUser: { id: string; name: string }[] = [];
 
 
   @ViewChild('chatWindow', { static: false }) chatWindow!: ElementRef;
@@ -63,6 +67,11 @@ export class ChannelMessageComponent implements AfterViewInit {
     public userService: UserService, private cd: ChangeDetectorRef,
     private authService: AuthService, private uploadFileService: UploadFileService,
     public channelsService: ChannelsService, public dialog: MatDialog, public messageService: MessagesService) { }
+
+
+  ngOnInit() {
+    this.loadData();
+  }
 
   ngAfterViewInit() {
     const observer = new MutationObserver(() => {
@@ -101,6 +110,70 @@ export class ChannelMessageComponent implements AfterViewInit {
     if (this.chatWindow && this.chatWindow.nativeElement) {
       this.chatWindow.nativeElement.scrollTop = this.chatWindow.nativeElement.scrollHeight;
     }
+  }
+
+  toggleSearch(): void {
+    this.isUserSelect = !this.isUserSelect; // Suchstatus umschalten
+    if (this.isUserSelect) {
+      this.onSearch();
+    } else {
+      this.filteredUsers = []; // Gefilterte Liste zurücksetzen, wenn keine Suche aktiv ist
+    }
+  }
+
+  updateSearchQuery(event: Event): void {
+    const target = event.target as HTMLTextAreaElement;
+    const fullText = target.value;
+
+    // Suche nach dem letzten `@`-Symbol und extrahiere den Teil danach
+    const lastAtIndex = fullText.lastIndexOf('@');
+    this.searchQuery = lastAtIndex !== -1 ? fullText.slice(lastAtIndex + 1).trim().toLowerCase() : '';
+
+    // Aktivieren der Suche, falls es eine Eingabe nach dem `@` gibt
+    this.isSearching = this.searchQuery.length > 0;
+    if (this.isSearching) {
+      this.onSearch();
+    } else {
+      this.filteredUsers = []; // Gefilterte Liste zurücksetzen, wenn keine Suche aktiv ist
+    }
+  }
+
+  selectUser(user: User) {
+    if (user && user.id) {
+      // Entferne das letzte '@' und füge den vollständigen Benutzernamen hinzu
+      this.channelChatMessage = this.channelChatMessage.trim(); // Leerzeichen am Ende entfernen
+      const lastAtIndex = this.channelChatMessage.lastIndexOf('@');
+      if (lastAtIndex !== -1) {
+        // Entferne den '@' und alles dahinter (einschließlich des letzten Benutzernamens)
+        this.channelChatMessage = this.channelChatMessage.slice(0, lastAtIndex);
+      }
+
+      // Füge den neuen Benutzernamen hinzu
+      this.channelChatMessage += ` @${user.name} `;
+
+      // Benutzer zu `markedUser` hinzufügen, falls noch nicht vorhanden
+      if (!this.markedUser.some(u => u.id === user.id)) {
+        this.markedUser.push({ id: user.id, name: user.name });
+        console.log(this.markedUser);
+
+      }
+
+      // Suche zurücksetzen
+      this.isSearching = false;
+      this.isUserSelect = false;
+      this.searchQuery = '';
+      this.filteredUsers = [];
+    } else {
+      console.error("Ungültiger Benutzer:", user);
+    }
+  }
+
+
+  onSearch(): void {
+    this.filteredUsers = this.users.filter(user =>
+      user.name.toLowerCase().startsWith(this.searchQuery) ||
+      (user.email && user.email.toLowerCase().startsWith(this.searchQuery))
+    );
   }
 
   openChannelDescriptionDialog() {

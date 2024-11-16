@@ -209,8 +209,8 @@
 
     </div>
     <div class="chat-message-input-container">
-        <textarea class="message-input" id="channelChatMessage" [(ngModel)]="channelChatMessage" type="text"
-            placeholder="Schreiben Sie Ihre Nachricht"></textarea>
+        <textarea class="message-input" id="channelChatMessage" [(ngModel)]="channelChatMessage"
+            (input)="updateSearchQuery($event)" type="text" placeholder="Schreiben Sie Ihre Nachricht"></textarea>
 
         <!-- Datei-Vorschau -->
 
@@ -225,7 +225,8 @@
                 <div class="separator"></div>
                 <div (click)="showEmoji()" class="message-icon"><mat-icon fontIcon="sentiment_satisfied"></mat-icon>
                 </div>
-                <div class="message-icon"><mat-icon fontIcon="alternate_email"></mat-icon></div>
+                <div (click)="toggleSearch()" class="message-icon"><mat-icon fontIcon="alternate_email"></mat-icon>
+                </div>
 
                 <div *ngIf="filePreviewUrl" class="file-preview">
                     <img *ngIf="selectedFile && selectedFile.type.startsWith('image/')" [src]="filePreviewUrl"
@@ -252,5 +253,21 @@
         <emoji-mart class="emoji-mart-chat" *ngIf="showEmojiPickerReact" (emojiSelect)="addEmojiForReact($event)"
             [darkMode]="false" title="Pick your emoji…" emoji="point_up">
         </emoji-mart>
+    </div>
+
+    <div class="search-block" *ngIf="isSearching && filteredUsers.length > 0">
+        <div class="found-block">
+            <div class="found-users" *ngFor="let user of filteredUsers" (click)="selectUser(user)"><img
+                    [src]="user.avatarPath" alt="">{{
+                user.name }}</div>
+        </div>
+    </div>
+
+    <div class="search-block" *ngIf="isUserSelect">
+        <div class="found-block">
+            <div class="found-users" *ngFor="let user of filteredUsers" (click)="selectUser(user)"><img
+                    [src]="user.avatarPath" alt="">{{
+                user.name }}</div>
+        </div>
     </div>
 </div>

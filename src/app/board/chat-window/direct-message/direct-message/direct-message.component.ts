@@ -67,6 +67,7 @@ export class DirectMessageComponent implements OnInit, AfterViewInit {
   editingConversationId: string | null = null;
   searchQuery: string = '';
   isSearching: boolean = false;
+  isUserSelect: boolean = false;
   markedUser: { id: string; name: string }[] = [];
 
 
@@ -96,16 +97,11 @@ export class DirectMessageComponent implements OnInit, AfterViewInit {
     observer.observe(this.chatWindow.nativeElement, { childList: true, subtree: true });
   }
 
-
-
-
   scrollToBottom() {
     if (this.chatWindow && this.chatWindow.nativeElement) {
       this.chatWindow.nativeElement.scrollTop = this.chatWindow.nativeElement.scrollHeight;
     }
   }
-
-
 
   async loadData() {
     this.auth.onAuthStateChanged(async (user) => {
@@ -128,6 +124,16 @@ export class DirectMessageComponent implements OnInit, AfterViewInit {
       }));
 
     });
+  }
+
+  // Suche umschalten
+  toggleSearch(): void {
+    this.isUserSelect = !this.isUserSelect; // Suchstatus umschalten
+    if (this.isUserSelect) {
+      this.onSearch();
+    } else {
+      this.filteredUsers = []; // Gefilterte Liste zurücksetzen, wenn keine Suche aktiv ist
+    }
   }
 
   updateSearchQuery(event: Event): void {
@@ -169,6 +175,7 @@ export class DirectMessageComponent implements OnInit, AfterViewInit {
 
       // Suche zurücksetzen
       this.isSearching = false;
+      this.isUserSelect = false;
       this.searchQuery = '';
       this.filteredUsers = [];
     } else {
@@ -183,8 +190,6 @@ export class DirectMessageComponent implements OnInit, AfterViewInit {
       (user.email && user.email.toLowerCase().startsWith(this.searchQuery))
     );
   }
-
-
 
   showEmoji() {
     this.showEmojiPickerEdit = false; // Blendet den anderen Picker sofort aus
