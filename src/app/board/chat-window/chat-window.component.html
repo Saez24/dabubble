@@ -9,7 +9,7 @@
             <span>{{ selectedUser.name }}</span>
             <mat-icon class="delete-selected-user" fontIcon="close" (click)="removeSelectedUser()"></mat-icon>
         </div>
-        <div class="search-block" *ngIf="isSearching">
+        <div class="search-block-chat-window" *ngIf="isSearching">
             <div class="found-block" *ngIf="channels.length">
                 <div class="found-users" *ngFor="let channel of channels"
                     (click)="selectChannel({ name: channel.name, id: channel.id })">

@@ -9,6 +9,7 @@ import { ChannelsService } from '../channels/channels.service';
 import { DirectMessage } from '../../models/direct.message.class';
 import { Message } from '../../models/message.class';
 import { ChatUtilityService } from './chat-utility.service';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable({
   providedIn: 'root'
@@ -88,7 +89,7 @@ export class SendMessageService {
 
       if (currentUser()) {
         // console.log("Aktueller Benutzer:", currentUser()); // Überprüfen, ob der aktuelle Benutzer korrekt abgerufen wird
-
+        const conversationId = uuidv4();
         // Überprüfe, ob ein Benutzer oder ein Kanal ausgewählt ist
         if (this.selectedUser?.id) {
           // console.log("DirectMessageUser:", this.selectedUser.id); // Überprüfen, ob der Benutzer korrekt gesetzt ist
@@ -104,6 +105,7 @@ export class SendMessageService {
             // Füge die neue Nachricht zur bestehenden Konversation hinzu
             await updateDoc(messageDocRef, {
               conversation: arrayUnion({
+                conversationId: conversationId,
                 senderName: currentUser()?.name,
                 message: this.chatMessage,
                 reactions: [],
@@ -111,6 +113,8 @@ export class SendMessageService {
                 receiverName: this.selectedUser?.name, // Zugriff auf den Namen des ausgewählten Benutzers
                 senderId: currentUser()?.id,
                 receiverId: this.selectedUser?.id, // Zugriff auf die ID des ausgewählten Benutzers
+                fileURL: '',
+                readedMessage: false,
               })
             });
 
@@ -142,6 +146,7 @@ export class SendMessageService {
               receiverId: newMessage.receiverId,
               timestamp: new Date(),
               conversation: [{
+                conversationId: conversationId,
                 senderName: newMessage.senderName,
                 message: newMessage.message,
                 reactions: newMessage.reactions,
@@ -149,6 +154,8 @@ export class SendMessageService {
                 receiverName: newMessage.receiverName,
                 senderId: newMessage.senderId,
                 receiverId: newMessage.receiverId,
+                fileURL: '',
+                readedMessage: false,
               }]
             });
 
@@ -227,14 +234,18 @@ export class SendMessageService {
         }
 
         // Eingabefelder bereinigen und Scrollen
-        this.chatMessage = '';
-        this.selectedFile = null;
-        this.scrollToBottom();
-        this.deleteUpload();
+        this.clearInputsAndScroll();
       } else {
         console.error('Kein Benutzer angemeldet');
       }
     }
+  }
+
+  clearInputsAndScroll() {
+    this.chatMessage = '';
+    this.selectedFile = null;
+    this.scrollToBottom();
+    this.deleteUpload();
   }
 
   showError() {
