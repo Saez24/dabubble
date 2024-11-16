@@ -1,5 +1,6 @@
 <div class="board-container">
     <header>
+        <div class="logoAndName">
         <div class="logo-container">
             <img src="./../../assets/images/main_logo.png" alt="DABubble Logo">
         </div>
@@ -33,6 +34,11 @@
                     </app-profile-editor-dialog>
                 </div>
             </div>
+        </div>
+    </div>
+        <div class="input-search-container response-input-search-container" >
+            <input name="searchText" type="text" placeholder="Devspace durchsuchen" [(ngModel)]="searchInput">
+            <img src="../../assets/images/icons/search.png" alt="search icon">
         </div>
     </header>
     <mat-drawer-container class="mat-drawer-container" autosize>

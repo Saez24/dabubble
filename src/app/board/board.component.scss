@@ -302,3 +302,78 @@ mat-toolbar-row {
         overflow: hidden !important;
     }
 }
+
+.response-input-search-container {
+    display: none;
+}
+
+.logoAndName {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+
+@media screen and (max-width: 1080px) {
+
+    .board-container .navigation-toggle-btn {
+        display: none !important;
+    }
+
+    header {
+        flex-direction: column;
+        gap: 20px;
+        height: auto;
+        padding: 0;
+
+        .logo-container>img {
+            height: 46px;
+        }
+
+        .avatar-container>img {
+            width: 54px;
+            height: 54px;
+        }
+    }
+
+    .input-search-container {
+        display: none;
+        padding: 12.5px 50px 12.5px 40px;
+    }
+
+    .response-input-search-container {
+        display: flex;
+        width: 100%;
+    }
+
+    .profile-menu-container {
+        span {
+            display: none;
+        }
+
+        .mat-icon {
+            display: none !important;
+        }
+    }
+
+    .sidenav-content {
+        display: none;
+    }
+
+    .mat-drawer-side {
+        width: 100% !important;
+
+        .mat-mdc-card {
+            width: 100%;
+        }
+    }
+}
+
+@media screen and (max-width: 375px) {
+    .workspace-content {
+        padding: 14px !important;
+    }
+
+    .mat-expansion-panel-header {
+        padding: 0 12px !important;
+    }
+}
