@@ -22,6 +22,7 @@ import { AddMemberDialogComponent } from '../../../../dialogs/add-member-dialog/
 import { ChannelDescriptionDialogComponent } from '../../../../dialogs/channel-description-dialog/channel-description-dialog.component';
 import { Message } from '../../../../shared/models/message.class';
 import { SafeUrlPipe } from '../../../../shared/pipes/safe-url.pipe';
+import { MembersDialogComponent } from '../../../../dialogs/members-dialog/members-dialog.component';
 
 
 
@@ -183,6 +184,10 @@ export class ChannelMessageComponent implements OnInit, AfterViewInit {
 
   openAddMemberDialog() {
     this.dialog.open(AddMemberDialogComponent)
+  }
+
+  showMembers() {
+    this.dialog.open(MembersDialogComponent)
   }
 
   showEmoji() {
