@@ -42,7 +42,7 @@ export class ChannelMessageComponent implements OnInit, AfterViewInit {
   users: User[] = [];
   filteredUsers: User[] = [];
   channels: Channel[] = [];
-  currentUser = this.authService.getUserSignal();
+  currentUser = this.authService.currentUser;
   showEmojiPicker: boolean = false;
   showEmojiPickerEdit: boolean = false;
   showEmojiPickerReact: boolean = false;
@@ -406,9 +406,11 @@ export class ChannelMessageComponent implements OnInit, AfterViewInit {
     }
 
     if (this.channelChatMessage.trim() || this.selectedFile) {
-      const currentUser = this.authService.currentUser;
+      const currentUser = this.authService.currentUser();
+      // console.log('channelChatMessage:', this.channelChatMessage);
+      // console.log('selectedFile:', this.selectedFile);
 
-      if (currentUser()) {
+      if (currentUser) {
         const messagesRef = collection(this.firestore, 'messages');
 
         const newMessage: Message = new Message({
@@ -418,25 +420,29 @@ export class ChannelMessageComponent implements OnInit, AfterViewInit {
           channelId: this.channelsService.currentChannelId, // Verwende die gespeicherte channelId
           reactions: [],
           answers: [],
-          fileURL: '',
+          fileURL: this.selectedFile ? '' : null,
         });
 
         const messageDocRef = await addDoc(messagesRef, {
           senderID: newMessage.senderID,
           senderName: newMessage.senderName,
           message: newMessage.message,
+          fileURL: newMessage.fileURL,
           channelId: newMessage.channelId,
           reaction: newMessage.reactions,
           answers: newMessage.answers,
           timestamp: new Date(),
         });
 
-        if (this.selectedFile && this.currentUserUid) {
-          debugger
+        if (this.selectedFile && this.currentUser()?.id) {
+          // console.log('File:', this.selectedFile);
+          // console.log('currentUserUid:', this.currentUser()?.id);
           try {
-            const fileURL = await this.uploadFileService.uploadFileWithIds(this.selectedFile, this.currentUserUid, messageDocRef.id); // Verwende die ID des neuen Dokuments
+            const fileURL = await this.uploadFileService.uploadFileWithIds(this.selectedFile, this.currentUser()?.id || '', messageDocRef.id); // Verwende die ID des neuen Dokuments
             newMessage.fileURL = fileURL; // Setze die Download-URL in der Nachricht
             await updateDoc(messageDocRef, { fileURL: newMessage.fileURL }); // Aktualisiere das Dokument mit der Datei-URL
+            // console.log('Datei erfolgreich hochgeladen:', fileURL);
+
           } catch (error) {
             console.error('Datei-Upload fehlgeschlagen:', error);
           }
@@ -505,7 +511,8 @@ export class ChannelMessageComponent implements OnInit, AfterViewInit {
         const fileData = reader.result as string;
         this.filePreviewUrl = fileData; // Speichere die Vorschau-URL für die Datei
         localStorage.setItem('selectedFile', JSON.stringify({ fileName: file.name, fileData }));
-        console.log('File saved to localStorage');
+        // console.log('File saved to localStorage');
+
       };
       reader.readAsDataURL(file);
     } else {

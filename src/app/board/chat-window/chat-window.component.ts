@@ -46,7 +46,7 @@ export class ChatWindowComponent implements OnInit {
   currentUserUid = '';
   senderAvatar: string | null = null;
   senderName: string | null = null;
-  selectedFile: File | null = null;// Service für den Datei-Upload
+  selectedFile = this.sendMessageService.selectedFile; // Service für den Datei-Upload
   filePreviewUrl: string | null = null;
   searchQuery: string = '';
   isSearching: boolean = false;

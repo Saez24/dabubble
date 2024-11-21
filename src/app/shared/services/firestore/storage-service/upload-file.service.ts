@@ -36,10 +36,10 @@ export class UploadFileService {
     try {
       // Hochladen
       await uploadBytes(uploadRef, file); // Datei direkt übergeben
-      console.log('Upload erfolgreich!');
+      // console.log('Upload erfolgreich!');
 
       const downloadURL = await getDownloadURL(uploadRef); // Lade die URL nach dem Hochladen ab
-      console.log('Datei verfügbar unter', downloadURL);
+      // console.log('Datei verfügbar unter', downloadURL);
       return downloadURL; // Gibt die Download-URL zurück
     } catch (error) {
       console.error('Upload fehlgeschlagen', error);
@@ -58,6 +58,45 @@ export class UploadFileService {
       ia[i] = byteString.charCodeAt(i);
     }
     return new Blob([ab], { type: mimeString });
+  }
+
+  async uploadFileWithIdsDirectMessages(file: File, conversationId: string, messageId: string): Promise<string> {
+    const storage = getStorage();
+
+    // Stelle sicher, dass der Dateiname existiert und hole die Dateiendung
+    const fileName = file.name;
+    const fileType = fileName.split('.').pop(); // Dateityp extrahieren
+
+    if (!fileType) {
+      console.error('Dateityp konnte nicht ermittelt werden');
+      throw new Error('Dateityp konnte nicht ermittelt werden'); // Fehler werfen, wenn der Dateityp nicht ermittelt werden kann
+    }
+
+    let folder = '';
+
+    if (['png', 'jpeg', 'jpg', 'gif', 'bmp'].includes(fileType)) {
+      folder = `images/${messageId}/${conversationId}`;
+    } else if (['pdf'].includes(fileType)) {
+      folder = `files/${messageId}/${conversationId}`;
+    } else {
+      console.error('Dateityp nicht unterstützt');
+      throw new Error('Dateityp nicht unterstützt'); // Fehler werfen, wenn der Dateityp nicht unterstützt wird
+    }
+
+    const uploadRef = ref(storage, `sended_files/${folder}/${fileName}`); // Verwende fileName
+
+    try {
+      // Hochladen
+      await uploadBytes(uploadRef, file); // Datei direkt übergeben
+      // console.log('Upload erfolgreich!');
+
+      const downloadURL = await getDownloadURL(uploadRef); // Lade die URL nach dem Hochladen ab
+      // console.log('Datei verfügbar unter', downloadURL);
+      return downloadURL; // Gibt die Download-URL zurück
+    } catch (error) {
+      console.error('Upload fehlgeschlagen', error);
+      throw error; // Fehler weitergeben
+    }
   }
 
 
