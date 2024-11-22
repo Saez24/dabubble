@@ -262,6 +262,7 @@ export class WorkspaceComponent implements OnInit {
 
   // method to change background color for channel or user container
   openChannel(channel: Channel, i: number) {
+    this.channelsService.channelIsClicked = true;
     this.channelsService.clickChannelContainer(channel, i);
     this.openChannelEvent.emit();
     if (this.currentUserUid) {
@@ -297,46 +298,4 @@ export class WorkspaceComponent implements OnInit {
       console.error("currentUserUid is null");
     }
   }
-
-  // Alternative Methode, um auf die Kanäle des Nutzers zuzugreifen
-
-  // getUserChannels(uid: string) {
-  //   const userDocRef = doc(this.firestore, `users/${uid}`);
-  //   onSnapshot(userDocRef, (doc) => {
-  //     if (doc.exists()) {
-  //       const data = doc.data() as {
-  //         channels: string[];
-  //       };
-  //       this.currentUserChannels = data.channels,
-  //       console.log('Benutzerinformationen:', this.currentUserChannels);
-  //     } else {
-  //       console.log('Kein Benutzerdokument gefunden');
-  //     }
-  //   });
-  // }
-
-
-  // async loadChannels(currentUserUid: string) {
-  //   let channelsRef = collection(this.firestore, 'channels');
-  //   let channelsQuery = query(channelsRef, orderBy('name'));
-
-  //   onSnapshot(channelsQuery, async (snapshot) => {
-  //     this.channels = await Promise.all(snapshot.docs.map(async (doc) => {
-  //       let channelData = doc.data() as Channel;
-  //       return { ...channelData, id: doc.id };
-  //     }));
-
-  //     if (currentUserUid) {
-  //       let userChannels = this.channels.filter(channel => {
-  //         return channel.members && channel.members.includes(currentUserUid);
-  //       });
-  //       this.currentUserChannels = userChannels;
-  //     } else {
-  //       this.currentUserChannels = [];
-  //     }
-  //   });
-  // }
-
-
-
 }

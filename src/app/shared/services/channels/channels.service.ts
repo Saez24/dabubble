@@ -1,4 +1,4 @@
-import { Injectable, OnInit } from '@angular/core';
+import { Injectable, OnInit, signal } from '@angular/core';
 import { Firestore, doc, onSnapshot, collection, query, orderBy } from '@angular/fire/firestore';
 import { Channel } from '../../models/channel.class';
 import { User } from '../../models/user.class';
@@ -13,14 +13,18 @@ export class ChannelsService implements OnInit {
 
   clickedChannels: boolean[] = [];
   clickedUsers: boolean[] = [];
-  currentChannelName: string = 'Kein Kanal ausgewählt';
+  currentChannelName: string = '';
   currentChannelDescription: string = 'Keine Kanalbeschreibung vorhanden';
   currentChannelAuthor: string = '';
   currentChannelId: string = '';
   currentChannelMemberUids: string[] = [];
   currentChannelMembers: string[] | any;
+  showMembersInfo = signal<boolean>(false);
+  showAddMemberDialog = signal<boolean>(false);
+  channelIsClicked: boolean = false;
 
-  channel: Channel | [] = [];
+  public channel: Channel = new Channel();
+  public channel$!: Observable<Channel>;
   public channels: Channel[] = [];
   public currentUserChannels: Channel[] = [];
 
@@ -86,6 +90,21 @@ export class ChannelsService implements OnInit {
     this.clickedUsers = new Array(userCount).fill(false);
   }
 
+  openMembersDialog() {
+    this.showMembersInfo.set(true);
+  }
+
+  closeMembersDialog() {
+    this.showMembersInfo.set(false);
+  }
+
+  openAddMemberDialog() {
+    this.showAddMemberDialog.set(true);
+  }
+
+  closeAddMemberDialog() {
+    this.showAddMemberDialog.set(false);
+  }
 
   async getChannelsFromCurrentUser() {
     const q = query(collection(this.firestore, 'channels'), where('channelAuthorId', '==', this.authService.currentUserUid));
@@ -97,7 +116,6 @@ export class ChannelsService implements OnInit {
       }
     });
   }
-
 
   updateChannelAuthor(messageId: string) {
     const messageRef = doc(this.firestore, 'channels', messageId);

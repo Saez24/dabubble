@@ -1,14 +1,14 @@
 <div class="chat-container max-width">
     <div class="chat-header">
-        <div *ngIf="channelsService.currentUserChannels" class="chat-header-button"
+        <div *ngIf="this.channelsService.currentUserChannels && this.channelsService.channelIsClicked" class="chat-header-button"
             (click)="openChannelDescriptionDialog()">
             <mat-icon class="icon" svgIcon="hashtag" aria-hidden="false" aria-label="Hashtag icon">
             </mat-icon>
             <span> {{ channelsService.currentChannelName }}</span>
             <mat-icon fontIcon="keyboard_arrow_down"></mat-icon>
         </div>
-        <div class="members-container">
-            <a class="show-members-button" (click)="showMembers()">
+        <div *ngIf="this.channelsService.channelIsClicked" class="members-container" >
+            <a class="show-members-button" (click)="this.channelsService.openMembersDialog()">
                 <div class="member-images">
                     <div class="members-list" *ngFor="let member of channelsService.currentChannelMembers?.slice(0, 3); let i = index"
                     [ngStyle]="{ 'margin-left': i >= 1 ? '-8px' : '0px' }">
@@ -24,7 +24,7 @@
                 </span>
                 </div>  
             </a>
-            <a (click)="openAddMemberDialog()">
+            <a (click)="this.channelsService.openAddMemberDialog()">
                 <mat-icon class="add-member-button" fontIcon="person_add"></mat-icon>
             </a>
         </div>

@@ -3,8 +3,7 @@ import { Component, ViewEncapsulation } from '@angular/core';
 import { ChannelsService } from '../../shared/services/channels/channels.service';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { AddMemberDialogComponent } from '../add-member-dialog/add-member-dialog.component';
+import { UserService } from '../../shared/services/firestore/user-service/user.service';
 
 
 @Component({
@@ -20,17 +19,20 @@ import { AddMemberDialogComponent } from '../add-member-dialog/add-member-dialog
   encapsulation: ViewEncapsulation.None
 })
 export class MembersDialogComponent {
+
+
   constructor(
     public channelsService: ChannelsService,
-    public dialogRef: MatDialogRef<AddMemberDialogComponent>,
-    public dialog: MatDialog
+    public userService: UserService
   ) {}
 
-  closeDialog() {
-    this.dialogRef.close();
+   async showProfile(selectedUserId: string) {
+    this.channelsService.showMembersInfo.set(false);
+    this.userService.showUserInfo.set(true);
+    await this.userService.getSelectedUserById(selectedUserId as string);
   }
 
   openAddMemberDialog() {
-    this.dialog.open(AddMemberDialogComponent)
+    
   }
 }

@@ -28,6 +28,8 @@ import { Channel } from '../shared/models/channel.class';
 import { ChatUtilityService } from '../shared/services/messages/chat-utility.service';
 import { ChannelsService } from '../shared/services/channels/channels.service';
 import { UserInfoDialogComponent } from "../dialogs/user-info-dialog/user-info-dialog.component";
+import { MembersDialogComponent } from '../dialogs/members-dialog/members-dialog.component';
+import { AddMemberDialogComponent } from '../dialogs/add-member-dialog/add-member-dialog.component';
 
 @Component({
   selector: 'app-board',
@@ -50,11 +52,12 @@ import { UserInfoDialogComponent } from "../dialogs/user-info-dialog/user-info-d
     MatFormFieldModule,
     MatMenuModule,
     ProfileDialogComponent,
-    AddPeopleDialog,
     ProfileEditorDialogComponent,
     DirectMessageComponent,
     ChannelMessageComponent,
-    UserInfoDialogComponent
+    UserInfoDialogComponent,
+    MembersDialogComponent,
+    AddMemberDialogComponent
 ],
   templateUrl: './board.component.html',
   styleUrls: ['./board.component.scss', '../../styles.scss'],
@@ -162,12 +165,10 @@ export class BoardComponent implements OnInit {
     this.userService.showOverlay.set(!this.userService.showOverlay());
   }
 
-
   openUserProfile(event: Event) {
     event.stopPropagation();
     this.userService.showProfile.set(true);
   }
-
 
   closeAllDialogs() {
     this.userService.showProfile.set(false);
@@ -177,11 +178,9 @@ export class BoardComponent implements OnInit {
     this.userService.showUserInfo.set(false);
   }
 
-
   stopPropagation(event: Event) {
     event.stopPropagation();
   }
-
 
   openChannelMessage() {
     this.chatUtilityService.openChannelMessage()

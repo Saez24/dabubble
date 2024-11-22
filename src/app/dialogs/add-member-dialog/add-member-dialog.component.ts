@@ -46,6 +46,7 @@ export class AddMemberDialogComponent implements OnInit {
   memberName: string = '';
   currentChannel: Channel | [] = [];
   currentChannelName: string = '';
+  currentChannelMembers: string[] = [];
   users: User[] | [] = [];
   currentUser: User | any;
   currentUserUid: string | null = null;
@@ -54,7 +55,7 @@ export class AddMemberDialogComponent implements OnInit {
   constructor (
     private auth: Auth,
     private firestore: Firestore,
-    private channelsService: ChannelsService,
+    public channelsService: ChannelsService,
   ) { }
 
   ngOnInit(): void {
@@ -62,6 +63,7 @@ export class AddMemberDialogComponent implements OnInit {
     this.currentChannel = this.channelsService.channel;
     this.currentChannelName = this.channelsService.currentChannelName
     this.currentChannelId = this.channelsService.currentChannelId
+    this.currentChannelMembers = this.channelsService.currentChannelMemberUids
     console.log(this.selectedUsers);
   }
 
@@ -116,12 +118,14 @@ export class AddMemberDialogComponent implements OnInit {
                   members: arrayUnion(...selectedUsers),
                   memberUids: arrayUnion(...selectedUsers.map(user => user.id))
                 });
-      
-                console.log(selectedUsers);
+
+        this.channelsService.showAddMemberDialog.set(false);
+        this.channelsService.showMembersInfo.set(false);
 
       } catch (error) {
         console.error("Fehler beim Aktualisieren des Channels:", error);
     }
+    
   }
 
 
@@ -182,7 +186,7 @@ export class AddMemberDialogComponent implements OnInit {
   selectUser(user: User): void {
     this.userSelected! = this.userSelected;
   
-    if (this.currentUserUid === user.id) {
+    if (this.currentUserUid === user.id || this.currentChannelMembers.includes(user.id)) {
         this.ownUserError = true; 
     } else {
         if (!this.selectedUsers.find(selectedUser => selectedUser.id === user.id)) {

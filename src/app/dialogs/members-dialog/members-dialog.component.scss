@@ -1,7 +1,7 @@
 .members-dialog {
     padding: 40px;
     width: 415px;
-    height: 411px;
+    max-height: 411px;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -63,23 +63,28 @@
     }
 }
 
-.mat-mdc-dialog-surface {
-    border-radius: 30px 0px 30px 30px !important;
-}
+// .mat-mdc-dialog-surface {
+//     border-radius: 30px 0px 30px 30px !important;
+// }
 
-.mat-mdc-dialog-container {
-    position: absolute;
-    display: flex;
-}
+// .mat-mdc-dialog-container {
+//     position: absolute;
+//     display: flex;
+//     height: 411px;
+//     width: 415px;
+//     top: 240px;
+//     left: 60%;
+// }
 
-.mdc-dialog {
-    position: fixed;
-    align-items: center;
-    justify-content: center;
-    box-sizing: border-box;
-    width: 100%;
-    top: 240px;
-    left: 491px;
-    height: auto !important;
-}
+// .mdc-dialog {
+//     position: fixed;
+//     align-items: center;
+//     justify-content: center;
+//     box-sizing: border-box;
+//     width: auto !important;
+//     top: 240px;
+//     left: 50%;
+//     height: 411px;
+// }
+
 

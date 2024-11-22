@@ -88,4 +88,14 @@
         </app-user-info-dialog>
     </div>
 
+    <div class="overlay" *ngIf="this.channelsService.showMembersInfo()" (click)="this.channelsService.closeMembersDialog()">
+        <app-members-dialog class="show-members-dialog" (click)="$event.stopPropagation()">
+        </app-members-dialog>
+    </div>
+
+    <div class="overlay" *ngIf="this.channelsService.showAddMemberDialog()" (click)="this.channelsService.closeAddMemberDialog()">
+        <app-add-member-dialog class="add-members-dialog" (click)="$event.stopPropagation()">
+        </app-add-member-dialog>
+    </div>
+
 </div>

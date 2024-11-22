@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ComponentRef, ElementRef, EventEmitter, HostListener, OnInit, Output, ViewChild, ViewContainerRef, ViewEncapsulation } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -62,7 +62,6 @@ export class ChannelMessageComponent implements OnInit, AfterViewInit {
   isSearching: boolean = false;
   isUserSelect: boolean = false;
   markedUser: { id: string; name: string }[] = [];
-
 
   @ViewChild('chatWindow', { static: false }) chatWindow!: ElementRef;
   constructor(private firestore: Firestore, private auth: Auth,
@@ -180,14 +179,6 @@ export class ChannelMessageComponent implements OnInit, AfterViewInit {
 
   openChannelDescriptionDialog() {
     this.dialog.open(ChannelDescriptionDialogComponent)
-  }
-
-  openAddMemberDialog() {
-    this.dialog.open(AddMemberDialogComponent)
-  }
-
-  showMembers() {
-    this.dialog.open(MembersDialogComponent)
   }
 
   showEmoji() {
