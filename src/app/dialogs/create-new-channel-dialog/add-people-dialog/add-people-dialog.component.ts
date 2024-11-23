@@ -68,6 +68,7 @@ export class AddPeopleDialog implements OnInit {
   constructor( 
     private firestore: Firestore,
     private auth: Auth,
+    public channelsService: ChannelsService,
     private authService: AuthService,
     @Inject(MAT_DIALOG_DATA) public data: any,
   ) {
@@ -129,6 +130,11 @@ export class AddPeopleDialog implements OnInit {
         this.selectedUsers.push(this.currentUser);
         let memberUids = this.getMemberUids();
         let newChannel = await this.createChannel(memberUids);
+
+        this.channelsService.channelCreatedInfo = true;
+        setTimeout(() => {
+          this.channelsService.channelCreatedInfo = false;
+        }, 3000); 
 
         if (newChannel) {
             await this.updateUserChannels(this.currentUser.id, newChannel.name);
