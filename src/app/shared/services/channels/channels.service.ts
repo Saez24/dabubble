@@ -21,12 +21,15 @@ export class ChannelsService implements OnInit {
   currentChannelMembers: string[] | any;
   showMembersInfo = signal<boolean>(false);
   showAddMemberDialog = signal<boolean>(false);
+  memberAddedInfo: boolean = false;
+  channelCreatedInfo: boolean = false;
   channelIsClicked: boolean = false;
 
   public channel: Channel = new Channel();
   public channel$!: Observable<Channel>;
   public channels: Channel[] = [];
   public currentUserChannels: Channel[] = [];
+  
 
   constructor(private firestore: Firestore, private authService: AuthService) {
     // Initialize authentication state listener
@@ -104,6 +107,18 @@ export class ChannelsService implements OnInit {
 
   closeAddMemberDialog() {
     this.showAddMemberDialog.set(false);
+  }
+
+  showMemberAddedInfo() {
+    this.memberAddedInfo = true;
+  }
+
+  closeMemberAddedInfo() {
+    this.memberAddedInfo = false;
+  }
+
+  closeChannelCreatedInfo() {
+    this.channelCreatedInfo = false;
   }
 
   async getChannelsFromCurrentUser() {

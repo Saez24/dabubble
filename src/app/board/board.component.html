@@ -98,4 +98,14 @@
         </app-add-member-dialog>
     </div>
 
+    <div class="overlay" *ngIf="this.channelsService.memberAddedInfo" (click)="this.channelsService.closeMemberAddedInfo()">
+        <app-member-added-info>
+        </app-member-added-info>
+    </div>
+
+    <div class="overlay" *ngIf="this.channelsService.channelCreatedInfo" (click)="this.channelsService.closeChannelCreatedInfo()">
+        <app-channel-created-info>
+        </app-channel-created-info>
+    </div>
+
 </div>

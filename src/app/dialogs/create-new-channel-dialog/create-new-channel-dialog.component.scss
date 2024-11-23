@@ -67,6 +67,10 @@ form {
     width: 100%;
 }
 
+.create-channel-form {
+    width: 100%;
+}
+
 .channel-name {
     width: 100%;
     @include dFlex($g: 20px, $fd: column, $ai: flex-start);
@@ -95,6 +99,11 @@ form {
 
 .mdc-dialog .mdc-dialog__content {
     padding: 0;
+    width: 100%;
+
+    form {
+        width: 100%;
+    }
 }
 
 .mat-mdc-dialog-container .mdc-dialog__surface {

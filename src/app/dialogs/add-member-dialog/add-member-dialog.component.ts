@@ -65,6 +65,7 @@ export class AddMemberDialogComponent implements OnInit {
     this.currentChannelId = this.channelsService.currentChannelId
     this.currentChannelMembers = this.channelsService.currentChannelMemberUids
     console.log(this.selectedUsers);
+    console.log(this.currentChannelMembers);
   }
 
   async loadData() {
@@ -118,9 +119,13 @@ export class AddMemberDialogComponent implements OnInit {
                   members: arrayUnion(...selectedUsers),
                   memberUids: arrayUnion(...selectedUsers.map(user => user.id))
                 });
-
-        this.channelsService.showAddMemberDialog.set(false);
-        this.channelsService.showMembersInfo.set(false);
+        
+        this.channelsService.closeAddMemberDialog();
+        this.channelsService.closeMembersDialog();
+        this.channelsService.memberAddedInfo = true;
+        setTimeout(() => {
+          this.channelsService.memberAddedInfo = false;
+        }, 3000);    
 
       } catch (error) {
         console.error("Fehler beim Aktualisieren des Channels:", error);
@@ -185,7 +190,6 @@ export class AddMemberDialogComponent implements OnInit {
 
   selectUser(user: User): void {
     this.userSelected! = this.userSelected;
-  
     if (this.currentUserUid === user.id || this.currentChannelMembers.includes(user.id)) {
         this.ownUserError = true; 
     } else {

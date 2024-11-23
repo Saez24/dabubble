@@ -30,6 +30,8 @@ import { ChannelsService } from '../shared/services/channels/channels.service';
 import { UserInfoDialogComponent } from "../dialogs/user-info-dialog/user-info-dialog.component";
 import { MembersDialogComponent } from '../dialogs/members-dialog/members-dialog.component';
 import { AddMemberDialogComponent } from '../dialogs/add-member-dialog/add-member-dialog.component';
+import { MemberAddedInfoComponent } from "../dialogs/member-added-info/member-added-info.component";
+import { ChannelCreatedInfoComponent } from "../dialogs/channel-created-info/channel-created-info.component";
 
 @Component({
   selector: 'app-board',
@@ -57,7 +59,9 @@ import { AddMemberDialogComponent } from '../dialogs/add-member-dialog/add-membe
     ChannelMessageComponent,
     UserInfoDialogComponent,
     MembersDialogComponent,
-    AddMemberDialogComponent
+    AddMemberDialogComponent,
+    MemberAddedInfoComponent,
+    ChannelCreatedInfoComponent
 ],
   templateUrl: './board.component.html',
   styleUrls: ['./board.component.scss', '../../styles.scss'],

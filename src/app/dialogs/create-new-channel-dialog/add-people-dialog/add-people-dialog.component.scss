@@ -164,7 +164,39 @@
     max-height: 120px;
 }
 
+.mdc-button {
+    height: 49px !important;
+    width: 125px !important;
+    border-radius: 25px !important;
+    background: $dark-purple !important;
 
+    &:hover {
+        cursor: pointer;
+        background-color: $purple !important;
+    }
+}
 
+.close-btn {
+    @include dFlex();
+    height: 40px;
+    width: 40px;
 
+    &:hover {
+        background-color: $light-purple;
+        color: $dark-purple;
+        }
 
+    .icon {
+        width: 24px;
+        height: 24px;
+    }
+}
+
+@media (max-width: 768px) {
+    .contact-container {
+        width: 240px;
+        top: 280px;
+        left: 20px;
+        gap: 15px;
+    }
+}

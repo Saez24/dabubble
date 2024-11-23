@@ -1,7 +1,7 @@
 <div class="add-people-dialog-content">
     <section class="header-add-people-dialog">
         <h1 mat-dialog-title>Leute hinzufügen</h1>
-        <a mat-dialog-close mat-icon-button (click)="this.channelsService.closeAddMemberDialog()"><mat-icon class="icon">close</mat-icon></a>
+        <a class="close-btn" mat-dialog-close mat-icon-button (click)="this.channelsService.closeAddMemberDialog()"><mat-icon class="icon">close</mat-icon></a>
     </section>
     <div class="current-channel-name">
         <mat-icon class="icon" svgIcon="hashtag" aria-hidden="false" aria-label="Workspace icon"></mat-icon>
@@ -47,7 +47,7 @@
                 </div>
             </div>
             <mat-dialog-actions>
-                <button
+                <button class="add-people-button"
                 mat-flat-button
                 type="submit"
                 [disabled]="channelForm.invalid">
