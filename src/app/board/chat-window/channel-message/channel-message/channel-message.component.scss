@@ -66,6 +66,7 @@
     display: flex;
     align-items: center;
     gap: 20px;
+    // width: 192px;
 }
 
 .members-list {
@@ -73,10 +74,13 @@
     align-items: center;
     gap: 10px;
     font-size: 20px;
+    border-radius: 50%;
+    padding: 2px;
+    background: white;
 
     >img {
         height: 40px;
-        margin-left: -20px;
+        // margin-left: -20px;
         border-radius: 50%;
     }
 
@@ -679,6 +683,93 @@
         border-radius: 50%;
         cursor: pointer;
     }
+}
+
+.search-block {
+    position: absolute;
+    height: auto;
+    max-height: 220px;
+    overflow-y: scroll !important;
+    bottom: 110px;
+    margin: 40px;
+    left: 0;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    background: white;
+    padding: 20px;
+    border-radius: 20px;
+    border: 1px solid #ADB0D9;
+    z-index: 999;
+
+}
+
+/* Anpassung der Scrollbar */
+.search-block::-webkit-scrollbar {
+    display: block !important;
+    width: 10px;
+    /* Breite der Scrollbar */
+}
+
+.search-block::-webkit-scrollbar-thumb {
+    background: #535AF1;
+    /* Farbe des Scrollbalkens */
+    border-radius: 5px;
+    /* Runde Ecken */
+}
+
+.search-block::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    /* Farbe des Scrolltrack */
+}
+
+.found-block {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-height: 100%;
+    scrollbar-width: thin !important;
+    /* Schmale Scrollbar */
+    scrollbar-color: #535AF1 #f1f1f1;
+    /* Farbe Scrollbar und Track */
+    overflow-y: scroll;
+}
+
+.found-users {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-sizing: border-box;
+    font-size: 18px;
+    cursor: pointer;
+    font-weight: 400;
+
+    >img {
+        height: 50px;
+        width: 50px;
+        border-radius: 50%;
+    }
+}
+
+.show-members-button {
+    display: flex;
+    align-items: center;
+    // min-width: 142px;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 3px 10px 3px 10px;
+    border-radius: 30px;
+    &:hover {
+        cursor: pointer;
+        background-color: #ECEEFE;
+    }
+}
+
+.member-images {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
 }
 
 @media screen and (max-width: 480px) {

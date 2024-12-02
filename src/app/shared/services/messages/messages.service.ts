@@ -36,7 +36,6 @@ export class MessagesService {
     lastAnswer: string = '';
     selectedMessage: Message | null = null;
 
-
     @Output() showThreadEvent = new EventEmitter<void>();
     @ViewChild(WorkspaceComponent) workspaceComponent!: WorkspaceComponent;
 

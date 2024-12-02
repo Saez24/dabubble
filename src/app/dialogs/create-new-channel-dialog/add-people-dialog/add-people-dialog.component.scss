@@ -16,6 +16,13 @@
     }
 }
 
+.header-add-people-dialog {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
 .dialog-content {
     box-sizing: border-box;
     overflow: hidden;
@@ -155,6 +162,34 @@
 
 .mdc-text-field--outlined .mat-mdc-form-field-infix, .mdc-text-field--no-label .mat-mdc-form-field-infix {
     max-height: 120px;
+}
+
+.mdc-button {
+    height: 49px !important;
+    width: 125px !important;
+    border-radius: 25px !important;
+    background: $dark-purple !important;
+
+    &:hover {
+        cursor: pointer;
+        background-color: $purple !important;
+    }
+}
+
+.close-btn {
+    @include dFlex();
+    height: 40px;
+    width: 40px;
+
+    &:hover {
+        background-color: $light-purple;
+        color: $dark-purple;
+        }
+
+    .icon {
+        width: 24px;
+        height: 24px;
+    }
 }
 
 

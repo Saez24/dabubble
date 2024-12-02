@@ -38,7 +38,6 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
     MatInputModule,
     MatIconModule,
     FormsModule,
-    AddPeopleDialog
 ],
   templateUrl: './create-new-channel-dialog.component.html',
   styleUrl: './create-new-channel-dialog.component.scss',

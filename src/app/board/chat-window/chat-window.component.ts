@@ -46,7 +46,7 @@ export class ChatWindowComponent implements OnInit {
   currentUserUid = '';
   senderAvatar: string | null = null;
   senderName: string | null = null;
-  selectedFile: File | null = null;// Service für den Datei-Upload
+  selectedFile = this.sendMessageService.selectedFile; // Service für den Datei-Upload
   filePreviewUrl: string | null = null;
   searchQuery: string = '';
   isSearching: boolean = false;
@@ -77,22 +77,9 @@ export class ChatWindowComponent implements OnInit {
     this.loadData();
   }
 
-  // async loadChannels() {
-  //   let channelRef = collection(this.firestore, 'channels');
-  //   let channelQuery = query(channelRef, orderBy('name'));
-
-  //   onSnapshot(channelQuery, async (snapshot) => {
-  //     this.channels = await Promise.all(snapshot.docs.map(async (doc) => {
-  //       let channelData = doc.data() as Channel;
-  //       return { ...channelData, id: doc.id };
-  //     }));
-
-  //   });
-  // }
-
   async onSearch(event: any) {
     this.searchQuery = event.target.value.trim().toLowerCase();
-    this.isSearching = this.searchQuery.length > 0;
+    this.isSearching = this.searchQuery.trim().length > 0;
 
     // Setze die Benutzer- und Kanallisten vor der Filterung zurück
     this.users = [...this.usersOriginal];
@@ -105,6 +92,7 @@ export class ChatWindowComponent implements OnInit {
         this.channels = this.channels.filter(channel =>
           channel.name.toLowerCase().startsWith(this.searchQuery.slice(1)) // startsWith anstelle von includes
         );
+
         this.users = []; // User-Suchergebnisse leeren
       } else if (this.searchQuery.startsWith('@') || this.isValidEmail(this.searchQuery)) {
         // Suche nach Usern (nach @ oder E-Mail-Adresse)
@@ -150,6 +138,7 @@ export class ChatWindowComponent implements OnInit {
     this.cd.detectChanges();
   }
 
+
   async loadUsers() {
     const usersRef = collection(this.firestore, 'users');
     const usersQuery = query(usersRef, orderBy('name'));
@@ -193,6 +182,7 @@ export class ChatWindowComponent implements OnInit {
   }
 
   selectUser(user: User) {
+
     if (user && user.id) {
       this.isSearching = false; // Suche beenden
       this.users = []; // Gefilterte Benutzer zurücksetzen

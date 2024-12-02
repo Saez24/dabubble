@@ -69,14 +69,14 @@
                             <div *ngFor="let user of users; let i = index" (click)="clickUserContainer(user, i)"
                                 [ngClass]="channelsService.clickedUsers[i] ? 'clicked' : ''">
                                 <div>
-                                    <img class="user-avatar" [src]="user.avatarPath" alt="Avatar Image">
+                                    <img class="user-avatar-workspace" [src]="user.avatarPath" alt="Avatar Image">
                                     <div [ngStyle]="{ 'background': user.loginState === 'loggedIn' ? '#92C83E' : '#686868' }"
                                         class="status">
                                     </div>
 
                                     <!-- Badge anzeigen, wenn der Benutzer der Sender ist und ungelesene Nachrichten für ihn existieren -->
-                                    <div *ngIf="user.id === currentUserUid && unreadMessagesCount > 0" class="badge"
-                                        matBadge="{{ unreadMessagesCount }}"></div>
+                                    <div *ngIf="user.unreadMessagesCount > 0" class="badge"
+                                        matBadge="{{ user.unreadMessagesCount }}"></div>
                                 </div>
                                 <span>{{ user.name }}</span>
                             </div>

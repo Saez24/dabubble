@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, Output, ViewChild, ViewEncapsulation } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ComponentRef, ElementRef, EventEmitter, HostListener, OnInit, Output, ViewChild, ViewContainerRef, ViewEncapsulation } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -21,6 +21,8 @@ import { MessagesService } from '../../../../shared/services/messages/messages.s
 import { AddMemberDialogComponent } from '../../../../dialogs/add-member-dialog/add-member-dialog.component';
 import { ChannelDescriptionDialogComponent } from '../../../../dialogs/channel-description-dialog/channel-description-dialog.component';
 import { Message } from '../../../../shared/models/message.class';
+import { SafeUrlPipe } from '../../../../shared/pipes/safe-url.pipe';
+import { MembersDialogComponent } from '../../../../dialogs/members-dialog/members-dialog.component';
 
 
 
@@ -28,19 +30,20 @@ import { Message } from '../../../../shared/models/message.class';
   selector: 'app-channel-message',
   standalone: true,
   imports: [MatCardModule, MatButtonModule, MatIconModule, MatDividerModule, FormsModule,
-    MatFormFieldModule, MatInputModule, CommonModule, PickerComponent, NgIf, NgFor],
+    MatFormFieldModule, MatInputModule, CommonModule, PickerComponent, SafeUrlPipe, NgIf, NgFor,],
   templateUrl: './channel-message.component.html',
   styleUrl: './channel-message.component.scss',
   changeDetection: ChangeDetectionStrategy.Default,
   encapsulation: ViewEncapsulation.None,
 })
-export class ChannelMessageComponent {
+export class ChannelMessageComponent implements OnInit, AfterViewInit {
   @Output() showThreadEvent = new EventEmitter<Message>();
   messages: Message[] = [];
   selectedMessage: Message | null = null;
   users: User[] = [];
+  filteredUsers: User[] = [];
   channels: Channel[] = [];
-  currentUser = this.authService.getUserSignal();
+  currentUser = this.authService.currentUser;
   showEmojiPicker: boolean = false;
   showEmojiPickerEdit: boolean = false;
   showEmojiPickerReact: boolean = false;
@@ -55,17 +58,29 @@ export class ChannelMessageComponent {
   senderName: string | null = null;
   selectedFile: File | null = null;// Service für den Datei-Upload
   filePreviewUrl: string | null = null;
+  searchQuery: string = '';
+  isSearching: boolean = false;
+  isUserSelect: boolean = false;
+  markedUser: { id: string; name: string }[] = [];
 
-
-
-  @ViewChild('chatWindow') private chatWindow!: ElementRef;
+  @ViewChild('chatWindow', { static: false }) chatWindow!: ElementRef;
   constructor(private firestore: Firestore, private auth: Auth,
     public userService: UserService, private cd: ChangeDetectorRef,
     private authService: AuthService, private uploadFileService: UploadFileService,
     public channelsService: ChannelsService, public dialog: MatDialog, public messageService: MessagesService) { }
 
-  ngOnInit() {
 
+  ngOnInit() {
+    this.loadData();
+  }
+
+  ngAfterViewInit() {
+    const observer = new MutationObserver(() => {
+      // console.log('Mutation detected');
+      this.scrollToBottom();
+    });
+
+    observer.observe(this.chatWindow.nativeElement, { childList: true, subtree: true });
   }
 
   async loadData() {
@@ -92,12 +107,78 @@ export class ChannelMessageComponent {
     });
   }
 
-  openChannelDescriptionDialog() {
-    this.dialog.open(ChannelDescriptionDialogComponent)
+  scrollToBottom() {
+    if (this.chatWindow && this.chatWindow.nativeElement) {
+      this.chatWindow.nativeElement.scrollTop = this.chatWindow.nativeElement.scrollHeight;
+    }
   }
 
-  openAddMemberDialog() {
-    this.dialog.open(AddMemberDialogComponent)
+  toggleSearch(): void {
+    this.isUserSelect = !this.isUserSelect; // Suchstatus umschalten
+    if (this.isUserSelect) {
+      this.onSearch();
+    } else {
+      this.filteredUsers = []; // Gefilterte Liste zurücksetzen, wenn keine Suche aktiv ist
+    }
+  }
+
+  updateSearchQuery(event: Event): void {
+    const target = event.target as HTMLTextAreaElement;
+    const fullText = target.value;
+
+    // Suche nach dem letzten `@`-Symbol und extrahiere den Teil danach
+    const lastAtIndex = fullText.lastIndexOf('@');
+    this.searchQuery = lastAtIndex !== -1 ? fullText.slice(lastAtIndex + 1).trim().toLowerCase() : '';
+
+    // Aktivieren der Suche, falls es eine Eingabe nach dem `@` gibt
+    this.isSearching = this.searchQuery.length > 0;
+    if (this.isSearching) {
+      this.onSearch();
+    } else {
+      this.filteredUsers = []; // Gefilterte Liste zurücksetzen, wenn keine Suche aktiv ist
+    }
+  }
+
+  selectUser(user: User) {
+    if (user && user.id) {
+      // Entferne das letzte '@' und füge den vollständigen Benutzernamen hinzu
+      this.channelChatMessage = this.channelChatMessage.trim(); // Leerzeichen am Ende entfernen
+      const lastAtIndex = this.channelChatMessage.lastIndexOf('@');
+      if (lastAtIndex !== -1) {
+        // Entferne den '@' und alles dahinter (einschließlich des letzten Benutzernamens)
+        this.channelChatMessage = this.channelChatMessage.slice(0, lastAtIndex);
+      }
+
+      // Füge den neuen Benutzernamen hinzu
+      this.channelChatMessage += ` @${user.name} `;
+
+      // Benutzer zu `markedUser` hinzufügen, falls noch nicht vorhanden
+      if (!this.markedUser.some(u => u.id === user.id)) {
+        this.markedUser.push({ id: user.id, name: user.name });
+        console.log(this.markedUser);
+
+      }
+
+      // Suche zurücksetzen
+      this.isSearching = false;
+      this.isUserSelect = false;
+      this.searchQuery = '';
+      this.filteredUsers = [];
+    } else {
+      console.error("Ungültiger Benutzer:", user);
+    }
+  }
+
+
+  onSearch(): void {
+    this.filteredUsers = this.users.filter(user =>
+      user.name.toLowerCase().startsWith(this.searchQuery) ||
+      (user.email && user.email.toLowerCase().startsWith(this.searchQuery))
+    );
+  }
+
+  openChannelDescriptionDialog() {
+    this.dialog.open(ChannelDescriptionDialogComponent)
   }
 
   showEmoji() {
@@ -321,9 +402,11 @@ export class ChannelMessageComponent {
     }
 
     if (this.channelChatMessage.trim() || this.selectedFile) {
-      const currentUser = this.authService.currentUser;
+      const currentUser = this.authService.currentUser();
+      // console.log('channelChatMessage:', this.channelChatMessage);
+      // console.log('selectedFile:', this.selectedFile);
 
-      if (currentUser()) {
+      if (currentUser) {
         const messagesRef = collection(this.firestore, 'messages');
 
         const newMessage: Message = new Message({
@@ -333,24 +416,29 @@ export class ChannelMessageComponent {
           channelId: this.channelsService.currentChannelId, // Verwende die gespeicherte channelId
           reactions: [],
           answers: [],
-          fileURL: '',
+          fileURL: this.selectedFile ? '' : null,
         });
 
         const messageDocRef = await addDoc(messagesRef, {
           senderID: newMessage.senderID,
           senderName: newMessage.senderName,
           message: newMessage.message,
+          fileURL: newMessage.fileURL,
           channelId: newMessage.channelId,
           reaction: newMessage.reactions,
           answers: newMessage.answers,
           timestamp: new Date(),
         });
 
-        if (this.selectedFile && this.currentUserUid) {
+        if (this.selectedFile && this.currentUser()?.id) {
+          // console.log('File:', this.selectedFile);
+          // console.log('currentUserUid:', this.currentUser()?.id);
           try {
-            const fileURL = await this.uploadFileService.uploadFileWithIds(this.selectedFile, this.currentUserUid, messageDocRef.id); // Verwende die ID des neuen Dokuments
+            const fileURL = await this.uploadFileService.uploadFileWithIds(this.selectedFile, this.currentUser()?.id || '', messageDocRef.id); // Verwende die ID des neuen Dokuments
             newMessage.fileURL = fileURL; // Setze die Download-URL in der Nachricht
             await updateDoc(messageDocRef, { fileURL: newMessage.fileURL }); // Aktualisiere das Dokument mit der Datei-URL
+            // console.log('Datei erfolgreich hochgeladen:', fileURL);
+
           } catch (error) {
             console.error('Datei-Upload fehlgeschlagen:', error);
           }
@@ -406,16 +494,6 @@ export class ChannelMessageComponent {
   }
 
 
-  scrollToBottom(): void {
-    if (this.chatWindow) {
-      try {
-        this.chatWindow.nativeElement.scrollTop = this.chatWindow.nativeElement.scrollHeight;
-      } catch (err) {
-        console.error('Scroll to bottom failed:', err);
-      }
-    }
-  }
-
   onFileSelected(event: Event) {
     const fileInput = event.target as HTMLInputElement;
     const file = fileInput.files?.[0];
@@ -429,7 +507,8 @@ export class ChannelMessageComponent {
         const fileData = reader.result as string;
         this.filePreviewUrl = fileData; // Speichere die Vorschau-URL für die Datei
         localStorage.setItem('selectedFile', JSON.stringify({ fileName: file.name, fileData }));
-        console.log('File saved to localStorage');
+        // console.log('File saved to localStorage');
+
       };
       reader.readAsDataURL(file);
     } else {

@@ -35,7 +35,6 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
     MatRadioModule,
     MatButtonModule,
     FormsModule,
-    CreateNewChannelDialog,
     NgIf,
     NgFor,
     NgStyle,
@@ -69,6 +68,7 @@ export class AddPeopleDialog implements OnInit {
   constructor(
     private firestore: Firestore,
     private auth: Auth,
+    public channelsService: ChannelsService,
     private authService: AuthService,
     @Inject(MAT_DIALOG_DATA) public data: any,
   ) {
@@ -134,6 +134,10 @@ export class AddPeopleDialog implements OnInit {
       if (newChannel) {
         await this.updateUserChannels(this.currentUser.id, newChannel.name);
       }
+      this.channelsService.channelCreatedInfo = true;
+      setTimeout(() => {
+        this.channelsService.channelCreatedInfo = false;
+      }, 3000);
     }
   }
 

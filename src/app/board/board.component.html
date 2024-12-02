@@ -19,19 +19,19 @@
                     *ngIf="currentUser()?.loginState === 'loggedOut'" class="state-icon">
                 <img src="../../assets/images/icons/inactive.png" alt="state Icon"
                     *ngIf="currentUser()?.loginState === 'inactive'" class="state-icon">
-            </div>
-            <mat-icon>keyboard_arrow_down</mat-icon>
-            <div class="overlay" *ngIf="this.userService.showOverlay()" (click)="closeAllDialogs()">
-                <div class="profile-menu" (click)="stopPropagation($event)">
-                    <div class="profil-menu-link-container"
-                        *ngIf="!this.userService.showProfile() && !this.userService.showProfileEditor()">
-                        <div class="profil-menu-links" (click)="openUserProfile($event)">Profil</div>
-                        <div class="profil-menu-links" (click)="authService.logout()">Log Out</div>
+                <mat-icon>keyboard_arrow_down</mat-icon>
+                <div class="overlay" *ngIf="this.userService.showOverlay()" (click)="closeAllDialogs()">
+                    <div class="profile-menu" (click)="stopPropagation($event)">
+                        <div class="profil-menu-link-container"
+                            *ngIf="!this.userService.showProfile() && !this.userService.showProfileEditor()">
+                            <div class="profil-menu-links" (click)="openUserProfile($event)">Profil</div>
+                            <div class="profil-menu-links" (click)="authService.logout()">Log Out</div>
+                        </div>
+                        <app-profile-dialog class="profil-details" *ngIf="this.userService.showProfile()">
+                        </app-profile-dialog>
+                        <app-profile-editor-dialog class="profil-editor" *ngIf="this.userService.showProfileEditor()">
+                        </app-profile-editor-dialog>
                     </div>
-                    <app-profile-dialog class="profil-details" *ngIf="this.userService.showProfile()">
-                    </app-profile-dialog>
-                    <app-profile-editor-dialog class="profil-editor" *ngIf="this.userService.showProfileEditor()">
-                    </app-profile-editor-dialog>
                 </div>
             </div>
         </div>
@@ -58,13 +58,13 @@
                         <app-direct-message [selectedUser]="chatUtilityService.directMessageUser"></app-direct-message>
                     </ng-container>
                 </mat-card-content>
-            </mat-card> 
+            </mat-card>
         </div>
-            <mat-drawer class="thread-drawer" mode="side" position="end" [opened]="showThreadComponent">
-                <mat-card-content appearance="outlined">
-                    <app-thread [selectedMessage]="selectedMessage" (closeThreadEvent)="closeThread()"></app-thread>
-                </mat-card-content>
-            </mat-drawer>
+        <mat-drawer class="thread-drawer" mode="side" position="end" [opened]="showThreadComponent">
+            <mat-card-content appearance="outlined">
+                <app-thread [selectedMessage]="selectedMessage" (closeThreadEvent)="closeThread()"></app-thread>
+            </mat-card-content>
+        </mat-drawer>
 
     </mat-drawer-container>
     <div class="navigation-toggle-btn" (click)="toggleWorkspace()"
@@ -81,6 +81,18 @@
     <div class="userInfoOverlay" *ngIf="this.userService.showUserInfo()" (click)="closeUserInfoDialog()">
         <app-user-info-dialog class="profil-details user-info">
         </app-user-info-dialog>
+    </div>
+
+    <div class="overlay" *ngIf="this.channelsService.showMembersInfo()"
+        (click)="this.channelsService.closeMembersDialog()">
+        <app-members-dialog class="show-members-dialog" (click)="$event.stopPropagation()">
+        </app-members-dialog>
+    </div>
+
+    <div class="overlay" *ngIf="this.channelsService.showAddMemberDialog()"
+        (click)="this.channelsService.closeAddMemberDialog()">
+        <app-add-member-dialog class="add-members-dialog" (click)="$event.stopPropagation()">
+        </app-add-member-dialog>
     </div>
 
 </div>

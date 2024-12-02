@@ -4,11 +4,12 @@ import { Channel } from '../../models/channel.class';
 import { UserService } from '../firestore/user-service/user.service';
 import { AuthService } from '../authentication/auth-service/auth.service';
 import { UploadFileService } from '../firestore/storage-service/upload-file.service';
-import { addDoc, arrayUnion, collection, doc, Firestore, getDocs, onSnapshot, orderBy, query, updateDoc, where } from '@angular/fire/firestore';
+import { addDoc, arrayUnion, collection, doc, Firestore, getDoc, getDocs, onSnapshot, orderBy, query, updateDoc, where } from '@angular/fire/firestore';
 import { ChannelsService } from '../channels/channels.service';
 import { DirectMessage } from '../../models/direct.message.class';
 import { Message } from '../../models/message.class';
 import { ChatUtilityService } from './chat-utility.service';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +17,7 @@ import { ChatUtilityService } from './chat-utility.service';
 export class SendMessageService {
   users: User[] = [];
   channels: Channel[] = [];
-  currentUser = this.authService.getUserSignal();
+  currentUser = this.authService.currentUser;
   showEmojiPicker = false;
   chatMessage = '';
   currentUserUid = this.currentUser()?.id;
@@ -87,154 +88,217 @@ export class SendMessageService {
       const currentUser = this.authService.currentUser;
 
       if (currentUser()) {
-        // console.log("Aktueller Benutzer:", currentUser()); // Überprüfen, ob der aktuelle Benutzer korrekt abgerufen wird
-
-        // Überprüfe, ob ein Benutzer oder ein Kanal ausgewählt ist
+        const conversationId = uuidv4();
         if (this.selectedUser?.id) {
-          // console.log("DirectMessageUser:", this.selectedUser.id); // Überprüfen, ob der Benutzer korrekt gesetzt ist
           this.messageId = await this.checkExistingConversation(this.selectedUser.id);
+          await this.sendDirectMessage(conversationId, currentUser);
 
-          // An einen Benutzer senden
-          const messagesRef = collection(this.firestore, 'direct_messages');
-
-          if (this.messageId) {
-            // Konversation existiert, also aktualisiere sie
-            const messageDocRef = doc(messagesRef, this.messageId);
-
-            // Füge die neue Nachricht zur bestehenden Konversation hinzu
-            await updateDoc(messageDocRef, {
-              conversation: arrayUnion({
-                senderName: currentUser()?.name,
-                message: this.chatMessage,
-                reactions: [],
-                timestamp: new Date(),
-                receiverName: this.selectedUser?.name, // Zugriff auf den Namen des ausgewählten Benutzers
-                senderId: currentUser()?.id,
-                receiverId: this.selectedUser?.id, // Zugriff auf die ID des ausgewählten Benutzers
-              })
-            });
-
-            // Datei verarbeiten, falls vorhanden
-            if (this.selectedFile && this.currentUserUid) {
-              try {
-                const fileURL = await this.uploadFileService.uploadFileWithIds(this.selectedFile, this.currentUserUid, messageDocRef.id);
-                await updateDoc(messageDocRef, { fileURL });
-              } catch (error) {
-                console.error('Datei-Upload fehlgeschlagen:', error);
-              }
-            }
-          } else {
-            // Es gibt keine Konversation, also erstelle eine neue
-            const newMessage: DirectMessage = new DirectMessage({
-              conversation: [],
-              senderId: currentUser()?.id,
-              senderName: currentUser()?.name,
-              message: this.chatMessage,
-              reactions: [],
-              fileURL: '',
-              receiverId: this.selectedUser?.id, // Zugriff auf die ID des ausgewählten Benutzers
-              receiverName: this.selectedUser?.name, // Zugriff auf den Namen des ausgewählten Benutzers
-            });
-
-            // Füge die neue Konversation in Firestore hinzu
-            const messageDocRef = await addDoc(messagesRef, {
-              senderId: newMessage.senderId,
-              receiverId: newMessage.receiverId,
-              timestamp: new Date(),
-              conversation: [{
-                senderName: newMessage.senderName,
-                message: newMessage.message,
-                reactions: newMessage.reactions,
-                timestamp: new Date(),
-                receiverName: newMessage.receiverName,
-                senderId: newMessage.senderId,
-                receiverId: newMessage.receiverId,
-              }]
-            });
-
-            // Datei verarbeiten, falls vorhanden
-            if (this.selectedFile && this.currentUserUid) {
-              try {
-                const fileURL = await this.uploadFileService.uploadFileWithIds(this.selectedFile, this.currentUserUid, messageDocRef.id);
-                newMessage.fileURL = fileURL;
-                await updateDoc(messageDocRef, { fileURL: newMessage.fileURL });
-              } catch (error) {
-                console.error('Datei-Upload fehlgeschlagen:', error);
-              }
-            }
-          }
-          if (this.selectedUser) {
-            // console.log("Users Array:", this.users);
-            // console.log("Selected User ID:", this.selectedUser.id);
-
-            const userIndex = this.users.findIndex(user => user.id === this.selectedUser?.id);
-            // console.log("User Index:", userIndex);
-
-            if (userIndex !== -1) {
-              this.chatUtilityService.openDirectMessageFromChat(this.selectedUser, userIndex);
-            } else {
-              console.error("User not found in users array for ID:", this.selectedUser.id);
-            }
-          } else {
-            console.error("Selected user is undefined");
-          }
 
         } else if (this.channelsService.currentChannelId) {
-          // An einen Kanal senden
-          const messagesRef = collection(this.firestore, 'messages');
-
-          const newMessage: Message = new Message({
-            senderID: currentUser()?.id,
-            senderName: currentUser()?.name,
-            message: this.chatMessage,
-            channelId: this.channelsService.currentChannelId,
-            reactions: [],
-            answers: [],
-            fileURL: '',
-          });
-
-          const messageDocRef = await addDoc(messagesRef, {
-            senderID: newMessage.senderID,
-            senderName: newMessage.senderName,
-            message: newMessage.message,
-            channelId: newMessage.channelId,
-            reactions: newMessage.reactions,
-            answers: newMessage.answers,
-            timestamp: new Date(),
-          });
-
-          if (this.selectedFile && this.currentUserUid) {
-            try {
-              const fileURL = await this.uploadFileService.uploadFileWithIds(this.selectedFile, this.currentUserUid, messageDocRef.id);
-              newMessage.fileURL = fileURL;
-              await updateDoc(messageDocRef, { fileURL: newMessage.fileURL });
-            } catch (error) {
-              console.error('Datei-Upload fehlgeschlagen:', error);
-            }
-          }
-          const channelIndex = this.channelsService.channels.findIndex(channel => channel.id === this.channelsService.currentChannelId);
-          // console.log(this.channelsService.channels[channelIndex]);
-          // console.log(this.channelsService.currentChannelId);
-
-          if (channelIndex !== -1) {
-            // Emit the event to switch to the selected channel's chat window
-            this.chatUtilityService.openChannelMessageFromChat(this.channelsService.channels[channelIndex], channelIndex);
-          } else {
-            console.error("Selected channel not found in channels array");
-          }
+          await this.sendChannelMessage(currentUser);
         } else {
-          this.showError(); // Fehler, wenn kein Benutzer oder Kanal ausgewählt ist
+          this.showError();
         }
 
-        // Eingabefelder bereinigen und Scrollen
-        this.chatMessage = '';
-        this.selectedFile = null;
-        this.scrollToBottom();
-        this.deleteUpload();
+        this.clearInputsAndScroll();
       } else {
         console.error('Kein Benutzer angemeldet');
       }
     }
+  }
+
+  async sendDirectMessage(conversationId: string, currentUser: any) {
+    const messagesRef = collection(this.firestore, 'direct_messages');
+
+    if (this.messageId) {
+      await this.updateConversation(messagesRef, conversationId, currentUser);
+    } else {
+      await this.createNewConversation(messagesRef, conversationId, currentUser);
+    }
+
+    if (this.selectedUser) {
+      this.handleDirectMessageUser();
+    } else {
+      console.error("Selected user is undefined");
+    }
+  }
+
+
+  async createNewConversation(messagesRef: any, conversationId: string, currentUser: any) {
+    const newMessage: DirectMessage = new DirectMessage({
+      conversation: [],
+      senderId: currentUser()?.id,
+      senderName: currentUser()?.name,
+      receiverId: this.selectedUser?.id,
+      receiverName: this.selectedUser?.name,
+    });
+
+    const messageDocRef = await addDoc(messagesRef, {
+      senderId: newMessage.senderId,
+      receiverId: newMessage.receiverId,
+      timestamp: new Date(),
+      conversation: [{
+        conversationId: conversationId,
+        senderName: newMessage.senderName,
+        message: newMessage.message,
+        reactions: newMessage.reactions,
+        timestamp: new Date(),
+        receiverName: newMessage.receiverName,
+        senderId: newMessage.senderId,
+        receiverId: newMessage.receiverId,
+        fileURL: '',
+        readedMessage: false,
+      }]
+    });
+    if (this.selectedFile) {
+      await this.uploadFileDirectMessage(messageDocRef, conversationId, currentUser);
+    }
+  }
+
+  async sendChannelMessage(currentUser: any) {
+    const messagesRef = collection(this.firestore, 'messages');
+    const newMessage: Message = new Message({
+      senderID: currentUser()?.id,
+      senderName: currentUser()?.name,
+      message: this.chatMessage,
+      channelId: this.channelsService.currentChannelId,
+      reactions: [],
+      answers: [],
+      fileURL: this.selectedFile ? '' : null,
+    });
+
+    const messageDocRef = await addDoc(messagesRef, {
+      senderID: newMessage.senderID,
+      senderName: newMessage.senderName,
+      message: newMessage.message,
+      channelId: newMessage.channelId,
+      reactions: newMessage.reactions,
+      answers: newMessage.answers,
+      fileURL: newMessage.fileURL,
+      timestamp: new Date(),
+    });
+
+    if (this.selectedFile && this.currentUser()?.id) {
+      await this.uploadFile(messageDocRef);
+    }
+
+    this.handleChannelMessage();
+  }
+
+  async uploadFile(messageDocRef: any) {
+    if (this.selectedFile && this.currentUser()?.id) {
+      try {
+        const fileURL = await this.uploadFileService.uploadFileWithIds(this.selectedFile, this.currentUser()?.id || '', messageDocRef.id);
+        await updateDoc(messageDocRef, { fileURL });
+      } catch (error) {
+        console.error('Datei-Upload fehlgeschlagen:', error);
+      }
+    } else {
+      console.error('No file selected');
+    }
+  }
+
+  async uploadFileDirectMessage(messageDocRef: any, conversationId: string, currentUser: any) {
+    if (this.selectedFile && this.currentUser()?.id && conversationId) {
+      try {
+        // Datei hochladen und URL erhalten
+        const fileURL = await this.uploadFileService.uploadFileWithIdsDirectMessages(
+          this.selectedFile,
+          conversationId,
+          messageDocRef.id
+        );
+
+        // Aktualisiere die Datei-URL innerhalb der richtigen Konversation
+        await updateDoc(messageDocRef, {
+          conversation: arrayUnion({
+            fileURL: fileURL,
+          }),
+        });
+
+        console.log('Datei-Upload erfolgreich:', fileURL);
+      } catch (error) {
+        console.error('Datei-Upload fehlgeschlagen:', error);
+      }
+    } else {
+      console.error('Keine Datei ausgewählt oder Benutzer nicht authentifiziert');
+    }
+  }
+
+
+  handleDirectMessageUser() {
+    if (this.selectedUser) {
+      const userIndex = this.users.findIndex(user => user.id === this.selectedUser?.id);
+      if (userIndex !== -1) {
+        this.chatUtilityService.openDirectMessageFromChat(this.selectedUser, userIndex);
+      } else {
+        console.error("User not found in users array for ID:", this.selectedUser?.id);
+      }
+    } else {
+      console.error("Selected user is null");
+    }
+  }
+
+  handleChannelMessage() {
+    const channelIndex = this.channelsService.channels.findIndex(channel => channel.id === this.channelsService.currentChannelId);
+    if (channelIndex !== -1) {
+      this.chatUtilityService.openChannelMessageFromChat(this.channelsService.channels[channelIndex], channelIndex);
+    } else {
+      console.error("Selected channel not found in channels array");
+    }
+  }
+  async updateConversation(messagesRef: any, conversationId: string, currentUser: any) {
+    if (this.messageId !== null && this.selectedFile) {
+      const messageDocRef = doc(messagesRef, this.messageId);
+      const docSnapshot = await getDoc(messageDocRef);
+
+      if (docSnapshot.exists()) {
+        const docData = docSnapshot.data();
+        const conversationArray = docData['conversation'] || [];
+        const fileURL = await this.uploadFileService.uploadFileWithIdsDirectMessages(this.selectedFile, conversationId, this.messageId);
+        // Lade das aktuelle Dokument
+
+        // Finde die Nachricht mit `conversationId` und aktualisiere die `fileURL`
+        const updatedConversation = conversationArray.map((message: any) =>
+          message.conversationId === conversationId
+            ? { ...message, fileURL }
+            : message
+        );
+
+        // Aktualisiere das Dokument mit der modifizierten Conversation
+        await updateDoc(messageDocRef, {
+          conversation: updatedConversation,
+        });
+
+        // Füge eine neue Nachricht hinzu, falls es notwendig ist
+        await updateDoc(messageDocRef, {
+          conversation: arrayUnion({
+            conversationId: conversationId,
+            senderName: currentUser().name || 'Unbekannter Sender', // Fallback-Wert
+            message: this.chatMessage || '', // Leere Nachricht, falls keine vorhanden
+            reactions: [],
+            timestamp: new Date(),
+            receiverName: this.selectedUser?.name || 'Unbekannter Empfänger', // Fallback-Wert
+            senderId: currentUser().id || 'Unbekannt', // Fallback-Wert
+            receiverId: this.selectedUser?.id || 'Unbekannt', // Fallback-Wert
+            fileURL: fileURL,
+            readedMessage: false,
+          }),
+        });
+
+      } else {
+        console.error("Dokument nicht gefunden");
+      }
+    } else {
+      console.error("Message ID ist null");
+    }
+  }
+
+
+  clearInputsAndScroll() {
+    this.chatMessage = '';
+    this.selectedFile = null;
+    this.scrollToBottom();
+    this.deleteUpload();
   }
 
   showError() {
@@ -264,7 +328,7 @@ export class SendMessageService {
         const fileData = reader.result as string;
         this.filePreviewUrl = fileData; // Speichere die Vorschau-URL für die Datei
         localStorage.setItem('selectedFile', JSON.stringify({ fileName: file.name, fileData }));
-        console.log('File saved to localStorage');
+        // console.log('File saved to localStorage');
       };
       reader.readAsDataURL(file);
     } else {
