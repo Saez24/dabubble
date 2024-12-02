@@ -28,6 +28,7 @@ import { Channel } from '../shared/models/channel.class';
 import { ChatUtilityService } from '../shared/services/messages/chat-utility.service';
 import { ChannelsService } from '../shared/services/channels/channels.service';
 import { UserInfoDialogComponent } from "../dialogs/user-info-dialog/user-info-dialog.component";
+import { SearchDialogComponent } from '../dialogs/search-dialog/search-dialog.component';
 
 @Component({
   selector: 'app-board',
@@ -54,7 +55,8 @@ import { UserInfoDialogComponent } from "../dialogs/user-info-dialog/user-info-d
     ProfileEditorDialogComponent,
     DirectMessageComponent,
     ChannelMessageComponent,
-    UserInfoDialogComponent
+    UserInfoDialogComponent,
+    SearchDialogComponent
 ],
   templateUrl: './board.component.html',
   styleUrls: ['./board.component.scss', '../../styles.scss'],

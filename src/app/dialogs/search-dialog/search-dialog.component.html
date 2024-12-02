@@ -1,0 +1,41 @@
+@if(this.showSearchDialog){
+<div class="search-container">
+    <div class="search-dialog">
+        @if(mainSearchList.length > 0){
+        @for(result of mainSearchList; track result; let index = $index){
+        @if(result.channelAuthor && result.name){
+        <div id="{{index}}" class="filtered-channel">
+            <span>Dein Kanal :</span>
+            <span class="filtered-channel-name">#{{result.name}}</span>
+            <span class="separator-bar"></span>
+        </div>
+        }
+        @if(result.name && result.avatarPath){
+        <div id="{{index}}" class="filtered-user-container">
+            <span>Benutzer :</span>
+            <div class="filtered-user">
+                <img src="{{result.avatarPath}}" alt="">
+                <span>{{result.name}}</span>
+            </div>
+            <span class="separator-bar"></span>
+        </div>
+        }
+
+        <!-- @else if(result.guest){
+        <div id="{{index}}" class="filtered-chat-container">
+            <span>Direktnachricht :</span>
+            <div class="filtered-partner">
+                <img src="{{result.guest.avatarPath}}" alt="">
+                <span> {{result.guest.name}}</span>
+            </div>
+            <span class="separator-bar"></span>
+        </div>
+        } -->
+        }
+        }
+        @else {
+        <span>Keine Ergebnisse gefunden</span>
+        }
+    </div>
+</div>
+}
