@@ -32,7 +32,6 @@ export class AuthService {
       this.userService.setUser(user);
       console.log('auth.service.currentUser() =', this.currentUser());
       console.log(this.currentUser()?.id);
-
     });
   }
 

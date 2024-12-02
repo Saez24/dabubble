@@ -37,12 +37,13 @@ export class SearchDialogComponent implements OnChanges {
   userService = inject(UserService);
   messagesService = inject(MessagesService);
   currentUser = this.authService.getUserSignal();
+  @Output() openChannelEvent = new EventEmitter<void>();
 
   showSearchDialog: boolean = false;
   mainSearchList: any[] = [];
   allData: (User | DirectMessage | Channel | Message)[] = [];
 
-  ngOnInit() {
+  ngOnInit() {  
     this.loadAllData();
   }
 
@@ -60,9 +61,24 @@ export class SearchDialogComponent implements OnChanges {
   }
 
 
+  openUserProfile(event: Event) {
+    event.stopPropagation();
+    this.userService.showProfile.set(true);
+    console.log('openUserProfile');
+    
+  }
+
+
+  async getSelectedUserInfo(selectedUserId: string | null) {
+    console.log('USER selected:', selectedUserId);
+
+    this.userService.showUserInfo.set(true);
+    await this.userService.getSelectedUserById(selectedUserId as string);
+  }
+
+
   ngOnChanges(changes: SimpleChanges) {
     setTimeout(() => {
-      this.loadAllData();
       this.handleSearchChanges(changes);
     }, 100);
   }
@@ -78,6 +94,7 @@ export class SearchDialogComponent implements OnChanges {
 
   showSearchDialogAndFilterItems(): void {
     console.log('searchValue =', this.searchValue);
+    console.log('allData =', this.allData);
 
     this.showSearchDialog = true;
     this.mainSearchList = this.filterSearchItems();
@@ -91,18 +108,23 @@ export class SearchDialogComponent implements OnChanges {
   }
 
 
-  // handleSearchChanges(changes: SimpleChanges): void {
-  //   if (changes['searchValue'] && this.searchValue.length > 0) {
-  //     this.showSearchDialogAndFilterItems();
-  //   } else {
-  //     this.hideSearchDialog();
-  //   }
-  // }
+  openChannel(channel: Channel, i: number) {
+    this.channelsService.channelIsClicked = true;
+    this.channelsService.clickChannelContainer(channel, i);
+    this.openChannelEvent.emit();
+    if (this.authService.currentUserUid) {
+      this.messagesService.loadMessages(this.authService.currentUserUid, channel.id);
+    } else {
+      console.error("FAIL!!!");
+    }
 
+    console.log('channel =', channel);
+    
+  }
 
 
   filterSearchItems(): SearchItem[] {
-    console.log('allData =', this.allData);
+
 
     return this.allData.filter((ad: SearchItem) => {
       if (this.isUser(ad)) {
