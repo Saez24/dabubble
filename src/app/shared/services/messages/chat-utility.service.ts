@@ -27,6 +27,7 @@ export class ChatUtilityService {
     this.showChannelMessage = true;
     this.showDirectMessage = false;
     this.showChatWindow = false;
+    this.setDrawerContainerMarginToZero()
   }
 
   openChannelMessageFromChat(selectedChannel: Channel, index: number) {
@@ -34,12 +35,14 @@ export class ChatUtilityService {
     this.showDirectMessage = false;
     this.showChatWindow = false;
     this.openChannelMessageEvent.emit({ selectedChannel, index });
+    this.setDrawerContainerMarginToZero()
   }
 
   openDirectMessage() {
     this.showDirectMessage = true;
     this.showChannelMessage = false;
     this.showChatWindow = false;
+    this.setDrawerContainerMarginToZero()
   }
 
   openDirectMessageFromChat(selectedUser: User, index: number) {
@@ -47,6 +50,7 @@ export class ChatUtilityService {
     this.showChannelMessage = false;
     this.showChatWindow = false;
     this.openDirectMessageEvent.emit({ selectedUser, index });
+    this.setDrawerContainerMarginToZero()
   }
 
   openChatWindow() {
@@ -62,5 +66,22 @@ export class ChatUtilityService {
 
   setMessageId(messageId: string | null) {
     this.messageIdSubject.next(messageId);
+  }
+
+  setDrawerContainerMarginToZero(): void {
+    const drawerContainer = document.querySelector('.mat-drawer-container') as HTMLElement;
+    const drawerContent = document.querySelector('.mat-drawer-content') as HTMLElement;
+    const drawer = document.querySelector('.mat-drawer') as HTMLElement;
+    const sidenavContent = document.querySelector('.sidenav-content') as HTMLElement;
+
+    if (drawerContainer) {
+      drawerContainer.style.marginLeft = '0';
+      drawerContent.style.marginLeft = '0';
+      drawer.style.removeProperty('transform');
+      sidenavContent.style.display = 'flex';
+
+    } else {
+      console.warn('Element mit der Klasse mat-drawer-container wurde nicht gefunden.');
+    }
   }
 }
