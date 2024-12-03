@@ -70,8 +70,8 @@ export class SearchDialogComponent implements OnChanges {
 
 
   async getSelectedUserInfo(selectedUserId: string | null) {
+    this.showSearchDialog = false;
     console.log('USER selected:', selectedUserId);
-
     this.userService.showUserInfo.set(true);
     await this.userService.getSelectedUserById(selectedUserId as string);
   }
@@ -109,6 +109,7 @@ export class SearchDialogComponent implements OnChanges {
 
 
   openChannel(channel: Channel, i: number) {
+    this.showSearchDialog = false;
     this.channelsService.channelIsClicked = true;
     this.channelsService.clickChannelContainer(channel, i);
     this.openChannelEvent.emit();

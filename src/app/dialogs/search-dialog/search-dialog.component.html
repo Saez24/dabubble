@@ -4,7 +4,7 @@
         @if(mainSearchList.length > 0){
         @for(result of mainSearchList; track result; let index = $index){
         @if(result.channelAuthor && result.name){
-        <div id="{{index}}" class="filtered-channel" (click)="openChannel(result.name, index)">
+        <div id="{{index}}" class="filtered-channel" (click)="this.openChannel(result.name, index)">
             <span>Dein Kanal :</span>
             <span class="filtered-channel-name">#{{result.name}}</span>
             <span class="separator-bar"></span>
