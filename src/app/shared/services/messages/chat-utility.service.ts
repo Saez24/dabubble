@@ -1,4 +1,4 @@
-import { EventEmitter, Injectable } from '@angular/core';
+import { EventEmitter, HostListener, Injectable } from '@angular/core';
 import { Channel } from '../../models/channel.class';
 import { User } from '../../models/user.class';
 import { BehaviorSubject, Observable } from 'rxjs';
@@ -17,17 +17,24 @@ export class ChatUtilityService {
   messageIdSubject: BehaviorSubject<string | null> = new BehaviorSubject<string | null>(null);
   messageId$: Observable<string | null> = this.messageIdSubject.asObservable();
   selectedUser: User | null = null;
+  isSmallScreen: boolean = window.innerWidth < 1080;
 
   public openDirectMessageEvent: EventEmitter<{ selectedUser: User, index: number }> = new EventEmitter();
   public openChannelMessageEvent: EventEmitter<{ selectedChannel: Channel, index: number }> = new EventEmitter();
 
   constructor(private userService: UserService,) { }
 
+  @HostListener('window:resize', ['$event'])
+  onResize(event: Event): void {
+    this.isSmallScreen = window.innerWidth < 1080;
+    this.adjustDrawerStylesForSmallScreen();
+  }
+
   openChannelMessage() {
     this.showChannelMessage = true;
     this.showDirectMessage = false;
     this.showChatWindow = false;
-    this.setDrawerContainerMarginToZero()
+    this.adjustDrawerStylesForSmallScreen();
   }
 
   openChannelMessageFromChat(selectedChannel: Channel, index: number) {
@@ -35,14 +42,14 @@ export class ChatUtilityService {
     this.showDirectMessage = false;
     this.showChatWindow = false;
     this.openChannelMessageEvent.emit({ selectedChannel, index });
-    this.setDrawerContainerMarginToZero()
+    this.adjustDrawerStylesForSmallScreen();
   }
 
   openDirectMessage() {
     this.showDirectMessage = true;
     this.showChannelMessage = false;
     this.showChatWindow = false;
-    this.setDrawerContainerMarginToZero()
+    this.adjustDrawerStylesForSmallScreen();
   }
 
   openDirectMessageFromChat(selectedUser: User, index: number) {
@@ -50,7 +57,7 @@ export class ChatUtilityService {
     this.showChannelMessage = false;
     this.showChatWindow = false;
     this.openDirectMessageEvent.emit({ selectedUser, index });
-    this.setDrawerContainerMarginToZero()
+    this.adjustDrawerStylesForSmallScreen();
   }
 
   openChatWindow() {
@@ -68,18 +75,21 @@ export class ChatUtilityService {
     this.messageIdSubject.next(messageId);
   }
 
-  setDrawerContainerMarginToZero(): void {
+  adjustDrawerStylesForSmallScreen(): void {
+    if (!this.isSmallScreen) return;
+
     const drawerContainer = document.querySelector('.mat-drawer-container') as HTMLElement;
     const drawerContent = document.querySelector('.mat-drawer-content') as HTMLElement;
     const drawer = document.querySelector('.mat-drawer') as HTMLElement;
     const sidenavContent = document.querySelector('.sidenav-content') as HTMLElement;
+    const mobileBackArrow = document.querySelector('.mobile-back-arrow') as HTMLElement;
 
     if (drawerContainer) {
       drawerContainer.style.marginLeft = '0';
       drawerContent.style.marginLeft = '0';
       drawer.style.removeProperty('transform');
       sidenavContent.style.display = 'flex';
-
+      mobileBackArrow.style.display = 'flex';
     } else {
       console.warn('Element mit der Klasse mat-drawer-container wurde nicht gefunden.');
     }

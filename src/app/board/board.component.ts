@@ -58,7 +58,7 @@ import { AddMemberDialogComponent } from '../dialogs/add-member-dialog/add-membe
     UserInfoDialogComponent,
     SearchDialogComponent,
     MembersDialogComponent,
-    AddMemberDialogComponent
+    AddMemberDialogComponent,
 ],
   templateUrl: './board.component.html',
   styleUrls: ['./board.component.scss', '../../styles.scss'],
@@ -89,11 +89,14 @@ export class BoardComponent implements OnInit {
     public messageService: MessagesService,
     public chatUtilityService: ChatUtilityService,
     public cd: ChangeDetectorRef,
-    public channelsService: ChannelsService
+    public channelsService: ChannelsService,
   ) {
     this.currentUser = this.authService.getUserSignal();
   }
 
+  goBack(){
+    
+  }
 
   ngOnInit() {
     this.loadData();
