@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit, ViewChild, ViewEncapsulation, WritableSignal, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, HostListener, OnInit, ViewChild, ViewEncapsulation, WritableSignal, inject } from '@angular/core';
 import { ChatWindowComponent } from "./chat-window/chat-window.component";
 import { WorkspaceComponent } from "./workspace/workspace.component";
 import { ThreadComponent } from './thread/thread.component';
@@ -77,7 +77,7 @@ export class BoardComponent implements OnInit {
   messages: Message[] = [];
   currentUserUid: string | null | undefined = null;
   selectedMessage: Message | null = null;
-
+  isSmallScreen: boolean = window.innerWidth < 1080;
 
 
   constructor(
@@ -96,6 +96,23 @@ export class BoardComponent implements OnInit {
 
   goBack(){
     
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event: Event): void {
+    this.isSmallScreen = window.innerWidth < 1080;
+    this.changeLogoInHeader();
+  }
+
+  changeLogoInHeader(): void{
+
+    // if (!this.isSmallScreen) return;
+    // const groupLogo = document.querySelector('hide-input-mobile') as HTMLElement;
+    // const devLogo = document.querySelector('.logo-container') as HTMLElement;
+
+    // groupLogo.style.display = 'flex';
+    // devLogo.style.display = 'none';
+
   }
 
   ngOnInit() {

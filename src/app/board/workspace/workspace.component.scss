@@ -307,6 +307,10 @@ span {
     font-size: 24px;
 }
 
+.new-chat-button-mobile{
+    display: none;
+}
+
 
 @media screen and (max-width: 1080px) {
 .hide-input-mobile{
@@ -321,21 +325,14 @@ span {
 }
 
 .new-chat-button-mobile{
-    display: flex;
+    display: flex !important;
     position: absolute;
     background-color: #535AF1;
     bottom: 30px;
-    right: 30px;
+    right: 14px;
     height: 54px !important;
     width: 54px !important;
 }
-}
-
-@media screen and (max-width: 768px) {
-    .new-chat-button-mobile{
-        bottom: 14px;
-        right: 14px;
-    }
 }
 
 @media screen and (max-width: 375px) {
