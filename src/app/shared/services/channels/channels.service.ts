@@ -70,6 +70,19 @@ export class ChannelsService implements OnInit {
   }
 
 
+  async loadChannelsAsPromise(userId: string): Promise<Channel[]> {
+    let channelsRef = collection(this.firestore, 'channels');
+    let channelsQuery = query(channelsRef, where('memberUids', 'array-contains', userId));
+    const querySnapshot = await getDocs(channelsQuery);
+    this.channels = querySnapshot.docs.map(doc => {
+      let channelData = doc.data() as Channel;
+      return { ...channelData, id: doc.id };
+    });
+    return this.channels;
+  }
+
+
+
   getChannelData(channel: Channel) {
     this.currentChannelName = channel.name;
     this.currentChannelDescription = channel.description;

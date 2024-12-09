@@ -75,6 +75,9 @@ export class SignInComponent {
     }
   }
 
+  resetPassword(): void {
+    this.router.navigateByUrl('send-mail');
+  }
 
   async emailLogin(email: string, password: string): Promise<void> {
     if (this.emailFormControl.valid && this.passwordFormControl.valid) {

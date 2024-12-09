@@ -16,6 +16,7 @@ import { User } from '../../../shared/models/user.class';
 import { NgFor, NgIf, NgStyle } from '@angular/common';
 import { MatInputModule } from '@angular/material/input';
 import { AuthService } from '../../../shared/services/authentication/auth-service/auth.service';
+import { getDoc, setDoc } from 'firebase/firestore';
 
 
 export class MyErrorStateMatcher implements ErrorStateMatcher {
@@ -63,8 +64,8 @@ export class AddPeopleDialog implements OnInit {
   @Input()
   color: ThemePalette
   dialogRef: any;
-  
-  constructor( 
+
+  constructor(
     private firestore: Firestore,
     private auth: Auth,
     public channelsService: ChannelsService,
@@ -84,9 +85,9 @@ export class AddPeopleDialog implements OnInit {
 
   onSubmit(form: NgForm) {
     if (form.valid) {
-        this.createNewChannel();
+      this.createNewChannel();
     } else {
-        console.log('Form is invalid');
+      console.log('Form is invalid');
     }
   }
 
@@ -106,12 +107,12 @@ export class AddPeopleDialog implements OnInit {
     let usersQuery = query(usersRef, orderBy('name'));
 
     onSnapshot(usersQuery, async (snapshot) => {
-        this.users = await Promise.all(snapshot.docs.map(async (doc) => {
-            let userData = doc.data() as User;
-            return { ...userData, id: doc.id };
-        }));
-        this.loadCurrentUser(currentUserId);
-      });
+      this.users = await Promise.all(snapshot.docs.map(async (doc) => {
+        let userData = doc.data() as User;
+        return { ...userData, id: doc.id };
+      }));
+      this.loadCurrentUser(currentUserId);
+    });
   }
 
   loadCurrentUser(currentUserId: string) {
@@ -135,60 +136,73 @@ export class AddPeopleDialog implements OnInit {
           this.channelsService.channelCreatedInfo = false;
         }, 3000); 
 
-        if (newChannel) {
-            await this.updateUserChannels(this.currentUser.id, newChannel.name);
-        }
+      if (newChannel) {
+        await this.updateUserChannels(this.currentUser.id, newChannel.name);
+      }
+      this.channelsService.channelCreatedInfo = true;
+      setTimeout(() => {
+        this.channelsService.channelCreatedInfo = false;
+      }, 3000);
     }
-}
+  }
 
-async createChannel(memberUids: string[]): Promise<Channel | null> {
+  async createChannel(memberUids: string[]): Promise<Channel | null> {
     let channelsRef = collection(this.firestore, 'channels');
     let newChannel: Channel = new Channel({
-        name: this.newChannelName,
-        description: this.newChannelDescription,
-        memberUids: memberUids,
-        members: this.selectedUsers,
-        channelAuthor: this.currentUser.name,
-        channelAuthorId: this.currentUser.id,
+      name: this.newChannelName,
+      description: this.newChannelDescription,
+      memberUids: memberUids,
+      members: this.selectedUsers,
+      channelAuthor: this.currentUser.name,
+      channelAuthorId: this.currentUser.id,
+      id: '',
     });
 
-    await addDoc(channelsRef, {
-        name: newChannel.name,
-        description: newChannel.description,
-        memberUids: newChannel.memberUids,
-        members: newChannel.members,
-        channelAuthor: newChannel.channelAuthor,
-        channelAuthorId: newChannel.channelAuthorId,
+    const docRef = await addDoc(channelsRef, {
+      name: newChannel.name,
+      description: newChannel.description,
+      memberUids: newChannel.memberUids,
+      members: newChannel.members,
+      channelAuthor: newChannel.channelAuthor,
+      channelAuthorId: newChannel.channelAuthorId,
+      id: '',
     });
+
+    // Store the document ID in the newChannel object
+    newChannel.id = docRef.id;
+
+    // Update the document with the new ID
+    await updateDoc(docRef, { id: docRef.id });
 
     return newChannel;
-}
+  }
 
-async updateUserChannels(userId: string, channelName: string) {
+
+  async updateUserChannels(userId: string, channelName: string) {
     let usersRef = collection(this.firestore, 'users');
     let userDocRef = doc(usersRef, userId);
 
     await updateDoc(userDocRef, {
-        channels: arrayUnion(channelName),
+      channels: arrayUnion(channelName),
     });
-}
+  }
 
-// Only the id of the users is pushed to the firestore
-getMemberUids(): string[] {
-  let memberUids: (string | null)[];
+  // Only the id of the users is pushed to the firestore
+  getMemberUids(): string[] {
+    let memberUids: (string | null)[];
 
-  if (this.selectedValue === 'addAll') {
+    if (this.selectedValue === 'addAll') {
       this.selectedUsers = [...this.users];
       memberUids = this.users.map(user => user.id);
-  } else if (this.selectedValue === 'specific') {
+    } else if (this.selectedValue === 'specific') {
       memberUids = this.selectedUsers.map(selectedUser => selectedUser.id);
-  } else {
+    } else {
       memberUids = [];
-  }
+    }
 
     // Filter out null values
     return memberUids.filter((uid): uid is string => uid !== null);
-}
+  }
 
 
   filterUsers() {
@@ -199,7 +213,7 @@ getMemberUids(): string[] {
         user.name?.toLowerCase().includes(this.searchTerm.toLowerCase())
       );
     }
-    if(this.searchTerm) {
+    if (this.searchTerm) {
       this.userSelected = true
     }
   }
@@ -209,34 +223,34 @@ getMemberUids(): string[] {
   }
 
   deleteUser(userId: string | null) {
-  if (userId) {
-    let userToDelete = this.selectedUsers.find(user => user.id === userId);
-    this.selectedUsers = this.selectedUsers.filter(user => user.id !== userId);
-    
-    if (userToDelete) {
-      console.log(`User deleted: ${userToDelete.name} (ID: ${userToDelete.id})`);
-    } else {
-      console.log(`User with ID: ${userId} not found.`);
+    if (userId) {
+      let userToDelete = this.selectedUsers.find(user => user.id === userId);
+      this.selectedUsers = this.selectedUsers.filter(user => user.id !== userId);
+
+      if (userToDelete) {
+        console.log(`User deleted: ${userToDelete.name} (ID: ${userToDelete.id})`);
+      } else {
+        console.log(`User with ID: ${userId} not found.`);
+      }
     }
   }
-}
 
-selectUser(user: User): void {
-  this.userSelected! = this.userSelected;
+  selectUser(user: User): void {
+    this.userSelected! = this.userSelected;
 
-  if (this.currentUserUid === user.id) {
-      this.ownUserError = true; 
-  } else {
+    if (this.currentUserUid === user.id) {
+      this.ownUserError = true;
+    } else {
       if (!this.selectedUsers.find(selectedUser => selectedUser.id === user.id)) {
-          this.selectedUsers.push(user);
-          this.ownUserError = false; 
+        this.selectedUsers.push(user);
+        this.ownUserError = false;
       } else {
-          this.ownUserError = false;
+        this.ownUserError = false;
       }
-  }
+    }
 
-  this.searchTerm = '';
-}
+    this.searchTerm = '';
+  }
 
 
 

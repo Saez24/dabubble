@@ -3,7 +3,13 @@
     <mat-card>
         <!-- Header of the component -->
         <section class="header-workspace section">
-            <div>
+            <div class="input-search-container flex-input-mobile" style="display: none;">
+                <input name="searchText" type="text" placeholder="Devspace durchsuchen" [(ngModel)]="searchInput">
+                <img src="../../assets/images/icons/search.png" alt="search icon">
+                <app-search-dialog [searchValue]="searchInput"></app-search-dialog>
+            </div>
+
+            <div class="group-logo hide-input-mobile">
                 <div>
                     <img src="../../../assets/images/workspace/Group.svg" alt="">
                 </div>
@@ -11,7 +17,7 @@
                     <span>DevSpace</span>
                 </div>
             </div>
-            <div>
+            <div class="hide-input-mobile">
                 <a (click)="triggerOpenChat()" class="new-chat-button"><mat-icon class="new-chat-icon"
                         svgIcon="new-channel" aria-hidden="false"></mat-icon></a>
             </div>
@@ -90,3 +96,5 @@
         </mat-card-content>
     </mat-card>
 </div>
+    <a (click)="triggerOpenChat()" class="new-chat-button new-chat-button-mobile"><mat-icon class="new-chat-icon" style="filter: invert(1);"
+            svgIcon="new-channel" aria-hidden="false"></mat-icon></a>

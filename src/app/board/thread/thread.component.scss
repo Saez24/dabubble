@@ -168,3 +168,25 @@
   font-size: 14px;
   color: #333;
 }
+
+@media screen and (max-width: 768px) {
+  .thread-header {
+      height: 60px !important;
+      padding: 0 20px 0 20px !important;
+  }
+
+  .thread-content{
+      margin-top: 48px !important;
+  }
+
+  .avatar {
+      height: 50px !important;
+      width: 50px !important;
+  }
+}
+
+@media screen and (max-width: 375px) {
+  .thread-message-container{
+      padding: 15px !important;
+  }
+}

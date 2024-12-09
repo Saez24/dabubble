@@ -33,7 +33,6 @@ import { ThreadMessagesComponent } from './thread-messages/thread-messages.compo
     PickerComponent,
     NgIf,
     NgFor,
-    SafeUrlPipe,
     ThreadMessagesComponent
   ],
   templateUrl: './thread.component.html',
