@@ -350,32 +350,37 @@ export class MessagesService {
     }
 
 
-    // async getMessagesFromCurrentUser() {
-    //     const q = query(collection(this.firestore, 'messages'), where('senderID', '==', this.authService.currentUserUid));
-    //     const querySnapshot = await getDocs(q);
-    //     querySnapshot.forEach(async (doc) => {
-    //         const message = doc.data() as Message;
-    //         this.updateSendernameOfMessage(doc.id, this.authService.currentUser()?.name as string);
-
-    //         if (message.answers) {
-    //             const answers = [];
-    //             answers.push(message);
-    //             console.log('!!!SENT:', answers);
-    //         }
-    //     });
-    // }
-
-
     async getMessagesFromCurrentUser() {
         const q = query(collection(this.firestore, 'messages'), where('senderID', '==', this.authService.currentUserUid));
         const querySnapshot = await getDocs(q);
         querySnapshot.forEach(async (doc) => {
             const message = doc.data() as Message;
-            if (message.senderID === this.authService.currentUserUid) {
-                this.updateSendernameOfMessage(doc.id, this.authService.currentUser()?.name as string);
+            this.updateSendernameOfMessage(doc.id, this.authService.currentUser()?.name as string);
+
+            if (message.answers) {
+                const answers = message['answers'] || []; // Antworten abrufen
+                for (let i = 0; i < answers.length; i++) {
+                    if (answers[i].senderID === this.authService.currentUserUid) {
+                        console.log(answers[i]);
+                        this.updateSendernameOfAnswer(doc.id, this.authService.currentUser()?.name as string, i);
+                    }
+                }
+
             }
         });
     }
+
+
+    // async getMessagesFromCurrentUser() {
+    //     const q = query(collection(this.firestore, 'messages'), where('senderID', '==', this.authService.currentUserUid));
+    //     const querySnapshot = await getDocs(q);
+    //     querySnapshot.forEach(async (doc) => {
+    //         const message = doc.data() as Message;
+    //         if (message.senderID === this.authService.currentUserUid) {
+    //             this.updateSendernameOfMessage(doc.id, this.authService.currentUser()?.name as string);
+    //         }
+    //     });
+    // }
 
 
     updateSendernameOfMessage(messageId: string, senderName: string) {
@@ -384,10 +389,13 @@ export class MessagesService {
     }
 
 
-    // updateSendernameOfAnswer(messageId: string, senderName: string, answerIndex: number) {
-    //     const messageRef = doc(this.firestore, 'messages', messageId);
+    updateSendernameOfAnswer(messageId: string, senderName: string, answerIndex: number) {
+        // const messageRef = doc(this.firestore, 'messages', messageId);
+        // updateDoc(messageRef, { [`answers.senderName`]: senderName });
+        // updateSendernameOfAnswer(messageId: string, senderName: string, answerIndex: number) {
+        //     const messageRef = doc(this.firestore, 'messages', messageId);
 
-    // }
+    }
 
     async loadConversations(message: DirectMessage): Promise<void> {
         const messageDocRef = doc(this.firestore, `direct_messages/${message.messageId}`);

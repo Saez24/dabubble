@@ -4,6 +4,7 @@ import { Injectable, signal } from '@angular/core';
 import { Firestore, collection, doc, getDoc, updateDoc, setDoc, query, orderBy, onSnapshot } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import { User } from '../../../models/user.class';
+import { getDocs } from 'firebase/firestore';
 
 @Injectable({
   providedIn: 'root'
@@ -34,12 +35,24 @@ export class UserService {
     onSnapshot(usersQuery, async (snapshot) => {
       this.users = await Promise.all(snapshot.docs.map(async (doc) => {
         let userData = doc.data() as User;
-        console.log(this.users);
         return { ...userData, id: doc.id };
       }));
 
     });
   }
+
+
+  async loadUsersAsPromise(): Promise<User[]> {
+    let usersRef = collection(this.firestore, 'users');
+    let usersQuery = query(usersRef, orderBy('name'));
+    const querySnapshot = await getDocs(usersQuery);
+    this.users = querySnapshot.docs.map(doc => {
+      let userData = doc.data() as User;
+      return { ...userData, id: doc.id };
+    });
+    return this.users;
+  }
+  
 
   getUserSignal() {
     return this.userSignal;

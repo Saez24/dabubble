@@ -92,6 +92,7 @@
   gap: 16px;
   padding: 24px 40px;
   width: -webkit-fill-available;
+  white-space: nowrap;
 }
 
 .line {
@@ -99,6 +100,7 @@
   background-color: black;
   width: 69%;
   background-color: #ADB0D9;
+  width: 100%;
 }
 
 .user-message-info {
@@ -309,5 +311,16 @@
     font-weight: 700;
     background: white;
     border: 1px solid #797EF3
+  }
+}
+
+@media screen and (max-width: 375px) {
+
+  .thread-message-container{
+      padding: 15px !important;
+  }
+
+  .answers {
+    padding: 24px 15px;
   }
 }

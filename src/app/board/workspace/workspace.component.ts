@@ -18,6 +18,8 @@ import { Overlay } from '@angular/cdk/overlay';
 import { MatBadgeModule } from '@angular/material/badge';
 import { Message } from '../../shared/models/message.class';
 import { DirectMessage } from '../../shared/models/direct.message.class';
+import { SearchDialogComponent } from '../../dialogs/search-dialog/search-dialog.component';
+import { FormsModule } from '@angular/forms';  
 
 @Component({
   selector: 'app-workspace',
@@ -30,7 +32,9 @@ import { DirectMessage } from '../../shared/models/direct.message.class';
     NgClass,
     NgStyle,
     MatBadgeModule,
-    NgIf
+    NgIf,
+    SearchDialogComponent,
+    FormsModule
   ],
   templateUrl: './workspace.component.html',
   styleUrl: './workspace.component.scss',
@@ -51,6 +55,7 @@ export class WorkspaceComponent implements OnInit {
   currentUserChannels: Channel[] = [];
   userConversationCount: number = 0;
   unreadMessagesCount: number = 0;
+  searchInput: string = '';
   @Input() openChatWindow!: () => void;
   @Output() openChannelEvent = new EventEmitter<void>();
   @Output() clickUserEvent = new EventEmitter<void>();

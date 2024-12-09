@@ -95,7 +95,7 @@ header {
     }
 
     >.state-icon {
-        right: 0;
+        right: 40px;
         bottom: 0;
         position: absolute;
         width: 16px;
@@ -329,17 +329,47 @@ mat-toolbar-row {
     border-radius: 30px 0px 30px 30px;
 }
 
+.back-btn-logo{
+    display: flex;
+    align-items: center;
+}
+
+.mobile-back-arrow{
+    display: none;
+    justify-content: center;
+    align-items: center;
+    height: 40px;
+    width: 40px;
+}
+
+.mobile-group-img{
+    height: 54px;
+    width: 54px;
+}
+
 @media screen and (max-width: 1080px) {
 
     .board-container .navigation-toggle-btn {
         display: none !important;
     }
 
+    .board-container{
+        padding: 0;
+        gap: 0;
+    }
+
+    .mat-drawer-container {
+        height: 100%;
+    }
+
+    .mat-mdc-card-content:last-child {
+        padding-bottom: 0 !important;
+    }
+
     header {
-        flex-direction: column;
         gap: 20px;
         height: auto;
-        padding: 0;
+        padding: 14px 14px;
 
         .logo-container>img {
             height: 46px;
@@ -348,17 +378,13 @@ mat-toolbar-row {
         .avatar-container>img {
             width: 54px;
             height: 54px;
+            right: 0 !important;
         }
     }
 
     .input-search-container {
         display: none;
         padding: 12.5px 50px 12.5px 40px;
-    }
-
-    .response-input-search-container {
-        display: flex;
-        width: 100%;
     }
 
     .profile-menu-container {
@@ -370,9 +396,17 @@ mat-toolbar-row {
             display: none !important;
         }
     }
-
-    .sidenav-content {
+    
+    .sidenav-content, .sidenav, .mat-drawer {
         display: none;
+
+        >mat-card {
+            border-radius: 0 !important;
+        }
+    }
+
+    .sidenav, .mat-drawer {
+        border-radius: 0 !important;
     }
 
     .mat-drawer-side {
@@ -382,14 +416,25 @@ mat-toolbar-row {
             width: 100%;
         }
     }
-}
 
-@media screen and (max-width: 375px) {
-    .workspace-content {
-        padding: 14px !important;
+    .chat-window-container{
+        margin: 0;
     }
 
-    .mat-expansion-panel-header {
-        padding: 0 12px !important;
+    .thread-content, .chat-content{
+        margin-bottom: 0 !important;
+    }
+
+    .thread-message-input-container, .chat-message-input-container{
+        bottom: 0 !important;
+    }
+
+    .thread-header{
+        padding: 0 !important;
+    }
+
+    .thread-drawer {
+        min-width: 0;
+        width: auto;
     }
 }

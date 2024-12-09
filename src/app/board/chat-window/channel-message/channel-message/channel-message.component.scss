@@ -335,7 +335,7 @@
 .show-reactions {
     display: flex;
     align-items: center;
-    justify-content: flex-end;
+    flex-wrap: wrap;
     gap: 10px;
 
     >.reaction-icon-button {
@@ -568,9 +568,16 @@
     border: 1px solid #ADB0D9
 }
 
+@media screen and (max-width: 1080px) {
+    .thread-container{
+        max-width: none;
+    }
+}
+
+
 @media screen and (max-width: 768px) {
     .chat-content {
-        margin-top: 60px;
+        margin-top: 48px;
     }
 
     .members-list {

@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit, ViewChild, ViewEncapsulation, WritableSignal, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, HostListener, OnInit, ViewChild, ViewEncapsulation, WritableSignal, inject } from '@angular/core';
 import { ChatWindowComponent } from "./chat-window/chat-window.component";
 import { WorkspaceComponent } from "./workspace/workspace.component";
 import { ThreadComponent } from './thread/thread.component';
@@ -18,7 +18,6 @@ import { IconsService } from '../shared/services/icons/icons.service';
 import { collection, Firestore, onSnapshot, orderBy, query } from '@angular/fire/firestore';
 import { Message } from '../shared/models/message.class';
 import { Auth } from '@angular/fire/auth';
-import { AddPeopleDialog } from "../dialogs/create-new-channel-dialog/add-people-dialog/add-people-dialog.component";
 import { ProfileEditorDialogComponent } from "../dialogs/profile-editor-dialog/profile-editor-dialog.component";
 import { DirectMessageComponent } from './chat-window/direct-message/direct-message/direct-message.component';
 import { MessagesService } from '../shared/services/messages/messages.service';
@@ -28,6 +27,7 @@ import { Channel } from '../shared/models/channel.class';
 import { ChatUtilityService } from '../shared/services/messages/chat-utility.service';
 import { ChannelsService } from '../shared/services/channels/channels.service';
 import { UserInfoDialogComponent } from "../dialogs/user-info-dialog/user-info-dialog.component";
+import { SearchDialogComponent } from '../dialogs/search-dialog/search-dialog.component';
 import { MembersDialogComponent } from '../dialogs/members-dialog/members-dialog.component';
 import { AddMemberDialogComponent } from '../dialogs/add-member-dialog/add-member-dialog.component';
 import { MemberAddedInfoComponent } from "../dialogs/member-added-info/member-added-info.component";
@@ -58,6 +58,7 @@ import { ChannelCreatedInfoComponent } from "../dialogs/channel-created-info/cha
     DirectMessageComponent,
     ChannelMessageComponent,
     UserInfoDialogComponent,
+    SearchDialogComponent,
     MembersDialogComponent,
     AddMemberDialogComponent,
     MemberAddedInfoComponent,
@@ -80,7 +81,7 @@ export class BoardComponent implements OnInit {
   messages: Message[] = [];
   currentUserUid: string | null | undefined = null;
   selectedMessage: Message | null = null;
-
+  isSmallScreen: boolean = window.innerWidth < 1080;
 
 
   constructor(
@@ -92,11 +93,31 @@ export class BoardComponent implements OnInit {
     public messageService: MessagesService,
     public chatUtilityService: ChatUtilityService,
     public cd: ChangeDetectorRef,
-    public channelsService: ChannelsService
+    public channelsService: ChannelsService,
   ) {
     this.currentUser = this.authService.getUserSignal();
   }
 
+  goBack(){
+    
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event: Event): void {
+    this.isSmallScreen = window.innerWidth < 1080;
+    this.changeLogoInHeader();
+  }
+
+  changeLogoInHeader(): void{
+
+    // if (!this.isSmallScreen) return;
+    // const groupLogo = document.querySelector('hide-input-mobile') as HTMLElement;
+    // const devLogo = document.querySelector('.logo-container') as HTMLElement;
+
+    // groupLogo.style.display = 'flex';
+    // devLogo.style.display = 'none';
+
+  }
 
   ngOnInit() {
     this.loadData();
