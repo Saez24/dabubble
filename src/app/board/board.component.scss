@@ -437,4 +437,42 @@ mat-toolbar-row {
         min-width: 0;
         width: auto;
     }
+
+    .add-members-dialog {
+        height: 60%;
+        width: 90%;
+        position: fixed;
+        top: 50%; 
+        left: 50%;
+        transform: translate(-50%, -50%);
+        border-radius: 30px 30px 30px 30px;
+    }
+
+    .show-members-dialog {
+        height: 60%;
+        width: 90%;
+        position: fixed;
+        top: 50%; 
+        left: 50%;
+        transform: translate(-50%, -50%);
+        border-radius: 30px 30px 30px 30px;
+    }
+
+    .dialog-content {
+        padding: 15px !important;
+        width: 100% !important;
+    }
+
+    .profile-menu {
+        top: 82px;
+    }
+
+    .profil-details, .profil-editor {
+        padding: 32px 26px;
+        width: 90%;
+    }
+
+    .container {
+      width: auto;
+    }
 }

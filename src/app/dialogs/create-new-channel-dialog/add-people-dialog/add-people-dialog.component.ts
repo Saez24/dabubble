@@ -69,7 +69,6 @@ export class AddPeopleDialog implements OnInit {
     private firestore: Firestore,
     private auth: Auth,
     public channelsService: ChannelsService,
-    public channelsService: ChannelsService,
     private authService: AuthService,
     @Inject(MAT_DIALOG_DATA) public data: any,
   ) {

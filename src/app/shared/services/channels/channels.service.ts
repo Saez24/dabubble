@@ -24,8 +24,6 @@ export class ChannelsService implements OnInit {
   memberAddedInfo: boolean = false;
   channelCreatedInfo: boolean = false;
   channelIsClicked: boolean = false;
-  channelCreatedInfo: boolean = false;
-  memberAddedInfo: boolean = false;
 
   public channel: Channel = new Channel();
   public channel$!: Observable<Channel>;
