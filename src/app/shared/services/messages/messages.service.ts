@@ -114,6 +114,18 @@ export class MessagesService {
         });
     }
 
+    async loadMessagesAsPromise(): Promise<Message[]> {
+        let messagesRef = collection(this.firestore, 'messages');
+        let messagesQuery = query(messagesRef);
+        const querySnapshot = await getDocs(messagesQuery);
+        this.messages = querySnapshot.docs.map(doc => {
+          let messageData = doc.data() as Message;
+          return { ...messageData, id: doc.id };
+        });       
+        return this.messages;
+      }
+
+
     async loadAnswersForMessage(message: Message) {
         const messageRef = doc(this.firestore, 'messages', message.messageId);
         const messageSnap = await getDoc(messageRef);
@@ -236,6 +248,7 @@ export class MessagesService {
             unsubscribeReceived();
         };
     }
+
 
     private async loadSelectedUser(targetUserId: string) {
         return await this.userService.getSelectedUserById(targetUserId);

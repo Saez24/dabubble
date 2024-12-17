@@ -127,6 +127,26 @@
             font-weight: 700;
         }
     }
+
+    >.filtered-message {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+
+        >img {
+            width: 32px;
+            height: 32px;
+            object-fit: cover;
+            border-radius: 100%;
+        }
+
+        >span {
+            font-size: 18px;
+            font-weight: 700;
+            font-style: italic;
+        }
+    }
 }
 
 .spacer {

@@ -9,7 +9,8 @@ import { User } from '../../shared/models/user.class';
 import { Channel } from '../../shared/models/channel.class';
 import { DirectMessage } from '../../shared/models/direct.message.class';
 import { Message } from '../../shared/models/message.class';
-import { Firestore } from '@angular/fire/firestore';
+import { Firestore, query } from '@angular/fire/firestore';
+import { collection, getDocs, where } from 'firebase/firestore';
 
 
 
@@ -31,6 +32,7 @@ export class SearchDialogComponent implements OnChanges {
   // firestore = inject(FirestoreService);
   // memberServ = inject(MemberDialogsService);
 
+  firestore = inject(Firestore);
   chatUtilityService = inject(ChatUtilityService);
   authService = inject(AuthService);
   channelsService = inject(ChannelsService);
@@ -42,6 +44,7 @@ export class SearchDialogComponent implements OnChanges {
   showSearchDialog: boolean = false;
   mainSearchList: any[] = [];
   allData: (User | DirectMessage | Channel | Message)[] = [];
+  messages: Message[] = [];
 
   ngOnInit() {  
     this.loadAllData();
@@ -56,6 +59,8 @@ export class SearchDialogComponent implements OnChanges {
         channels.forEach((channel: Channel) => { this.allData.push(channel) });
         let users: User[] = await this.userService.loadUsersAsPromise();
         users.forEach((user: User) => { this.allData.push(user) });
+        let messages: Message[] = await this.messagesService.loadMessagesAsPromise();
+        messages.forEach((message: Message) => { this.allData.push(message) });
       }
     });
   }
@@ -125,18 +130,16 @@ export class SearchDialogComponent implements OnChanges {
 
 
   filterSearchItems(): SearchItem[] {
-
-
-    return this.allData.filter((ad: SearchItem) => {
+    return this.allData.filter((ad: SearchItem) => {    
       if (this.isUser(ad)) {
         return ad.name.toLowerCase().includes(this.searchValue.toLowerCase());
       } else if (this.isChannel(ad)) {
         return ad.name.toLowerCase().includes(this.searchValue.toLowerCase());
       } else if (this.isChatMessage(ad)) {
-        return ad.senderName!.toLowerCase().includes(this.searchValue.toLowerCase());
+        return ad.message?.toLowerCase().includes(this.searchValue.toLowerCase());
       } 
-      // else if (this.DirectMessage(ad)) {
-      //   return ad.senderName!.some((chat) => chat.message.toLowerCase().includes(this.searchValue.toLowerCase()))
+      // else if (this.isDirectMessage(ad)) {
+      //   return ad.conversation!.some((chat) => chat.message.toLowerCase().includes(this.searchValue.toLowerCase()))
       // } 
       else {
         return false
