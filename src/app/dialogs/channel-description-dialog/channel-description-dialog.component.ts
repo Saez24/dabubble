@@ -159,7 +159,7 @@ export class ChannelDescriptionDialogComponent {
       if (channelDoc.exists()) {
         let channelData = channelDoc.data();
         
-        let updatedMembers = channelData['members'].filter((member: any) => member !== currentUserId);
+        let updatedMembers = channelData['members'].filter((member: any) => member.uid !== currentUserId);
         let updatedMemberUids = channelData['memberUids'].filter((uid: any) => uid !== currentUserId);
   
         await updateDoc(channelDocRef, {
