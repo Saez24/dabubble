@@ -164,3 +164,9 @@
         background-color: #797EF3;
     }
 }
+
+@media screen and (max-width: 1080px) {
+.container {
+    width: auto;
+  }
+}
