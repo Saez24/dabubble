@@ -91,8 +91,8 @@ export class SendMessageService {
         const conversationId = uuidv4();
         if (this.selectedUser?.id) {
           this.messageId = await this.checkExistingConversation(this.selectedUser.id);
-          await this.sendDirectMessage(conversationId, currentUser);
 
+          await this.sendDirectMessage(conversationId, currentUser);
 
         } else if (this.channelsService.currentChannelId) {
           await this.sendChannelMessage(currentUser);
@@ -247,49 +247,57 @@ export class SendMessageService {
     }
   }
   async updateConversation(messagesRef: any, conversationId: string, currentUser: any) {
-    if (this.messageId !== null && this.selectedFile) {
-      const messageDocRef = doc(messagesRef, this.messageId);
-      const docSnapshot = await getDoc(messageDocRef);
 
-      if (docSnapshot.exists()) {
-        const docData = docSnapshot.data();
-        const conversationArray = docData['conversation'] || [];
-        const fileURL = await this.uploadFileService.uploadFileWithIdsDirectMessages(this.selectedFile, conversationId, this.messageId);
-        // Lade das aktuelle Dokument
+    if (this.messageId !== null) {
+      try {
+        const messageDocRef = doc(messagesRef, this.messageId);
+        const docSnapshot = await getDoc(messageDocRef);
 
-        // Finde die Nachricht mit `conversationId` und aktualisiere die `fileURL`
-        const updatedConversation = conversationArray.map((message: any) =>
-          message.conversationId === conversationId
-            ? { ...message, fileURL }
-            : message
-        );
+        if (docSnapshot.exists()) {
+          const docData = docSnapshot.data();
+          const conversationArray = docData['conversation'] || [];
+          let fileURL = '';
 
-        // Aktualisiere das Dokument mit der modifizierten Conversation
-        await updateDoc(messageDocRef, {
-          conversation: updatedConversation,
-        });
+          if (this.selectedFile) {
+            fileURL = await this.uploadFileService.uploadFileWithIdsDirectMessages(this.selectedFile, conversationId, this.messageId);
+          }
 
-        // Füge eine neue Nachricht hinzu, falls es notwendig ist
-        await updateDoc(messageDocRef, {
-          conversation: arrayUnion({
-            conversationId: conversationId,
-            senderName: currentUser().name || 'Unbekannter Sender', // Fallback-Wert
-            message: this.chatMessage || '', // Leere Nachricht, falls keine vorhanden
-            reactions: [],
-            timestamp: new Date(),
-            receiverName: this.selectedUser?.name || 'Unbekannter Empfänger', // Fallback-Wert
-            senderId: currentUser().id || 'Unbekannt', // Fallback-Wert
-            receiverId: this.selectedUser?.id || 'Unbekannt', // Fallback-Wert
-            fileURL: fileURL,
-            readedMessage: false,
-          }),
-        });
+          // Finde die Nachricht mit `conversationId` und aktualisiere die `fileURL`, falls vorhanden
+          const updatedConversation = conversationArray.map((message: any) =>
+            message.conversationId === conversationId
+              ? { ...message, fileURL: fileURL || message.fileURL }
+              : message
+          );
 
-      } else {
-        console.error("Dokument nicht gefunden");
+          // Aktualisiere das Dokument mit der modifizierten Conversation
+          await updateDoc(messageDocRef, {
+            conversation: updatedConversation,
+          });
+
+          // Füge eine neue Nachricht hinzu, falls es notwendig ist
+          await updateDoc(messageDocRef, {
+            conversation: arrayUnion({
+              conversationId: conversationId,
+              senderName: currentUser().name || 'Unbekannter Sender', // Fallback-Wert
+              message: this.chatMessage || '', // Leere Nachricht, falls keine vorhanden
+              reactions: [],
+              timestamp: new Date(),
+              receiverName: this.selectedUser?.name || 'Unbekannter Empfänger', // Fallback-Wert
+              senderId: currentUser().id || 'Unbekannt', // Fallback-Wert
+              receiverId: this.selectedUser?.id || 'Unbekannt', // Fallback-Wert
+              fileURL: fileURL,
+              readedMessage: false,
+            }),
+          });
+
+        } else {
+          console.error("Dokument nicht gefunden");
+        }
+      } catch (error) {
+        console.error("Fehler beim Aktualisieren der Konversation:", error);
       }
     } else {
-      console.error("Message ID ist null");
+      console.error("Ungültige Nachricht");
     }
   }
 

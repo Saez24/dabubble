@@ -43,6 +43,7 @@ export class ChatWindowComponent implements OnInit {
   currentUser = this.authService.getUserSignal();
   showEmojiPicker = false;
   chatMessage = '';
+  markedUser: { id: string; name: string }[] = [];
   currentUserUid = '';
   senderAvatar: string | null = null;
   senderName: string | null = null;
@@ -50,6 +51,12 @@ export class ChatWindowComponent implements OnInit {
   filePreviewUrl: string | null = null;
   searchQuery: string = '';
   isSearching: boolean = false;
+  searchQueryMessage: string = '';
+  isSearchingMessage: boolean = false;
+  isUserSelect: boolean = false;
+  isChannelSelect: boolean = false;
+  filteredUsers: User[] = [];
+  filteredChannels: Channel[] = [];
   selectedUser = this.userService.selectedUser;
   selectedChannel = this.channelsService.currentChannelId;
   messageId: string | null = null;
@@ -115,6 +122,8 @@ export class ChatWindowComponent implements OnInit {
       // Leere Ergebnisse, falls die Eingabe nicht passt
       this.channels = [];
       this.users = [];
+      await this.loadUsers(); // Lade die Benutzerliste neu
+      await this.loadChannels(); // Lade die Kanalliste neu
     }
   }
 
@@ -174,23 +183,26 @@ export class ChatWindowComponent implements OnInit {
 
   selectChannel(channel: { name: string; id: string }) {
     this.searchQuery = `#${channel.name}`; // Channel-Namen mit # voranstellen
+    this.sendMessageService.chatMessage = ''; // Chat-Nachricht zurücksetzen
     this.isSearching = false; // Suche beenden
+    this.isSearchingMessage = false;
     this.channels = []; // Gefilterte Channels zurücksetzen
-    this.channelsService.currentChannelId = channel.id; // Channel-ID setzen
-    // console.log(this.channelsService.currentChannelId);
-    // console.log("DirectMessageUser:", this.messageService.directMessageUser);
+    this.channelsService.currentChannelId = channel.id; // Channel-ID setzen;
   }
 
   selectUser(user: User) {
+    this.searchQuery = "@"; // Benutzername mit @ voranstellen
+    this.chatMessage = ''; // Chat-Nachricht zurücksetzen
 
     if (user && user.id) {
       this.isSearching = false; // Suche beenden
+      this.isSearchingMessage = false;
+      this.sendMessageService.chatMessage = '';
+      this.isUserSelect = false; // Benutzer suchen
       this.users = []; // Gefilterte Benutzer zurücksetzen
       this.selectedUser = user; // Benutzer setzen
       this.sendMessageService.selectedUser = this.selectedUser; // Korrekte Bindung verwenden
-      // console.log("Ausgewählter Benutzer:", this.selectedUser.id); // Benutzer anzeigen
-      // // console.log(this.currentUser()?.id);
-      // console.log("Selected User in sendMessageService:", this.sendMessageService.selectedUser);
+
     } else {
       console.error("Ungültiger Benutzer:", user); // Fehler protokollieren
     }
@@ -207,6 +219,71 @@ export class ChatWindowComponent implements OnInit {
       duration: 2000, // 2 Sekunden anzeigen
       panelClass: ['custom-snackbar'],
     });
+  }
+
+  toggleSearch(): void {
+    this.isUserSelect = !this.isUserSelect; // Suchstatus umschalten
+    if (this.isUserSelect) {
+      this.onSearchMessageArea();
+    } else {
+      this.filteredUsers = []; // Gefilterte Liste zurücksetzen, wenn keine Suche aktiv ist
+    }
+  }
+
+  updateSearchQuery(event: Event): void {
+    const target = event.target as HTMLTextAreaElement;
+    const fullText = target.value;
+
+    // Überprüfen, ob der Text mit @ oder # beginnt
+    const lastAtIndex = fullText.lastIndexOf('@');
+    const lastHashIndex = fullText.lastIndexOf('#');
+
+    if (lastAtIndex !== -1 && (lastAtIndex > lastHashIndex || lastHashIndex === -1)) {
+      // Suche nach Benutzern mit @
+      this.searchQueryMessage = fullText.slice(lastAtIndex + 1).trim().toLowerCase();
+      this.isChannelSelect = false;
+      this.isUserSelect = true; // Benutzer suchen
+      this.isSearchingMessage = true;
+
+      this.onSearchMessageArea();
+    } else if (lastHashIndex !== -1) {
+      // Suche nach Kanälen mit #
+      this.searchQueryMessage = fullText.slice(lastHashIndex + 1).trim().toLowerCase();
+      this.isUserSelect = false; // Kanäle suchen
+      this.isChannelSelect = true;
+      this.isSearchingMessage = true;
+      this.onSearchMessageArea();
+    } else {
+      // Keine Suche aktiv, Liste zurücksetzen
+      this.searchQueryMessage = '';
+      this.isSearchingMessage = false;
+      this.filteredUsers = [];
+      this.filteredChannels = [];
+
+    }
+  }
+
+  async onSearchMessageArea() {
+    await this.loadUsers(); // Benutzerliste neu laden
+    await this.loadChannels(); // Kanalliste neu laden
+    // Benutzersuche mit @
+    if (this.isUserSelect) {
+      this.filteredUsers = this.users.filter(user =>
+        user.name.toLowerCase().startsWith(this.searchQueryMessage) ||
+        (user.email && user.email.toLowerCase().startsWith(this.searchQuery))
+      );
+    } else {
+      this.filteredUsers = []; // Zurücksetzen, wenn keine Benutzersuche aktiv ist
+    }
+
+    // Kanalsuche mit #
+    if (!this.isUserSelect) {
+      this.filteredChannels = this.channels.filter(channel =>
+        channel.name.toLowerCase().startsWith(this.searchQueryMessage)
+      );
+    } else {
+      this.filteredChannels = []; // Zurücksetzen, wenn keine Kanalsuche aktiv ist
+    }
   }
 
   // showEmoji() {

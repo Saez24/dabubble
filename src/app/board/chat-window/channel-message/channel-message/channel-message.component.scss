@@ -175,7 +175,6 @@
     flex-direction: column;
     gap: 8px;
     box-sizing: border-box;
-    width: max-content;
 
     >.message-infos-sender {
         font-weight: 700;
@@ -569,7 +568,7 @@
 }
 
 @media screen and (max-width: 1080px) {
-    .thread-container{
+    .thread-container {
         max-width: none;
     }
 }
@@ -767,6 +766,7 @@
     gap: 10px;
     padding: 3px 10px 3px 10px;
     border-radius: 30px;
+
     &:hover {
         cursor: pointer;
         background-color: #ECEEFE;

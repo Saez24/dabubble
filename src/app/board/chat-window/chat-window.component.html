@@ -25,7 +25,7 @@
     </div>
     <div class="chat-message-input-container">
         <textarea class="message-input" id="chatMessage" [(ngModel)]="sendMessageService.chatMessage" type="text"
-            placeholder="Schreiben Sie Ihre Nachricht"></textarea>
+            (input)="updateSearchQuery($event)" placeholder="Schreiben Sie Ihre Nachricht"></textarea>
 
         <!-- Datei-Vorschau -->
         <div class="message-icon-container">
@@ -38,7 +38,8 @@
                 <div (click)="messageService.showEmoji()" class="message-icon"><mat-icon
                         fontIcon="sentiment_satisfied"></mat-icon>
                 </div>
-                <div class="message-icon"><mat-icon fontIcon="alternate_email"></mat-icon></div>
+                <div (click)="toggleSearch()" class="message-icon"><mat-icon fontIcon="alternate_email"></mat-icon>
+                </div>
 
                 <div *ngIf="sendMessageService.filePreviewUrl" class="file-preview">
                     <img *ngIf="sendMessageService.selectedFile && sendMessageService.selectedFile.type.startsWith('image/')"
@@ -63,4 +64,23 @@
             emoji="point_up">
         </emoji-mart>
     </div>
+
+    <div class="search-block"
+        *ngIf="(isSearchingMessage && filteredUsers.length > 0) || (isUserSelect && filteredUsers.length > 0)">
+        <div class="found-block">
+            <div class="found-users" *ngFor="let user of filteredUsers" (click)="selectUser(user)">
+                <img [src]="user.avatarPath" alt="">{{ user.name }}
+            </div>
+        </div>
+    </div>
+
+    <div class="search-block" *ngIf="isSearchingMessage && filteredChannels.length > 0">
+        <div class="found-block">
+            <div class="found-users" *ngFor="let channels of filteredChannels"
+                (click)="selectChannel({ name: channels.name, id: channels.id })">
+                <span>#</span>{{ channels.name }}
+            </div>
+        </div>
+    </div>
+
 </div>

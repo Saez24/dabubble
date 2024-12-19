@@ -218,19 +218,21 @@
         </emoji-mart>
     </div>
 
-    <div class="search-block" *ngIf="isSearching && filteredUsers.length > 0">
+    <div class="search-block"
+        *ngIf="(isSearching && filteredUsers.length > 0) || (isUserSelect && filteredUsers.length > 0)">
         <div class="found-block">
-            <div class="found-users" *ngFor="let user of filteredUsers" (click)="selectUser(user)"><img
-                    [src]="user.avatarPath" alt="">{{
-                user.name }}</div>
+            <div class="found-users" *ngFor="let user of filteredUsers" (click)="selectUser(user)">
+                <img [src]="user.avatarPath" alt="">{{ user.name }}
+            </div>
         </div>
     </div>
 
-    <div class="search-block" *ngIf="isUserSelect">
+    <div class="search-block" *ngIf="isSearching && filteredChannels.length > 0">
         <div class="found-block">
-            <div class="found-users" *ngFor="let user of filteredUsers" (click)="selectUser(user)"><img
-                    [src]="user.avatarPath" alt="">{{
-                user.name }}</div>
+            <div class="found-users" *ngFor="let channel of channels; let i = index" (click)="openChannel(channel, i)">
+                <span>#</span>{{ channel.name }}
+            </div>
         </div>
     </div>
+
 </div>

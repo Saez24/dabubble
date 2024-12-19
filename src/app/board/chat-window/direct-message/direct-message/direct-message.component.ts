@@ -23,7 +23,8 @@ import { DirectMessage } from '../../../../shared/models/direct.message.class';
 import { ChatUtilityService } from '../../../../shared/services/messages/chat-utility.service';
 import { v4 as uuidv4 } from 'uuid';
 import { EmojiReaction } from '../../../../shared/models/emoji-reaction.model';
-
+import { ChannelMessageComponent } from '../../channel-message/channel-message/channel-message.component';
+import { ChannelNavigationService } from '../../../../shared/services/chat/channel-navigation.service';
 
 
 
@@ -31,7 +32,7 @@ import { EmojiReaction } from '../../../../shared/models/emoji-reaction.model';
   selector: 'app-direct-message',
   standalone: true,
   imports: [MatCardModule, MatButtonModule, MatIconModule, MatDividerModule, FormsModule,
-    MatFormFieldModule, MatInputModule, CommonModule, PickerComponent, NgIf, NgFor],
+    MatFormFieldModule, MatInputModule, CommonModule, PickerComponent, NgIf, NgFor, ChannelMessageComponent],
   templateUrl: './direct-message.component.html',
   styleUrl: './direct-message.component.scss',
   changeDetection: ChangeDetectionStrategy.Default,
@@ -45,6 +46,7 @@ export class DirectMessageComponent implements OnInit, AfterViewInit {
   messages = this.messagesService.messages;
   users: User[] = [];
   filteredUsers: User[] = [];
+  filteredChannels: Channel[] = [];
   channels: Channel[] = [];
   currentUser = this.authService.getUserSignal();
   showEmojiPicker = false;
@@ -52,6 +54,7 @@ export class DirectMessageComponent implements OnInit, AfterViewInit {
   showEmojiPickerReact: boolean = false;
   showMessageEdit = false;
   showMessageEditArea = false;
+  channelChatMessage = '';
   directChatMessage = '';
   messageArea = true;
   editedMessage = '';
@@ -68,15 +71,17 @@ export class DirectMessageComponent implements OnInit, AfterViewInit {
   searchQuery: string = '';
   isSearching: boolean = false;
   isUserSelect: boolean = false;
+  isChannelSelect: boolean = false;
   markedUser: { id: string; name: string }[] = [];
 
-
+  @Output() openChannelEvent = new EventEmitter<void>();
   @ViewChild('chatWindow', { static: false }) chatWindow!: ElementRef;
 
   constructor(private firestore: Firestore, private auth: Auth,
     private userService: UserService, private cd: ChangeDetectorRef,
     private authService: AuthService, private uploadFileService: UploadFileService,
-    public channelsService: ChannelsService, public dialog: MatDialog, public messagesService: MessagesService, private chatUtilityService: ChatUtilityService) {
+    public channelsService: ChannelsService, public dialog: MatDialog, public messagesService: MessagesService, private chatUtilityService: ChatUtilityService,
+    private channelNavigationService: ChannelNavigationService) {
 
   }
 
@@ -107,7 +112,9 @@ export class DirectMessageComponent implements OnInit, AfterViewInit {
   async loadData() {
     this.auth.onAuthStateChanged(async (user) => {
       if (user) {
-        this.loadUsers();
+        await this.loadUsers();
+        await this.loadChannels();
+
       } else {
         console.log('Kein Benutzer angemeldet');
       }
@@ -123,7 +130,18 @@ export class DirectMessageComponent implements OnInit, AfterViewInit {
         let userData = doc.data() as User;
         return { ...userData, id: doc.id };
       }));
+    });
+  }
 
+  async loadChannels() {
+    let channelsRef = collection(this.firestore, 'channels');
+    let channelsQuery = query(channelsRef, orderBy('name'));
+
+    onSnapshot(channelsQuery, async (snapshot) => {
+      this.channels = await Promise.all(snapshot.docs.map(async (doc) => {
+        let channelsData = doc.data() as Channel;
+        return { ...channelsData, id: doc.id };
+      }));
     });
   }
 
@@ -141,17 +159,56 @@ export class DirectMessageComponent implements OnInit, AfterViewInit {
     const target = event.target as HTMLTextAreaElement;
     const fullText = target.value;
 
-    // Suche nach dem letzten `@`-Symbol und extrahiere den Teil danach
+    // Überprüfen, ob der Text mit @ oder # beginnt
     const lastAtIndex = fullText.lastIndexOf('@');
-    this.searchQuery = lastAtIndex !== -1 ? fullText.slice(lastAtIndex + 1).trim().toLowerCase() : '';
+    const lastHashIndex = fullText.lastIndexOf('#');
 
-    // Aktivieren der Suche, falls es eine Eingabe nach dem `@` gibt
-    this.isSearching = this.searchQuery.length > 0;
-    if (this.isSearching) {
+    if (lastAtIndex !== -1 && (lastAtIndex > lastHashIndex || lastHashIndex === -1)) {
+      // Suche nach Benutzern mit @
+      this.searchQuery = fullText.slice(lastAtIndex + 1).trim().toLowerCase();
+      this.isChannelSelect = false;
+      this.isUserSelect = true; // Benutzer suchen
+      this.isSearching = true;
+      this.onSearch();
+    } else if (lastHashIndex !== -1) {
+      // Suche nach Kanälen mit #
+      this.searchQuery = fullText.slice(lastHashIndex + 1).trim().toLowerCase();
+      this.isUserSelect = false; // Kanäle suchen
+      this.isChannelSelect = true;
+      this.isSearching = true;
       this.onSearch();
     } else {
-      this.filteredUsers = []; // Gefilterte Liste zurücksetzen, wenn keine Suche aktiv ist
+      // Keine Suche aktiv, Liste zurücksetzen
+      this.searchQuery = '';
+      this.isSearching = false;
+      this.filteredUsers = [];
+      this.filteredChannels = [];
     }
+  }
+
+
+  async openChannel(channel: Channel, i: number) {
+    const currentUser = this.currentUser();
+    this.isSearching = false; // Suche beenden
+    this.searchQuery = ''; // Suche zurücksetzen
+    this.channels = []; // Gefilterte Channels zurücksetzen
+    this.channelChatMessage = ''; // Chat-Nachricht zurücksetzen
+    this.channelsService.currentChannelId = channel.id;
+    this.channelsService.channelIsClicked = true;
+    this.channelsService.clickChannelContainer(channel, i);
+    this.channelNavigationService.selectChannel(channel, i);
+    if (currentUser) {
+      this.messagesService.loadMessages(currentUser.id, channel.id);
+    } else {
+      console.error("currentUserUid is null");
+    }
+    this.loadChannels();
+  }
+
+  handleOpenChannelEvent() {
+    // Logik zum Wechseln zur Channel-Ansicht
+    console.log('Channel geöffnet');
+    // Hier können Sie die Logik hinzufügen, um zur Channel-Ansicht zu wechseln
   }
 
   selectUser(user: User) {
@@ -170,7 +227,6 @@ export class DirectMessageComponent implements OnInit, AfterViewInit {
       // Benutzer zu `markedUser` hinzufügen, falls noch nicht vorhanden
       if (!this.markedUser.some(u => u.id === user.id)) {
         this.markedUser.push({ id: user.id, name: user.name });
-        console.log(this.markedUser);
 
       }
 
@@ -186,10 +242,25 @@ export class DirectMessageComponent implements OnInit, AfterViewInit {
 
 
   onSearch(): void {
-    this.filteredUsers = this.users.filter(user =>
-      user.name.toLowerCase().startsWith(this.searchQuery) ||
-      (user.email && user.email.toLowerCase().startsWith(this.searchQuery))
-    );
+    // Benutzersuche mit @
+    if (this.isUserSelect) {
+      this.filteredUsers = this.users.filter(user =>
+        user.name.toLowerCase().startsWith(this.searchQuery) ||
+        (user.email && user.email.toLowerCase().startsWith(this.searchQuery))
+      );
+    } else {
+      this.filteredUsers = []; // Zurücksetzen, wenn keine Benutzersuche aktiv ist
+    }
+
+    // Kanalsuche mit #
+    if (!this.isUserSelect) {
+      this.filteredChannels = this.channels.filter(channel =>
+        channel.name.toLowerCase().startsWith(this.searchQuery)
+      );
+
+    } else {
+      this.filteredChannels = []; // Zurücksetzen, wenn keine Kanalsuche aktiv ist
+    }
   }
 
   showEmoji() {
