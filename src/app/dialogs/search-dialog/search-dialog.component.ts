@@ -11,6 +11,7 @@ import { DirectMessage } from '../../shared/models/direct.message.class';
 import { Message } from '../../shared/models/message.class';
 import { Firestore, query } from '@angular/fire/firestore';
 import { collection, getDocs, where } from 'firebase/firestore';
+import { filter, find } from 'rxjs';
 
 
 
@@ -60,7 +61,7 @@ export class SearchDialogComponent implements OnChanges {
         let users: User[] = await this.userService.loadUsersAsPromise();
         users.forEach((user: User) => { this.allData.push(user) });
         let messages: Message[] = await this.messagesService.loadMessagesAsPromise();
-        messages.forEach((message: Message) => { this.allData.push(message) });
+        messages.forEach((message: Message) => { this.allData.push(message)});
       }
     });
   }
@@ -79,6 +80,13 @@ export class SearchDialogComponent implements OnChanges {
     console.log('USER selected:', selectedUserId);
     this.userService.showUserInfo.set(true);
     await this.userService.getSelectedUserById(selectedUserId as string);
+  }
+
+
+  getChannelNAme(channelId: string) {
+    let channel = this.channelsService.channels.find((channel: Channel) => channel.id === channelId);
+    console.log('channel =', channel);
+    return channel ? channel.name : '';
   }
 
 

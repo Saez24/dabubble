@@ -22,7 +22,7 @@
         }
         @else if(result.message){
         <div id="{{index}}" class="filtered-chat-container">
-            <span> #{{result.channelId}} :</span>
+            <span> #{{getChannelNAme(result.channelId)}} :</span>
             <div class="filtered-message">
                 <!-- <img src="{{result.guest.avatarPath}}" alt=""> -->
                 <span>" {{result.message.slice(0, 20)}}... "</span>
