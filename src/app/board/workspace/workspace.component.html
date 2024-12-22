@@ -2,12 +2,13 @@
 <div class="workspace-content">
     <mat-card>
         <!-- Header of the component -->
+        <div class="input-search-container flex-input-mobile" style="display: none;">
+            <input name="searchText" type="text" placeholder="Devspace durchsuchen" [(ngModel)]="searchInput">
+            <img src="../../assets/images/icons/search.png" alt="search icon">
+            <app-search-dialog [searchValue]="searchInput"></app-search-dialog>
+        </div>
         <section class="header-workspace section">
-            <div class="input-search-container flex-input-mobile" style="display: none;">
-                <input name="searchText" type="text" placeholder="Devspace durchsuchen" [(ngModel)]="searchInput">
-                <img src="../../assets/images/icons/search.png" alt="search icon">
-                <app-search-dialog [searchValue]="searchInput"></app-search-dialog>
-            </div>
+            
 
             <div class="group-logo hide-input-mobile">
                 <div>
