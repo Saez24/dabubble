@@ -32,7 +32,7 @@ import { ChatUtilityService } from '../../../../shared/services/messages/chat-ut
   selector: 'app-channel-message',
   standalone: true,
   imports: [MatCardModule, MatButtonModule, MatIconModule, MatDividerModule, FormsModule,
-    MatFormFieldModule, MatInputModule, CommonModule, PickerComponent, SafeUrlPipe, NgIf, NgFor,],
+    MatFormFieldModule, MatInputModule, CommonModule, PickerComponent, NgIf, NgFor,],
   templateUrl: './channel-message.component.html',
   styleUrl: './channel-message.component.scss',
   changeDetection: ChangeDetectionStrategy.Default,
