@@ -9,8 +9,8 @@ import { UserService } from '../firestore/user-service/user.service';
 })
 export class ChatUtilityService {
   users = this.userService.users;
-  showChatWindow: boolean = false;
-  showChannelMessage: boolean = true;
+  showChatWindow: boolean = true;
+  showChannelMessage: boolean = false;
   showDirectMessage: boolean = false;
   directMessageUser: User | null = null;
   selectedChannel: Channel | null = null;
