@@ -13,7 +13,6 @@ import { Auth } from '@angular/fire/auth';
 import { UserService } from '../../shared/services/firestore/user-service/user.service';
 import { AuthService } from '../../shared/services/authentication/auth-service/auth.service';
 import { UploadFileService } from '../../shared/services/firestore/storage-service/upload-file.service';
-import { SafeUrlPipe } from '../../shared/pipes/safe-url.pipe';
 import { arrayUnion, getDoc, getDocs } from 'firebase/firestore';
 import { ChannelsService } from '../../shared/services/channels/channels.service';
 import { Channel } from '../../shared/models/channel.class';
@@ -77,7 +76,10 @@ export class ThreadComponent implements OnInit {
     this.closeThreadEvent.emit();
   }
 
-  getCurrentUser() {
+  async getCurrentUser() {
+    while (this.authService.currentUser() === undefined) {
+      await new Promise((resolve) => setTimeout(resolve, 100)); // Kurz warten
+    }
     const userId = this.currentUser()?.id;
     if (userId) {
       this.currentUserUid = userId;
