@@ -20,6 +20,7 @@ import { Message } from '../../shared/models/message.class';
 import { DirectMessage } from '../../shared/models/direct.message.class';
 import { SearchDialogComponent } from '../../dialogs/search-dialog/search-dialog.component';
 import { FormsModule } from '@angular/forms';  
+import { BoardComponent } from '../board.component';
 
 @Component({
   selector: 'app-workspace',
@@ -74,6 +75,7 @@ export class WorkspaceComponent implements OnInit {
     private messagesService: MessagesService,
     private chatUtilityService: ChatUtilityService,
     private overlay: Overlay,
+    private boardComponent: BoardComponent
   ) {
   }
 
@@ -302,5 +304,19 @@ export class WorkspaceComponent implements OnInit {
 
       console.error("currentUserUid is null");
     }
+  }
+
+  toggleNewChatForMobile(){
+    this.boardComponent.toggleWorkspace();
+    this.boardComponent.openChatWindow();
+    const sidenavContent = document.querySelector('.sidenav-content') as HTMLElement;
+    const mobileBackArrow = document.querySelector('.mobile-back-arrow') as HTMLElement;
+    const groupLogo = document.querySelector('.group-logo') as HTMLElement;
+    const logoContainer = document.querySelector('.logo-container') as HTMLElement;
+
+    sidenavContent.style.display = 'flex';
+    mobileBackArrow.style.display = 'flex';
+    groupLogo.style.display = 'flex';
+    logoContainer.style.display = 'none';
   }
 }
