@@ -329,12 +329,12 @@ mat-toolbar-row {
     border-radius: 30px 0px 30px 30px;
 }
 
-.back-btn-logo{
+.back-btn-logo {
     display: flex;
     align-items: center;
 }
 
-.mobile-back-arrow{
+.mobile-back-arrow {
     display: none;
     justify-content: center;
     align-items: center;
@@ -342,7 +342,7 @@ mat-toolbar-row {
     width: 40px;
 }
 
-.mobile-group-img{
+.mobile-group-img {
     height: 54px;
     width: 54px;
 }
@@ -353,13 +353,17 @@ mat-toolbar-row {
         display: none !important;
     }
 
-    .board-container{
+    .board-container {
         padding: 0;
         gap: 0;
     }
 
     .mat-drawer-container {
         height: 100%;
+    }
+
+    .mat-drawer-content {
+        margin-left: 0 !important;
     }
 
     .mat-mdc-card-content:last-child {
@@ -396,8 +400,10 @@ mat-toolbar-row {
             display: none !important;
         }
     }
-    
-    .sidenav-content, .sidenav, .mat-drawer {
+
+    .sidenav-content,
+    .sidenav,
+    .mat-drawer {
         display: none;
 
         >mat-card {
@@ -405,7 +411,8 @@ mat-toolbar-row {
         }
     }
 
-    .sidenav, .mat-drawer {
+    .sidenav,
+    .mat-drawer {
         border-radius: 0 !important;
     }
 
@@ -417,19 +424,21 @@ mat-toolbar-row {
         }
     }
 
-    .chat-window-container{
+    .chat-window-container {
         margin: 0;
     }
 
-    .thread-content, .chat-content{
+    .thread-content,
+    .chat-content {
         margin-bottom: 0 !important;
     }
 
-    .thread-message-input-container, .chat-message-input-container{
+    .thread-message-input-container,
+    .chat-message-input-container {
         bottom: 0 !important;
     }
 
-    .thread-header{
+    .thread-header {
         padding: 0 !important;
     }
 
@@ -442,7 +451,7 @@ mat-toolbar-row {
         height: auto;
         width: 90%;
         position: fixed;
-        top: 50%; 
+        top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
         border-radius: 30px 30px 30px 30px;
@@ -452,7 +461,7 @@ mat-toolbar-row {
         height: auto;
         width: 90%;
         position: fixed;
-        top: 50%; 
+        top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
         border-radius: 30px 30px 30px 30px;
@@ -470,16 +479,17 @@ mat-toolbar-row {
         left: 50%;
         transform: translate(-50%);
         right: 0;
-    
+
     }
 
-    .profil-details, .profil-editor {
+    .profil-details,
+    .profil-editor {
         padding: 32px 18px;
         width: 90%;
     }
 
     .container {
-      width: auto !important;
+        width: auto !important;
     }
 
     .mat-typography h1 {

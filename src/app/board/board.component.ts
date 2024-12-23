@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, HostListener, OnInit, ViewChild, ViewEncapsulation, WritableSignal, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, HostListener, OnInit, ViewChild, ViewEncapsulation, WritableSignal, inject } from '@angular/core';
 import { ChatWindowComponent } from "./chat-window/chat-window.component";
 import { WorkspaceComponent } from "./workspace/workspace.component";
 import { ThreadComponent } from './thread/thread.component';
@@ -32,6 +32,7 @@ import { MembersDialogComponent } from '../dialogs/members-dialog/members-dialog
 import { AddMemberDialogComponent } from '../dialogs/add-member-dialog/add-member-dialog.component';
 import { MemberAddedInfoComponent } from "../dialogs/member-added-info/member-added-info.component";
 import { ChannelCreatedInfoComponent } from "../dialogs/channel-created-info/channel-created-info.component";
+import { BehaviorSubject } from 'rxjs';
 
 @Component({
   selector: 'app-board',
@@ -63,7 +64,7 @@ import { ChannelCreatedInfoComponent } from "../dialogs/channel-created-info/cha
     AddMemberDialogComponent,
     MemberAddedInfoComponent,
     ChannelCreatedInfoComponent
-],
+  ],
   templateUrl: './board.component.html',
   styleUrls: ['./board.component.scss', '../../styles.scss'],
   encapsulation: ViewEncapsulation.None
@@ -79,9 +80,19 @@ export class BoardComponent implements OnInit {
   currentUser = this.authService.getUserSignal();
   workspaceOpen = true;
   messages: Message[] = [];
+  selectedUser: User | null = null;
+  directMessageUser: User | null = null;
+  selectedChannel: Channel | null = null;
   currentUserUid: string | null | undefined = null;
   selectedMessage: Message | null = null;
   isSmallScreen: boolean = window.innerWidth < 1080;
+  showChatWindow: boolean = true;
+  showChannelMessage: boolean = false;
+  showDirectMessage: boolean = false;
+  messageIdSubject: BehaviorSubject<string | null> = new BehaviorSubject<string | null>(null);
+
+  public openDirectMessageEvent: EventEmitter<{ selectedUser: User, index: number }> = new EventEmitter();
+  public openChannelMessageEvent: EventEmitter<{ selectedChannel: Channel, index: number }> = new EventEmitter();
 
 
   constructor(
@@ -98,9 +109,6 @@ export class BoardComponent implements OnInit {
     this.currentUser = this.authService.getUserSignal();
   }
 
-  goBack(){
-    
-  }
 
   @HostListener('window:resize', ['$event'])
   onResize(event: Event): void {
@@ -108,7 +116,7 @@ export class BoardComponent implements OnInit {
     this.changeLogoInHeader();
   }
 
-  changeLogoInHeader(): void{
+  changeLogoInHeader(): void {
 
     // if (!this.isSmallScreen) return;
     // const groupLogo = document.querySelector('hide-input-mobile') as HTMLElement;
@@ -167,8 +175,6 @@ export class BoardComponent implements OnInit {
     });
   }
 
-
-
   closeThread() {
     this.showThreadComponent = false;
     this.selectedMessage = null;
@@ -183,6 +189,22 @@ export class BoardComponent implements OnInit {
   toggleWorkspace() {
     this.drawer.toggle();
     this.workspaceOpen = !this.workspaceOpen;
+  }
+
+  toggleWorkspaceMobile() {
+    if (this.drawer) {
+      this.drawer.toggle(); // Toggle-Funktion des Drawers
+      this.goBack()
+    }
+    this.workspaceOpen = !this.workspaceOpen; // Zustand umschalten
+  }
+
+  // Methode zum expliziten Schließen (optional)
+  closeWorkspace() {
+    if (this.isSmallScreen && this.drawer) {
+      this.drawer.close(); // Schließt den Drawer nur, wenn die Bedingung erfüllt ist
+    }
+    this.workspaceOpen = false; // Zustand setzen
   }
 
 
@@ -208,27 +230,100 @@ export class BoardComponent implements OnInit {
   }
 
   openChannelMessage() {
-    this.chatUtilityService.openChannelMessage()
+    this.closeWorkspace();
+    this.showChannelMessage = true;
+    this.showDirectMessage = false;
+    this.showChatWindow = false;
+    this.adjustDrawerStylesForSmallScreen();
   }
 
   openChannelMessageFromChat(selectedChannel: Channel, index: number) {
-    this.chatUtilityService.openChannelMessageFromChat(selectedChannel, index);
-
+    this.closeWorkspace();
+    this.showChannelMessage = true;
+    this.showDirectMessage = false;
+    this.showChatWindow = false;
+    this.openChannelMessageEvent.emit({ selectedChannel, index });
+    this.adjustDrawerStylesForSmallScreen();
   }
 
   openDirectMessage() {
-    this.chatUtilityService.openDirectMessage();
+    this.closeWorkspace();
+    this.showDirectMessage = true;
+    this.showChannelMessage = false;
+    this.showChatWindow = false;
+    this.adjustDrawerStylesForSmallScreen();
   }
 
   openDirectMessageFromChat(selectedUser: User, index: number) {
-    this.chatUtilityService.openDirectMessageFromChat(selectedUser, index)
+    this.closeWorkspace();
+    this.showDirectMessage = true;
+    this.showChannelMessage = false;
+    this.showChatWindow = false;
+    this.openDirectMessageEvent.emit({ selectedUser, index });
+    this.adjustDrawerStylesForSmallScreen();
   }
 
 
   openChatWindow() {
-    this.chatUtilityService.openChatWindow();
-    this.chatUtilityService.setMessageId(null);
-    this.chatUtilityService.directMessageUser = null;
+    this.closeWorkspace();
+    this.showChatWindow = true;
+    this.showDirectMessage = false;
+    this.showChannelMessage = false;
+    this.setMessageId(null);
+    this.directMessageUser = null;
+    this.selectedChannel = null;
+    this.selectedUser = null;
+    this.userService.selectedUser = null;
+  }
+
+  setMessageId(messageId: string | null) {
+    this.messageIdSubject.next(messageId);
+  }
+
+  adjustDrawerStylesForSmallScreen(): void {
+    if (!this.isSmallScreen) return;
+
+    const drawerContainer = document.querySelector('.mat-drawer-container') as HTMLElement;
+    const drawer = document.querySelector('.mat-drawer') as HTMLElement;
+    const sidenavContent = document.querySelector('.sidenav-content') as HTMLElement;
+    const mobileBackArrow = document.querySelector('.mobile-back-arrow') as HTMLElement;
+    const groupLogo = document.querySelector('.group-logo') as HTMLElement;
+    const logoContainer = document.querySelector('.logo-container') as HTMLElement;
+
+    if (drawerContainer) {
+
+      drawer.style.removeProperty('transform');
+      sidenavContent.style.display = 'flex';
+      mobileBackArrow.style.display = 'flex';
+      groupLogo.style.display = 'flex';
+      logoContainer.style.display = 'none';
+
+    } else {
+      console.warn('Element mit der Klasse mat-drawer-container wurde nicht gefunden.');
+    }
+  }
+
+  goBack(): void {
+    if (!this.isSmallScreen) return;
+
+    const drawerContainer = document.querySelector('.mat-drawer-container') as HTMLElement;
+    const drawer = document.querySelector('.mat-drawer') as HTMLElement;
+    const sidenavContent = document.querySelector('.sidenav-content') as HTMLElement;
+    const mobileBackArrow = document.querySelector('.mobile-back-arrow') as HTMLElement;
+    const groupLogo = document.querySelector('.group-logo') as HTMLElement;
+    const logoContainer = document.querySelector('.logo-container') as HTMLElement;
+
+    if (drawerContainer) {
+
+      drawer.style.setProperty('transform: none', 'translateX(0)');
+      sidenavContent.style.display = 'none';
+      mobileBackArrow.style.display = 'none';
+      groupLogo.style.display = 'none';
+      logoContainer.style.display = 'flex';
+
+    } else {
+      console.warn('Element mit der Klasse mat-drawer-container wurde nicht gefunden.');
+    }
   }
 
 }

@@ -1,7 +1,7 @@
 <div class="board-container">
     <header>
         <div class="back-btn-logo">
-            <div (click)="goBack()" class="mobile-back-arrow">
+            <div (click)="toggleWorkspaceMobile()" class="mobile-back-arrow">
                 <img src="./../../assets/images/icons/mobile_arrow_back.svg" alt="Back">
             </div>
             <div class="group-logo" style="display: none;">
@@ -51,23 +51,22 @@
     </header>
     <mat-drawer-container class="mat-drawer-container" autosize>
         <mat-drawer #drawer class="sidenav" [opened]="true" mode="side">
-            <app-workspace (openChannelEvent)="chatUtilityService.openChannelMessage()"
-                (clickUserEvent)="chatUtilityService.openDirectMessage()"
-                [openChatWindow]="chatUtilityService.openChatWindow.bind(this)"></app-workspace>
+            <app-workspace (openChannelEvent)="openChannelMessage()" (clickUserEvent)="openDirectMessage()"
+                [openChatWindow]="openChatWindow.bind(this)"></app-workspace>
         </mat-drawer>
         <div class="sidenav-content">
             <mat-card class="chat-window-container" appearance="outlined">
                 <mat-card-content>
-                    <ng-container *ngIf="this.chatUtilityService.showChatWindow">
+                    <ng-container *ngIf="this.showChatWindow">
                         <app-chat-window
-                            (openDirectMessageFromChatEvent)="chatUtilityService.openDirectMessageFromChat($event.selectedUser, $event.index)"
-                            (openChannelMessageFromChatEvent)="chatUtilityService.openChannelMessageFromChat($event.selectedChannel, $event.index)"
-                            (openChannelMessageEvent)="chatUtilityService.openChannelMessage()"></app-chat-window>
+                            (openDirectMessageFromChatEvent)="openDirectMessageFromChat($event.selectedUser, $event.index)"
+                            (openChannelMessageFromChatEvent)="openChannelMessageFromChat($event.selectedChannel, $event.index)"
+                            (openChannelMessageEvent)="openChannelMessage()"></app-chat-window>
                     </ng-container>
-                    <ng-container *ngIf="this.chatUtilityService.showChannelMessage">
+                    <ng-container *ngIf="this.showChannelMessage">
                         <app-channel-message (showThreadEvent)="showThread($event)"></app-channel-message>
                     </ng-container>
-                    <ng-container *ngIf="this.chatUtilityService.showDirectMessage">
+                    <ng-container *ngIf="this.showDirectMessage">
                         <app-direct-message [selectedUser]="chatUtilityService.directMessageUser"></app-direct-message>
                     </ng-container>
                 </mat-card-content>
@@ -108,12 +107,14 @@
         </app-add-member-dialog>
     </div>
 
-    <div class="overlay" *ngIf="this.channelsService.memberAddedInfo" (click)="this.channelsService.closeMemberAddedInfo()">
+    <div class="overlay" *ngIf="this.channelsService.memberAddedInfo"
+        (click)="this.channelsService.closeMemberAddedInfo()">
         <app-member-added-info>
         </app-member-added-info>
     </div>
 
-    <div class="overlay" *ngIf="this.channelsService.channelCreatedInfo" (click)="this.channelsService.closeChannelCreatedInfo()">
+    <div class="overlay" *ngIf="this.channelsService.channelCreatedInfo"
+        (click)="this.channelsService.closeChannelCreatedInfo()">
         <app-channel-created-info>
         </app-channel-created-info>
     </div>

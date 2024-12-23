@@ -79,7 +79,6 @@ export class ChatUtilityService {
     if (!this.isSmallScreen) return;
 
     const drawerContainer = document.querySelector('.mat-drawer-container') as HTMLElement;
-    const drawerContent = document.querySelector('.mat-drawer-content') as HTMLElement;
     const drawer = document.querySelector('.mat-drawer') as HTMLElement;
     const sidenavContent = document.querySelector('.sidenav-content') as HTMLElement;
     const mobileBackArrow = document.querySelector('.mobile-back-arrow') as HTMLElement;
@@ -87,8 +86,7 @@ export class ChatUtilityService {
     const logoContainer = document.querySelector('.logo-container') as HTMLElement;
 
     if (drawerContainer) {
-      drawerContainer.style.marginLeft = '0';
-      drawerContent.style.marginLeft = '0';
+
       drawer.style.removeProperty('transform');
       sidenavContent.style.display = 'flex';
       mobileBackArrow.style.display = 'flex';
