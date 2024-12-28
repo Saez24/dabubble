@@ -250,6 +250,20 @@ export class MessagesService {
     }
 
 
+    async loadDirectMessagesAsPromise(): Promise<DirectMessage[]> {
+        let directMessagesRef = collection(this.firestore, 'direct_messages');
+        let directMessagesQuery = query(directMessagesRef);
+        const querySnapshot = await getDocs(directMessagesQuery);
+        
+        this.directMessages = querySnapshot.docs.map(doc => {
+          let directMessageData = doc.data() as DirectMessage;
+          return { ...directMessageData, id: doc.id, timestamp: directMessageData.timestamp || new Date() };
+        });
+        
+        return this.directMessages;
+      }
+
+
     private async loadSelectedUser(targetUserId: string) {
         return await this.userService.getSelectedUserById(targetUserId);
     }

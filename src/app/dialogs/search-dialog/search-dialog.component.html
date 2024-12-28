@@ -20,18 +20,32 @@
             <span class="separator-bar"></span>
         </div>
         }
-        @else if(result.message){
-        <div id="{{index}}" class="filtered-chat-container">
-            <span> #{{getChannelNAme(result.channelId)}} :</span>
+        @else if(result.message && result.channelId){
+        <!-- <div id="{{index}}" class="filtered-chat-container">
+            <span> #{{getChannelName(result.channelId)}} :</span>
             <div class="filtered-message">
-                <!-- <img src="{{result.guest.avatarPath}}" alt=""> -->
                 <span>" {{result.message.slice(0, 20)}}... "</span>
             </div>
             <span class="separator-bar"></span>
+        </div> -->
+        }
+        @else if(result.conversation){
+        <div id="{{index}}" class="filtered-user-container">
+            <span>Direkt Nachricht :</span>
+            @if (result.senderId === this.authService.currentUserUid){
+                <div class="filtered-user">
+                    <img src="{{this.filterUserById(result.receiverId)?.avatarPath}}" alt="">
+                    <span>{{this.filterUserById(result.receiverId)?.name}}</span>
+                </div>
+            }
+            @else {
+                <div class="filtered-user">
+                    <img src="{{this.filterUserById(result.senderId)?.avatarPath}}" alt="">
+                    <span>{{this.filterUserById(result.senderId)?.name}}</span>
+                </div>
+            }
+            <span class="separator-bar"></span>
         </div>
-
-
-        
         }
         }
         }

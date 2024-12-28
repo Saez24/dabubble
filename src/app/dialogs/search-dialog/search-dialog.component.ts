@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { NgIf } from '@angular/common';
 import { EventEmitter, inject, Input, Output, OnChanges, SimpleChanges } from '@angular/core';
 import { AuthService } from '../../shared/services/authentication/auth-service/auth.service';
 import { ChannelsService } from '../../shared/services/channels/channels.service';
@@ -47,7 +48,7 @@ export class SearchDialogComponent implements OnChanges {
   allData: (User | DirectMessage | Channel | Message)[] = [];
   messages: Message[] = [];
 
-  ngOnInit() {  
+  ngOnInit() {
     this.loadAllData();
   }
 
@@ -61,7 +62,13 @@ export class SearchDialogComponent implements OnChanges {
         let users: User[] = await this.userService.loadUsersAsPromise();
         users.forEach((user: User) => { this.allData.push(user) });
         let messages: Message[] = await this.messagesService.loadMessagesAsPromise();
-        messages.forEach((message: Message) => { this.allData.push(message)});
+        messages.forEach((message: Message) => { this.allData.push(message) });
+        let directMessages: DirectMessage[] = await this.messagesService.loadDirectMessagesAsPromise();
+        directMessages.forEach(async (directMessage: DirectMessage) => {
+          if (this.authService.currentUserUid === directMessage.receiverId) {
+            directMessages.forEach((directMessage: DirectMessage) => { this.allData.push(directMessage) });
+          }
+        });
       }
     });
   }
@@ -70,22 +77,18 @@ export class SearchDialogComponent implements OnChanges {
   openUserProfile(event: Event) {
     event.stopPropagation();
     this.userService.showProfile.set(true);
-    console.log('openUserProfile');
-    
   }
 
 
   async getSelectedUserInfo(selectedUserId: string | null) {
     this.showSearchDialog = false;
-    console.log('USER selected:', selectedUserId);
     this.userService.showUserInfo.set(true);
     await this.userService.getSelectedUserById(selectedUserId as string);
   }
 
 
-  getChannelNAme(channelId: string) {
+  getChannelName(channelId: string) {
     let channel = this.channelsService.channels.find((channel: Channel) => channel.id === channelId);
-    console.log('channel =', channel);
     return channel ? channel.name : '';
   }
 
@@ -106,13 +109,12 @@ export class SearchDialogComponent implements OnChanges {
   }
 
   showSearchDialogAndFilterItems(): void {
-    console.log('searchValue =', this.searchValue);
     console.log('allData =', this.allData);
 
     this.showSearchDialog = true;
     this.mainSearchList = this.filterSearchItems();
 
-    console.log('result =', this.mainSearchList);
+    console.log('mainSearchList =', this.mainSearchList);
   }
 
 
@@ -131,29 +133,46 @@ export class SearchDialogComponent implements OnChanges {
     } else {
       console.error("FAIL!!!");
     }
+  }
 
-    console.log('channel =', channel);
-    
+
+  filterUserById(userId: string) {
+    if (this.userService.users) {
+      let filteredUser = this.userService.users.find((user: User) => user.id === userId);
+      console.log('filteredUser =', filteredUser);
+
+      return filteredUser;
+    }
+    return null;
   }
 
 
   filterSearchItems(): SearchItem[] {
-    return this.allData.filter((ad: SearchItem) => {    
+    return this.allData.filter((ad: SearchItem) => {
       if (this.isUser(ad)) {
         return ad.name.toLowerCase().includes(this.searchValue.toLowerCase());
       } else if (this.isChannel(ad)) {
         return ad.name.toLowerCase().includes(this.searchValue.toLowerCase());
       } else if (this.isChatMessage(ad)) {
         return ad.message?.toLowerCase().includes(this.searchValue.toLowerCase());
-      } 
-      // else if (this.isDirectMessage(ad)) {
-      //   return ad.conversation!.some((chat) => chat.message.toLowerCase().includes(this.searchValue.toLowerCase()))
-      // } 
-      else {
-        return false
+      } else if (this.isDirectMessage(ad)) {
+        return this.filterConversationMessage(ad);
+      } else {
+        return false;
       }
     });
   }
+
+
+  filterConversationMessage(directMessage: DirectMessage): boolean {
+    if (!directMessage.conversation) {
+      return false;
+    }
+    return directMessage.conversation.some(conversation =>
+      conversation.message?.toLowerCase().includes(this.searchValue.toLowerCase())
+    );
+  }
+
 
   isUser(item: SearchItem): item is User {
     return (item as User).name !== undefined;
@@ -164,7 +183,7 @@ export class SearchDialogComponent implements OnChanges {
   }
 
   isDirectMessage(item: SearchItem): item is DirectMessage {
-    return (item as DirectMessage).senderName !== undefined;
+    return (item as DirectMessage).conversation !== undefined;
   }
 
   isChatMessage(item: SearchItem): item is Message {
