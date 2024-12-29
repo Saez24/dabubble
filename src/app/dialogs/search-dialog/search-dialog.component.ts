@@ -68,6 +68,9 @@ export class SearchDialogComponent implements OnChanges {
           if (this.authService.currentUserUid === directMessage.receiverId) {
             directMessages.forEach((directMessage: DirectMessage) => { this.allData.push(directMessage) });
           }
+          else {
+            return;
+          }
         });
       }
     });
