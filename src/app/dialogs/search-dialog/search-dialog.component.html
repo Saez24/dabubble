@@ -33,15 +33,15 @@
         <div id="{{index}}" class="filtered-user-container">
             <span>Direkt Nachricht :</span>
             @if (result.senderId === this.authService.currentUserUid){
-                <div class="filtered-user">
-                    <img src="{{this.filterUserById(result.receiverId)?.avatarPath}}" alt="">
-                    <span>{{this.filterUserById(result.receiverId)?.name}}</span>
+                <div class="filtered-user" (click)="openDirectMessage(result.receiverId)">
+                    <img src="{{filterUserById(result.receiverId)?.avatarPath}}" alt="">
+                    <span>{{filterUserById(result.receiverId)?.name}}</span>
                 </div>
             }
             @else {
-                <div class="filtered-user">
-                    <img src="{{this.filterUserById(result.senderId)?.avatarPath}}" alt="">
-                    <span>{{this.filterUserById(result.senderId)?.name}}</span>
+                <div class="filtered-user" (click)="openDirectMessage(result.senderId)">
+                    <img src="{{filterUserById(result.senderId)?.avatarPath}}" alt="">
+                    <span>{{filterUserById(result.senderId)?.name}}</span>
                 </div>
             }
             <span class="separator-bar"></span>

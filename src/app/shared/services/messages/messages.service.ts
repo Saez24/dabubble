@@ -18,6 +18,7 @@ import { getDocs, updateDoc } from 'firebase/firestore';
     providedIn: 'root'
 })
 export class MessagesService {
+    users: User[] = [];
     chatMessage: string = '';
     editingMessageId: string | null = null;
     showMessageEditArea: boolean = false;

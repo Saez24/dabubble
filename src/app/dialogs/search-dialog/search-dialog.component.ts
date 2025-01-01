@@ -1,6 +1,5 @@
-import { Component } from '@angular/core';
 import { NgIf } from '@angular/common';
-import { EventEmitter, inject, Input, Output, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, inject, Input, Output, OnChanges, SimpleChanges } from '@angular/core';
 import { AuthService } from '../../shared/services/authentication/auth-service/auth.service';
 import { ChannelsService } from '../../shared/services/channels/channels.service';
 import { UserService } from '../../shared/services/firestore/user-service/user.service';
@@ -13,10 +12,9 @@ import { Message } from '../../shared/models/message.class';
 import { Firestore, query } from '@angular/fire/firestore';
 import { collection, getDocs, where } from 'firebase/firestore';
 import { filter, find } from 'rxjs';
+// import { WorkspaceComponent } from '../../board/workspace/workspace.component';
 
 
-
-// type SearchItem = CurrentUser | PrivateChat | Channel | ChatMessage;
 type SearchItem = User | DirectMessage | Channel | Message;
 
 @Component({
@@ -34,6 +32,7 @@ export class SearchDialogComponent implements OnChanges {
   // firestore = inject(FirestoreService);
   // memberServ = inject(MemberDialogsService);
 
+  // workspaceComponent = inject(WorkspaceComponent);
   firestore = inject(Firestore);
   chatUtilityService = inject(ChatUtilityService);
   authService = inject(AuthService);
@@ -47,6 +46,7 @@ export class SearchDialogComponent implements OnChanges {
   mainSearchList: any[] = [];
   allData: (User | DirectMessage | Channel | Message)[] = [];
   messages: Message[] = [];
+
 
   ngOnInit() {
     this.loadAllData();
@@ -65,8 +65,8 @@ export class SearchDialogComponent implements OnChanges {
         messages.forEach((message: Message) => { this.allData.push(message) });
         let directMessages: DirectMessage[] = await this.messagesService.loadDirectMessagesAsPromise();
         directMessages.forEach(async (directMessage: DirectMessage) => {
-          if (this.authService.currentUserUid === directMessage.receiverId) {
-            directMessages.forEach((directMessage: DirectMessage) => { this.allData.push(directMessage) });
+          if (this.authService.currentUserUid === directMessage.receiverId || this.authService.currentUserUid === directMessage.senderId) {
+            this.allData.push(directMessage);
           }
           else {
             return;
@@ -116,7 +116,7 @@ export class SearchDialogComponent implements OnChanges {
 
     this.showSearchDialog = true;
     this.mainSearchList = this.filterSearchItems();
-
+    console.log('searchitems =', this.filterSearchItems());
     console.log('mainSearchList =', this.mainSearchList);
   }
 
@@ -143,15 +143,36 @@ export class SearchDialogComponent implements OnChanges {
     if (this.userService.users) {
       let filteredUser = this.userService.users.find((user: User) => user.id === userId);
       console.log('filteredUser =', filteredUser);
-
       return filteredUser;
     }
     return null;
   }
 
 
-  filterSearchItems(): SearchItem[] {
-    return this.allData.filter((ad: SearchItem) => {
+  // filterSearchItems(): SearchItem[] {
+  //   return this.allData.filter((ad: SearchItem) => {
+  //     console.log('ad =', ad);
+
+  //     if (this.isUser(ad)) {
+  //       return ad.name.toLowerCase().includes(this.searchValue.toLowerCase());
+  //     } else if (this.isChannel(ad)) {
+  //       return ad.name.toLowerCase().includes(this.searchValue.toLowerCase());
+  //     } else if (this.isChatMessage(ad)) {
+  //       return ad.message?.toLowerCase().includes(this.searchValue.toLowerCase());
+  //     } else if (this.isDirectMessage(ad)) {
+  //       // return this.filterConversationMessage(ad);
+  //       return ad.conversation?.forEach((conversation) => {
+  //         conversation.message?.toLowerCase().includes(this.searchValue.toLowerCase());
+  //       });
+  //     } else {
+  //       return false;
+  //     }
+  //   });
+  // }
+
+
+  filterSearchItems(): (User | DirectMessage | Channel | Message)[] {
+    return this.allData.filter((ad: User | DirectMessage | Channel | Message) => {
       if (this.isUser(ad)) {
         return ad.name.toLowerCase().includes(this.searchValue.toLowerCase());
       } else if (this.isChannel(ad)) {
@@ -159,7 +180,7 @@ export class SearchDialogComponent implements OnChanges {
       } else if (this.isChatMessage(ad)) {
         return ad.message?.toLowerCase().includes(this.searchValue.toLowerCase());
       } else if (this.isDirectMessage(ad)) {
-        return this.filterConversationMessage(ad);
+        return ad.conversation?.some(conversation => conversation.message?.toLowerCase().includes(this.searchValue.toLowerCase())) ?? false;
       } else {
         return false;
       }
@@ -191,5 +212,14 @@ export class SearchDialogComponent implements OnChanges {
 
   isChatMessage(item: SearchItem): item is Message {
     return (item as Message).senderName !== undefined;
+  }
+
+
+  openDirectMessage(userId: string): void {
+    if (this.authService.currentUserUid && userId) {
+      this.messagesService.loadDirectMessages(this.authService.currentUserUid, userId);
+      this.chatUtilityService.setMessageId(null);
+      // this.messagesService.setAllMessagesAsRead();
+    }
   }
 }
