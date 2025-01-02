@@ -290,14 +290,23 @@ export class WorkspaceComponent implements OnInit {
   }
 
   clickUserContainer(user: User, i: number) {
+    console.log('CLICK!!!');
+    console.log('users01', this.clickedUsers);
     this.clickedUsers.fill(false);
+    console.log('users02', this.clickedUsers);
     this.clickedChannels.fill(false);
+
+      // muss ich in searchDialog auf true setzen
     this.clickedUsers[i] = true;
+
+    console.log('clickedUsers03', this.clickedUsers);
     this.messagesService.getUserName(user);
     this.clickUserEvent.emit();
     if (this.currentUserUid) {
       this.messagesService.loadDirectMessages(this.currentUserUid, user.id);
       this.chatUtilityService.setMessageId(null);
+
+      // muss ich in searchDialog ausfuehren
       this.setAllMessagesAsRead()
     } else {
 

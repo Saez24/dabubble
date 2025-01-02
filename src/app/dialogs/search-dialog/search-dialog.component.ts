@@ -142,7 +142,6 @@ export class SearchDialogComponent implements OnChanges {
   filterUserById(userId: string) {
     if (this.userService.users) {
       let filteredUser = this.userService.users.find((user: User) => user.id === userId);
-      console.log('filteredUser =', filteredUser);
       return filteredUser;
     }
     return null;
@@ -215,11 +214,16 @@ export class SearchDialogComponent implements OnChanges {
   }
 
 
-  openDirectMessage(userId: string): void {
-    if (this.authService.currentUserUid && userId) {
+  async openDirectMessage(userId: string) {
+    console.log('userId =', userId);
+
+    this.showSearchDialog = false;
+    this.chatUtilityService.directMessageUser = await this.userService.getSelectedUserById(userId);
+    
+    if (this.authService.currentUserUid) {
       this.messagesService.loadDirectMessages(this.authService.currentUserUid, userId);
       this.chatUtilityService.setMessageId(null);
-      // this.messagesService.setAllMessagesAsRead();
+      // this.setAllMessagesAsRead()
     }
   }
 }
