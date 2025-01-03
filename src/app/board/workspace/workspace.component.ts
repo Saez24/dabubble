@@ -21,6 +21,7 @@ import { DirectMessage } from '../../shared/models/direct.message.class';
 import { SearchDialogComponent } from '../../dialogs/search-dialog/search-dialog.component';
 import { FormsModule } from '@angular/forms';  
 import { BoardComponent } from '../board.component';
+import { UserService } from '../../shared/services/firestore/user-service/user.service';
 
 @Component({
   selector: 'app-workspace',
@@ -47,7 +48,7 @@ export class WorkspaceComponent implements OnInit {
   channels: Channel[] = [];
   users: User[] = [];
   clickedChannels: boolean[] = [];
-  clickedUsers: boolean[] = [];
+  // clickedUsers: boolean[] = [];
   icons: string[] = [];
   panelOpenState = false;
   arrowRotated: boolean[] = [false, false];
@@ -73,6 +74,7 @@ export class WorkspaceComponent implements OnInit {
     private firestore: Firestore,
     private auth: Auth,
     private messagesService: MessagesService,
+    private userService: UserService,
     private chatUtilityService: ChatUtilityService,
     private overlay: Overlay,
     private boardComponent: BoardComponent
@@ -290,9 +292,9 @@ export class WorkspaceComponent implements OnInit {
   }
 
   clickUserContainer(user: User, i: number) {
-    this.clickedUsers.fill(false);
+    this.userService.clickedUsers.fill(false);
     this.clickedChannels.fill(false);
-    this.clickedUsers[i] = true;
+    this.userService.clickedUsers[i] = true;
     this.messagesService.getUserName(user);
     this.clickUserEvent.emit();
     if (this.currentUserUid) {

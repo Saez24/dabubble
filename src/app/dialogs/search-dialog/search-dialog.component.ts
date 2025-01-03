@@ -12,7 +12,6 @@ import { Message } from '../../shared/models/message.class';
 import { Firestore, query } from '@angular/fire/firestore';
 import { collection, getDocs, where } from 'firebase/firestore';
 import { filter, find } from 'rxjs';
-// import { WorkspaceComponent } from '../../board/workspace/workspace.component';
 
 
 type SearchItem = User | DirectMessage | Channel | Message;
@@ -27,12 +26,9 @@ type SearchItem = User | DirectMessage | Channel | Message;
 export class SearchDialogComponent implements OnChanges {
   @Input() searchValue!: any;
   @Output() sendEmptyString: EventEmitter<string> = new EventEmitter<string>();
+  @Output() clickUserEvent = new EventEmitter<void>();
+  @Output() openChannelEvent = new EventEmitter<void>();
 
-  // boardServ = inject(BoardService);
-  // firestore = inject(FirestoreService);
-  // memberServ = inject(MemberDialogsService);
-
-  // workspaceComponent = inject(WorkspaceComponent);
   firestore = inject(Firestore);
   chatUtilityService = inject(ChatUtilityService);
   authService = inject(AuthService);
@@ -40,7 +36,6 @@ export class SearchDialogComponent implements OnChanges {
   userService = inject(UserService);
   messagesService = inject(MessagesService);
   currentUser = this.authService.getUserSignal();
-  @Output() openChannelEvent = new EventEmitter<void>();
 
   showSearchDialog: boolean = false;
   mainSearchList: any[] = [];
@@ -111,6 +106,7 @@ export class SearchDialogComponent implements OnChanges {
     }
   }
 
+  
   showSearchDialogAndFilterItems(): void {
     console.log('allData =', this.allData);
 
@@ -126,23 +122,9 @@ export class SearchDialogComponent implements OnChanges {
   }
 
 
-  openChannel(channel: Channel, i: number) {
-    this.showSearchDialog = false;
-    this.channelsService.channelIsClicked = true;
-    this.channelsService.clickChannelContainer(channel, i);
-    this.openChannelEvent.emit();
-    if (this.authService.currentUserUid) {
-      this.messagesService.loadMessages(this.authService.currentUserUid, channel.id);
-    } else {
-      console.error("FAIL!!!");
-    }
-  }
-
-
   filterUserById(userId: string) {
     if (this.userService.users) {
       let filteredUser = this.userService.users.find((user: User) => user.id === userId);
-      console.log('filteredUser =', filteredUser);
       return filteredUser;
     }
     return null;
@@ -215,7 +197,31 @@ export class SearchDialogComponent implements OnChanges {
   }
 
 
-  openDirectMessage(userId: string): void {
+  openChannel(channel: Channel, i: number) {
+    this.showSearchDialog = false;
+    this.channelsService.channelIsClicked = true;
+    this.channelsService.clickChannelContainer(channel, i);
+    this.openChannelEvent.emit();
+    if (this.authService.currentUserUid) {
+      this.messagesService.loadMessages(this.authService.currentUserUid, channel.id);
+    } else {
+      console.error("FAIL!!!");
+    }
+  }
+
+
+ async openDirectMessage(userId: string) {
+
+    this.userService.clickedUsers.fill(false);
+
+    // find the index of the clicked user
+    let index = this.userService.users.findIndex((user: User) => user.id === userId);
+    this.userService.clickedUsers[index] = true;
+
+    this.showSearchDialog = false;
+    this.chatUtilityService.directMessageUser = await this.userService.getSelectedUserById(userId);
+    this.clickUserEvent.emit();
+
     if (this.authService.currentUserUid && userId) {
       this.messagesService.loadDirectMessages(this.authService.currentUserUid, userId);
       this.chatUtilityService.setMessageId(null);

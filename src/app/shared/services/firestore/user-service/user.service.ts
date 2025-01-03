@@ -21,6 +21,8 @@ export class UserService {
   showProfileEditor = signal<boolean>(false);
   showOverlay = signal<boolean>(false);
   users: User[] = [];
+  // Array to hold the clicked state of each user
+  clickedUsers: boolean[] = []; // maybe use a Map instead of an array/ maybe move to another service?
   selectedUser: User | null = null;
   selectedUserId: string = '';
 

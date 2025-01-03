@@ -494,7 +494,7 @@ export class MessagesService {
           // Filtere die Konversationen, bei denen der aktuelle Benutzer der Empfänger ist
           const q = query(
             messagesCollectionRef,
-            where('conversation.receiverId', '==', this.currentUserUid) // nur Konversationen des aktuellen Benutzers
+            where('conversation.receiverId', '==', this.authService.currentUserUid) // nur Konversationen des aktuellen Benutzers
           );
     
           // Listener für Echtzeit-Updates
