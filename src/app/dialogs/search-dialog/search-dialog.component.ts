@@ -106,7 +106,7 @@ export class SearchDialogComponent implements OnChanges {
     }
   }
 
-  
+
   showSearchDialogAndFilterItems(): void {
     console.log('allData =', this.allData);
 
