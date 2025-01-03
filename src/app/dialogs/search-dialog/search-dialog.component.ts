@@ -219,7 +219,7 @@ export class SearchDialogComponent implements OnChanges {
     if (this.authService.currentUserUid && userId) {
       this.messagesService.loadDirectMessages(this.authService.currentUserUid, userId);
       this.chatUtilityService.setMessageId(null);
-      // this.messagesService.setAllMessagesAsRead();
+      this.messagesService.setAllMessagesAsRead();
     }
   }
 }

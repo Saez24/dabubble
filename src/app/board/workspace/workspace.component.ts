@@ -147,86 +147,86 @@ export class WorkspaceComponent implements OnInit {
     }
   }
 
-  async setAllMessagesAsRead(): Promise<void> {
-    try {
-      // Referenz zur gesamten Sammlung `direct_messages`
-      const messagesCollectionRef = collection(this.firestore, 'direct_messages');
+  // async setAllMessagesAsRead(): Promise<void> {
+  //   try {
+  //     // Referenz zur gesamten Sammlung `direct_messages`
+  //     const messagesCollectionRef = collection(this.firestore, 'direct_messages');
 
-      // Abrufen aller Dokumente innerhalb der Sammlung
-      const querySnapshot = await getDocs(messagesCollectionRef);
+  //     // Abrufen aller Dokumente innerhalb der Sammlung
+  //     const querySnapshot = await getDocs(messagesCollectionRef);
 
-      // Durchlaufe jedes Dokument in der Sammlung
-      for (const doc of querySnapshot.docs) {
-        const data = doc.data();
-        const conversations = data['conversation'] || [];
+  //     // Durchlaufe jedes Dokument in der Sammlung
+  //     for (const doc of querySnapshot.docs) {
+  //       const data = doc.data();
+  //       const conversations = data['conversation'] || [];
 
-        // Aktualisiere nur die Konversationen, bei denen `receiverId` der aktuelle Benutzer ist
-        const updatedConversations = conversations.map((conv: any) => {
-          if (conv.receiverId === this.currentUserUid && !conv.readedMessage) {
-            return { ...conv, readedMessage: true };
-          }
-          return conv;
-        });
+  //       // Aktualisiere nur die Konversationen, bei denen `receiverId` der aktuelle Benutzer ist
+  //       const updatedConversations = conversations.map((conv: any) => {
+  //         if (conv.receiverId === this.currentUserUid && !conv.readedMessage) {
+  //           return { ...conv, readedMessage: true };
+  //         }
+  //         return conv;
+  //       });
 
-        // Überschreibe das Dokument mit den aktualisierten Konversationen
-        await updateDoc(doc.ref, { conversation: updatedConversations });
-        this.listenToConversations()
-      }
+  //       // Überschreibe das Dokument mit den aktualisierten Konversationen
+  //       await updateDoc(doc.ref, { conversation: updatedConversations });
+  //       this.listenToConversations()
+  //     }
 
-      // console.log('Alle Nachrichten wurden als gelesen markiert.');
-    } catch (error) {
-      console.error('Fehler beim Aktualisieren der Nachrichten:', error);
-    }
-  }
+  //     // console.log('Alle Nachrichten wurden als gelesen markiert.');
+  //   } catch (error) {
+  //     console.error('Fehler beim Aktualisieren der Nachrichten:', error);
+  //   }
+  // }
 
-  async listenToConversations(): Promise<void> {
-    try {
-      // Referenz zur gesamten Sammlung `direct_messages`
-      const messagesCollectionRef = collection(this.firestore, 'direct_messages');
+  // async listenToConversations(): Promise<void> {
+  //   try {
+  //     // Referenz zur gesamten Sammlung `direct_messages`
+  //     const messagesCollectionRef = collection(this.firestore, 'direct_messages');
 
-      // Filtere die Konversationen, bei denen der aktuelle Benutzer der Empfänger ist
-      const q = query(
-        messagesCollectionRef,
-        where('conversation.receiverId', '==', this.currentUserUid) // nur Konversationen des aktuellen Benutzers
-      );
+  //     // Filtere die Konversationen, bei denen der aktuelle Benutzer der Empfänger ist
+  //     const q = query(
+  //       messagesCollectionRef,
+  //       where('conversation.receiverId', '==', this.currentUserUid) // nur Konversationen des aktuellen Benutzers
+  //     );
 
-      // Listener für Echtzeit-Updates
-      onSnapshot(q, (querySnapshot) => {
-        // Mapping der ungelesenen Nachrichten pro Sender
-        const unreadMessagesBySender: { [key: string]: number } = {};
+  //     // Listener für Echtzeit-Updates
+  //     onSnapshot(q, (querySnapshot) => {
+  //       // Mapping der ungelesenen Nachrichten pro Sender
+  //       const unreadMessagesBySender: { [key: string]: number } = {};
 
-        querySnapshot.forEach((doc) => {
-          const data = doc.data();
-          const conversations = data['conversation'] || [];
+  //       querySnapshot.forEach((doc) => {
+  //         const data = doc.data();
+  //         const conversations = data['conversation'] || [];
 
-          // Filtere ungelesene Nachrichten
-          const userConversations = conversations.filter((conv: any) =>
-            conv.receiverId === this.currentUserUid && !conv.readedMessage
-          );
+  //         // Filtere ungelesene Nachrichten
+  //         const userConversations = conversations.filter((conv: any) =>
+  //           conv.receiverId === this.currentUserUid && !conv.readedMessage
+  //         );
 
-          // Zähle ungelesene Nachrichten für jeden Sender
-          userConversations.forEach((conv: any) => {
-            if (!unreadMessagesBySender[conv.senderId]) {
-              unreadMessagesBySender[conv.senderId] = 0;
-            }
-            unreadMessagesBySender[conv.senderId]++;
-          });
-        });
+  //         // Zähle ungelesene Nachrichten für jeden Sender
+  //         userConversations.forEach((conv: any) => {
+  //           if (!unreadMessagesBySender[conv.senderId]) {
+  //             unreadMessagesBySender[conv.senderId] = 0;
+  //           }
+  //           unreadMessagesBySender[conv.senderId]++;
+  //         });
+  //       });
 
-        // Aktualisiere die Benutzerliste mit der Anzahl ungelesener Nachrichten
-        this.users = this.users.map((user) => {
-          return {
-            ...user,
-            unreadMessagesCount: unreadMessagesBySender[user.id] || 0, // Standardwert: 0
-          };
-        });
+  //       // Aktualisiere die Benutzerliste mit der Anzahl ungelesener Nachrichten
+  //       this.users = this.users.map((user) => {
+  //         return {
+  //           ...user,
+  //           unreadMessagesCount: unreadMessagesBySender[user.id] || 0, // Standardwert: 0
+  //         };
+  //       });
 
-        // console.log('Ungelesene Nachrichten pro Sender:', unreadMessagesBySender);
-      });
-    } catch (error) {
-      console.error('Fehler beim Überwachen der Konversationen:', error);
-    }
-  }
+  //       // console.log('Ungelesene Nachrichten pro Sender:', unreadMessagesBySender);
+  //     });
+  //   } catch (error) {
+  //     console.error('Fehler beim Überwachen der Konversationen:', error);
+  //   }
+  // }
 
 
 
@@ -298,7 +298,8 @@ export class WorkspaceComponent implements OnInit {
     if (this.currentUserUid) {
       this.messagesService.loadDirectMessages(this.currentUserUid, user.id);
       this.chatUtilityService.setMessageId(null);
-      this.setAllMessagesAsRead()
+      // this.setAllMessagesAsRead()
+      this.messagesService.setAllMessagesAsRead()
     } else {
 
 
